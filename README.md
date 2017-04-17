@@ -1,4 +1,8 @@
 # Union Info System
+## 开发环境
+0. Python 2.7  
+1. Django 1.11+
+
 ## 开发流程示例
 0. git checkout master && git pull origin master（确保基于最新的master开发）
 2. git checkout -b gyc/homepage（建立新分支，以 [自己名字]/[分支作用] 命名）
