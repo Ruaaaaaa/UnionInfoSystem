@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'base',
     'dashboard',
     'participation',
 ]
@@ -58,6 +59,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR + '/templates/',
+                 BASE_DIR + '/base/templates/',
                  BASE_DIR + '/dashboard/templates/',
                  BASE_DIR + '/participation/templates/',
         ],
