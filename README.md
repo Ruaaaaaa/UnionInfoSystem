@@ -9,9 +9,10 @@
 2. 在自己的分支上进行开发
 3. 开发完了
 4. 再次git pull origin master（解决可能和master存在的冲突）
-5. 在本仓库中提出Pull request申请，等待代码review
-6. 负责人review通过后，会把你的分支和master合并
-7. 一次开发结束，分支删除
+5. git push origin gyc/homepage（将你的分支推送上来）
+6. 提出Pull request申请，等待代码review
+7. 负责人review通过后，会把你的分支和master合并
+8. 一次开发结束，分支删除
 
 ## 文件结构
 两个App：dashboard 和 participation。 
