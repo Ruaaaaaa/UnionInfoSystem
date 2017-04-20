@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from dashboard import views
-from participation import views
+from dashboard import views as dashboard
+from participation import views as participation
+from base import views as base
 
 urlpatterns = [
-    url(r'^admin', admin.site.urls),
+    url(r'^login', base.login),
 ]
