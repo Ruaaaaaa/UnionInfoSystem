@@ -26,7 +26,7 @@ class User(models.Model):
 
 class Activity(models.Model):
     aid = models.IntegerField(primary_key = True)
-    creator = models.ForeignKey(User, null = True)
+    creator = models.ForeignKey(User, null = True, related_name = 'activities_created')
     title = models.CharField(max_length = 256)
     description = models.CharField(max_length = 2048)
     poster = models.CharField(max_length = 256, null = True)
@@ -35,7 +35,7 @@ class Activity(models.Model):
     begin_at = models.DateTimeField(null = True)
     end_at = models.DateTimeField(null = True)
     signin_count = models.IntegerField(default = 0)
-    signin_max = models.IntegerField(default = 0, null = True)
+    signin_max = models.IntegerField(null = True)
     checkin_count = models.IntegerField(default = 0)
     need_checkin = models.BooleanField(default = 1)
 
@@ -45,7 +45,7 @@ class Broadcast(models.Model):
     bid = models.IntegerField(primary_key = True)
     title = models.CharField(max_length = 256)
     content =  models.CharField(max_length = 4096)
-    sender =  models.ForeignKey(User, null = True)
+    sender =  models.ForeignKey(User, null = True , related_name = 'broadcasts')
     send_at = models.DateTimeField(null = True)
     send_notice = models.BooleanField(default = 0)
     send_email = models.BooleanField(default = 0)
@@ -55,8 +55,8 @@ class Broadcast(models.Model):
 
 class Record(models.Model):
     rid = models.IntegerField(primary_key = True)
-    user = models.ForeignKey(User, null = True)
-    activity = models.ForeignKey(Activity, null = True)
+    user = models.ForeignKey(User, null = True, related_name = 'records')
+    activity = models.ForeignKey(Activity, null = True, related_name = 'records')
     signin_at = models.DateTimeField(null = True)
     checked_in = models.BooleanField(default = 0)
     checkin_at = models.DateTimeField(null = True)
@@ -65,9 +65,9 @@ class Record(models.Model):
 
 class Message(models.Model):
     mid = models.IntegerField(primary_key = True)
-    broadcast = models.ForeignKey(Broadcast, null = True)
-    sender = models.ForeignKey(User, null = True, related_name = 'message_sended')
-    receiver = models.ForeignKey(User, null = True, related_name = 'message_received')
+    broadcast = models.ForeignKey(Broadcast, null = True, related_name = 'messages')
+    sender = models.ForeignKey(User, null = True, related_name = 'messages_sended')
+    receiver = models.ForeignKey(User, null = True, related_name = 'messages_received')
     send_at = models.DateTimeField(null = True)
     received = models.BooleanField(default = 0)
     receive_at = models.DateTimeField(null = True)
