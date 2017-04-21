@@ -5,6 +5,19 @@ from django.db import models
 
 # Create your models here.
 
+
+class Department(models.Model):
+    did = models.IntegerField(primary_key = True)
+    name = models.CharField(max_length = 256)
+
+
+
+class Subunion(models.Model):
+    suid = models.IntegerField(primary_key = True)
+    name = models.CharField(max_length = 256)
+
+
+
 class User(models.Model):
     uid = models.IntegerField(primary_key = True)
     is_admin = models.BooleanField(default = 0)
@@ -21,6 +34,8 @@ class User(models.Model):
     password = models.CharField(max_length = 32)
     register_at = models.DateTimeField(null = True)
     last_login_at = models.DateTimeField(null = True)
+    department = models.ForeignKey(Department, null = True, related_name = 'users')
+    subunion = models.ForeignKey(Subunion, null = True, related_name = 'users')
 
 
 
