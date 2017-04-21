@@ -16,9 +16,26 @@
 
 ## 文件结构
 三个个App：**base**，**dashboard** 和 **participation**。  
-基础共用的view、api写在base下，和管理员后台相关的view、api写在dashboard下；和教师参与相关的view、api写在participation下。   
+基础共用的view、api写在base下，和管理员后台相关的view、api写在dashboard下；和教师参与相关的view、api写在participation下。  
+
+## JSON响应规范
+成功: {status: 'success', msg: '我是成功后提示给用户的信息', data: { 我是传递给前端的数据 } }   
+失败: {status: 'error', msg: '我是失败后提示给用户的信息'}   
+
+## api与views
+原则上 views.py 中不能直接与数据库交互，读写数据库的数据都需要在 api.py 中写相应的函数进行调用，尽量使 api.py 中的函数可重用性更强。
+
+## sessions
+base下的 sessions.py 提供了基础的session操作，请阅读。
+
+## decorators
+base下的 decorators.py 提供了 require_login 和 require_admin 两个装饰器，用于页面访问时的身份检查，请阅读。
+
+## model
 目前所有的表写在base的model中。  
-全局共享的常量存放在 **/InfoSystem/global.py** 中。  
+
+## 全局常量
+全局共享的常量存放在 **/InfoSystem/shared.py** 中。  
 
 ## 语法规范
 0. 函数名使用小驼峰式，如isValidUser(args)
