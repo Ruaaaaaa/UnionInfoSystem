@@ -16,4 +16,4 @@ from base import sessions
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
-	return render(request, 'user_login.html', {'title': '管理员登陆'})
+	return render(request, 'admin_login.html', {'title': '管理员登陆'})

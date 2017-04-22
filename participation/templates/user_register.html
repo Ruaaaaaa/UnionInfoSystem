@@ -1,8 +1,18 @@
-{% extends 'base.html' %}
+{% extends 'user_base.html' %}
 
 {% block title %}
 {{ title }}
 {% endblock %}
 
+{% block css %}
+{{ block.super }}
+<style type="text/css">register</style>
+{% endblock %}
+
 {% block body %}
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript">//register</script>
 {% endblock %}
