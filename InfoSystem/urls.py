@@ -26,5 +26,5 @@ urlpatterns = [
 
 
     # Admin part
-    url(r'^admin/login', dashboard.login),
+    url(r'^admin/login', dashboard.login)
 ]
