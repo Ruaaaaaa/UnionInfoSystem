@@ -16,9 +16,9 @@ from base import sessions
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
-	return render(request, 'user_login.html', {'title': '用户登陆'})
+	return render(request, 'participation/login.html', {'title': '用户登陆'})
 
 
 @require_http_methods(['GET', 'POST'])
 def register(request):
-	return render(request, 'user_register.html', {'title': '用户注册'})
+	return render(request, 'participation/register.html', {'title': '用户注册'})
