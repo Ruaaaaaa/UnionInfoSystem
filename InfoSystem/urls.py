@@ -20,5 +20,11 @@ from participation import views as participation
 from base import views as base
 
 urlpatterns = [
-    url(r'^login', base.login),
+	# User part
+    url(r'^login', participation.login),
+    url(r'^register', participation.register),
+
+
+    # Admin part
+    url(r'^admin/login', dashboard.login),
 ]
