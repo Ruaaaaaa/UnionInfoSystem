@@ -7,7 +7,6 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 
-
 from django.views.decorators.http import require_http_methods
 from base.decorators import login_required, admin_required
 
@@ -15,7 +14,3 @@ from base import api
 from base import sessions
 
 # Create your views here.
-
-@require_http_methods(['GET', 'POST'])
-def login(request):
-	return render(request, 'login.html', {'title': '用户登陆'})
