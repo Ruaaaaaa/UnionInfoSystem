@@ -3,14 +3,14 @@
 Database interface for views.py
 """
 from __future__ import unicode_literals
-from models import *
+from base.models import *
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
 import datetime
 
-def getUidByName(name):
+def getUidByUsername(username):
     try:
-        user = User.objects.get(name = name)
+        user = User.objects.get(username = username)
     except ObjectDoesNotExist:
         print u"没有这个用户名"
         return -1
@@ -49,9 +49,11 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
+        user = User(id_hash = '0')
+        user.save() 
         print u"没有这个身份证号"
-        return 0
-    user.username = usernanme
+        #return 0
+    user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
@@ -118,3 +120,4 @@ def userSignIn(uid, aaid):
         return 1
     print u"报名过了"
     return 2
+

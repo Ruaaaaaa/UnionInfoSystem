@@ -28,7 +28,8 @@ def login(request):
 			return JsonResponse({'status': 'error', 'msg': '请输入用户名和密码。'})
 		username = request.POST['username'] 
 		pwd = request.POST['pwd']
-		uid = getUidByName(username)
+
+		uid = getUidByUsername(username)
 		if uid == -1: # no such username 
 			return JsonResponse({'status': 'error', 'msg': '没有这个账号!'})
 		if verifyPassword(uid, pwd) == False:
@@ -58,11 +59,6 @@ def verification(request):
 	if len(realname) == 0 or len(idnumber) == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	midnumber = md5.new()   
-	midnumber.update(idnumber)   
-	idnumber = midnumber.hexdigest()  
-
-
 	veresult = verificationOfRealId(realname, idnumber) ;
 	if veresult == 0:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！实名或身份证号有误。'})
@@ -87,8 +83,6 @@ def register(request):
 		idnumber = request.has_key['id_number'] if request.POST.has_key('id_number') else 0
 		if len(username) == 0 or len(pwd) == 0 or len(mobile) == 0 or len(email) == 0:
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
-		mpwd = md5.new()   
-		mpwd.update(pwd)   
 
 		print request.POST
 		if False and verificationOfRealId(request.POST['real_name'], request.POST['id_number']) != 1:
@@ -98,8 +92,10 @@ def register(request):
 			return JsonResponse({'status': 'error', 'msg': '此用户名已被注册，请重新填写'})
 		if len(pwd) < 6 or len(username) < 4:
 			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
+		idnumber
+		registerAccount(idnumber, username, pwd, mobile, email)
+		return JsonResponse({'status': 'success', 'msg': '注册成功'})
 
-		registerAccount(idnumber, username, mpwd.hexdigest(), mobile, email)
 
 @require_http_methods(['GET'])
 @csrf_exempt
