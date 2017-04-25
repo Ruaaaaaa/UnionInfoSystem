@@ -22,8 +22,7 @@ def verifyPassword(uid, pwd):
     except ObjectDoesNotExist:
         print u"没有这个用户"
         return -1
-    user.password = pwd
-    user.save()
+    return user.password == pwd
 
 def getIdentityByUid(uid):
     try:
@@ -119,3 +118,4 @@ def userSignIn(uid, aaid):
         return 1
     print u"报名过了"
     return 2
+
