@@ -16,7 +16,15 @@ from base import sessions
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
-	return render(request, 'participation/login.html', {})
+	if request.method == 'GET': #GET METHOD
+		return render(request, 'participation/login.html', {})
+	else: #POST METHOD
+		if not request.has_key('username') or not request.has_key('pwd'):
+			return JsonResponse({'status': 'error', 'msg': 'No username or password!'})
+		username = request['username'] 
+		pwd = request['pwd']
+		if
+
 
 
 @require_http_methods(['GET', 'POST'])
