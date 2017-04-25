@@ -121,3 +121,9 @@ def userSignIn(uid, aaid):
     print u"报名过了"
     return 2
 
+def registeredUsername(username):
+    try:
+        user = User.objects.get(username = username)
+    except ObjectDoesNotExist:
+        return 0
+    return 1
