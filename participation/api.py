@@ -66,7 +66,7 @@ def getActibityByAaid(aaid):
     #user = User.objects.get(id_hash=idnumber)
     return model_to_dict(acti)
 
-def userCheckin(uid, aaid):
+def userCheckIn(uid, aaid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
@@ -80,14 +80,40 @@ def userCheckin(uid, aaid):
     try:
         rec = user.records.get(aaid = aaid)
     except ObjectDoesNotExist:
-        if rec.check_in:
-            print u"签到过了"
-            return 2
-        rec.check_in = 1
-        rec.checkin_at = datetime.datetime.now()
-        rec.save()
-        print "签到成功"
-        return 1
-    print u"未报名"
-    return 0
+        print u"未报名"
+        return 0
+    if rec.check_in:
+        print u"签到过了"
+        return 2
+    rec.check_in = 1
+    rec.checkin_at = datetime.datetime.now()
+    rec.save()
+    print "签到成功"
+    return 1
 
+def userSignIn(uid, aaid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无此用户"
+        return 0
+    try:
+        act = Activity.objects.get(aaid = aaid)
+    except ObjectDoesNotExist:
+        print u"无活动"
+        return 0
+    try:
+        user.records.get(aaid=aaid)
+    except ObjectDoesNotExist:
+        rec = Record(
+            aid = act.aid,
+            aaid = act.aaid,
+            uid = user.uid,
+            user = user,
+            activity = act,
+            signin_at = datetime.datetime.now()
+        )
+        rec.save()
+        return 1
+    print u"报名过了"
+    return 2
