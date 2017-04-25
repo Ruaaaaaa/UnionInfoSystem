@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
 
 from base import sessions
@@ -16,6 +17,7 @@ import md5
 # Create your views here.
 
 @require_http_methods(['GET', 'POST'])
+@csrf_exempt
 def login(request):
 	if request.method == 'GET': #GET METHOD
 		return render(request, 'participation/login.html', {})
@@ -35,12 +37,14 @@ def login(request):
 		return JsonResponse({'status': 'success', 'msg': '登陆成功!'})
 
 @require_http_methods(['GET'])
+@csrf_exempt
 @login_required 
 def logout(request):
 	sessions.logout(request) 
 	return HttpResponseRedirect('/login')
 
 @require_http_methods(['POST'])
+@csrf_exempt
 def verification(request):
 	if not request.has_key('idnumber') or not request.has_key('realname'):
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
@@ -64,6 +68,7 @@ def verification(request):
 	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'idnumber': idnumber}})
 
 @require_http_methods(['GET', 'POST'])
+@csrf_exempt
 def register(request):
 	if request.method == 'GET':
 		return render(request, 'participation/register.html', {})
@@ -89,24 +94,37 @@ def register(request):
 		registerAccount(idnumber, username, mpwd.hexdigest())
 
 @require_http_methods(['GET'])
+@csrf_exempt
 @login_required
 def activity(request, aaid):
 	Act = getActivityByAaid(aaid) 
 	return render(request, 'participation/activity.html', {'aaid': Act})
 
 @require_http_methods(['GET', 'POST'])
+@csrf_exempt
 @login_required
 def checkin(request, aaid):
-	return render(request, 'participation/checkin.html', {'aaid': aaid})
+	if request.method == 'GET':
+		return render(request, 'participation/checkin.html', {'aaid': aaid})
+	else:
+		uid = request.sessions['uid']
+		result = userCheckin(uid, aaid) ;
+		if result == 0:
+			return JsonResponse({'status': 'error', 'msg': '签到失败！'})
+		elif result == 2:
+			return JsonResponse({'status': 'error', 'msg': '您已签到。'})
+		else:
+			return JsonResponse({'status': 'error', 'msg': '签到成功！'})
 
 
 @require_http_methods(['GET'])
+@csrf_exempt
 @login_required
 def checkinSuccess(request):
 	return render(request, 'participation/checkin_success.html', {})
 
-
 @require_http_methods(['GET'])
+@csrf_exempt
 @login_required
 def checkinFail(request):
 	return render(request, 'participation/checkin_fail.html', {})
