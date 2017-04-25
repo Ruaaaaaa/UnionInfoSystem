@@ -1,15 +1,88 @@
 {% extends 'participation/base.html' %}
 
 {% block title %}
-{{ title }}
+身份验证
 {% endblock %}
 
 {% block css %}
 {{ block.super }}
-<style type="text/css">register</style>
+<style type="text/css">
+.weui-loading {
+	display: none;
+}
+.register-wrapper {
+	margin-top: 50px;
+	padding-top: 10px;
+}
+.navbar-header {
+	height: 50px;
+	background: purple;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+</style>
 {% endblock %}
 
 {% block body %}
+<div class="navbar-header"></div>
+<div class="register-wrapper">
+	<div class="weui-cells__title">身份验证</div>
+	<div class="weui-cells">
+	    <div class="weui-cell">
+	        <div class="weui-cell__bd">
+	            <input class="weui-input" type="text" placeholder="请输入您的身份证号" required id="username">
+	        </div>
+	    </div>
+	</div>
+	<div class="weui-btn-area">
+	    <button class="weui-btn weui-btn_default" id="login_btn"><i class="weui-loading" id="login_loading"></i>立即验证</button>
+	</div>
+	<div class="weui-cells__title">信息补全</div>
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="text" placeholder="请输入用户名"/>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="password" placeholder="请输入密码"/>
+            </div>
+        </div>
+    </div>
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">手机号码</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="tel" placeholder="请输入手机号码"/>
+            </div>
+        </div>
+    </div>
+    <div class="weui-cells__tips">底部说明文字底部说明文字</div>
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="text" placeholder="请输入用户名"/>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="password" placeholder="请输入密码"/>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">手机号码</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="tel" placeholder="请输入手机号码"/>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block js %}
