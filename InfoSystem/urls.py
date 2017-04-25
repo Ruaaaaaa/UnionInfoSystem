@@ -22,11 +22,13 @@ from base import views as base
 urlpatterns = [
 	# User part
     url(r'^login', participation.login),
+    url(r'^logout', participation.logout),
     url(r'^register', participation.register),
     url(r'^activity/([0-9]{8})/$', participation.activity),
-    url(r'^activity/([0-9]{8})/checkin$', participation.checkin),
-    url(r'^activity/checkin/success$', participation.checkinSuccess),
-    url(r'^activity/checkin/fail$', participation.checkinFail),
+    url(r'^activity/([0-9]{8})/checkin$', participation.checkIn),
+    url(r'^activity/checkin/success$', participation.checkInSuccess),
+    url(r'^activity/checkin/fail$', participation.checkInFail),
+    url(r'^activity/([0-9]{8})/signin$', participation.signIn),
     
     # Admin part
     url(r'^admin/login', dashboard.login),
