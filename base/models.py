@@ -31,7 +31,7 @@ class User(models.Model):
     email = models.CharField(max_length = 256, null = True)
     registered = models.BooleanField(default = 0)
     username = models.CharField(max_length = 32, null = True)
-    password = models.CharField(max_length = 32, null =True)
+    password = models.CharField(max_length = 32, null = True)
     register_at = models.DateTimeField(null = True)
     last_login_at = models.DateTimeField(null = True)
     department = models.ForeignKey(Department, null = True, related_name = 'users')
