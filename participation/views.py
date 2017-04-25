@@ -111,6 +111,7 @@ def checkIn(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'participation/checkin.html', {'aaid': aaid})
 	else:
+		print 123
 		uid = request.sessions['uid']
 		result = userCheckIn(uid, aaid) ;
 		if result == 0:

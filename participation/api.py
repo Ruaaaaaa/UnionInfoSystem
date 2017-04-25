@@ -49,8 +49,6 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        user = User(id_hash = '0')
-        user.save() 
         print u"没有这个身份证号"
         #return 0
     user.username = username
@@ -60,7 +58,7 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     user.save()
     return 1
 
-def getActibityByAaid(aaid):
+def getActivityByAaid(aaid):
     try:
         acti = Activity.objects.get(aaid = aaid)
     except ObjectDoesNotExist:
@@ -121,9 +119,3 @@ def userSignIn(uid, aaid):
     print u"报名过了"
     return 2
 
-def registeredUsername(username):
-    try:
-        User.objects.get(username = username)
-    except ObjectDoesNotExist:
-        return 0
-    return 1

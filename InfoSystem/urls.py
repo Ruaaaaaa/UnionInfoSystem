@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^login', participation.login),
     url(r'^logout', participation.logout),
     url(r'^register', participation.register),
+    url(r'^verification', participation.verification),
     url(r'^activity/([0-9]{8})/$', participation.activity),
     url(r'^activity/([0-9]{8})/checkin$', participation.checkIn),
     url(r'^activity/checkin/success$', participation.checkInSuccess),
