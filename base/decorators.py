@@ -12,7 +12,7 @@ from django.http import HttpResponseRedirect
 def login_required(function):
     def wrap(request, *args, **kwargs):
         (uid, identity) = sessions.getUser(request)
-        if (not uid) or (not identity):
+        if (uid is None) or (identity is None):
             return HttpResponseRedirect('/login?from=' + request.get_full_path())
         else:
             return function(request, *args, **kwargs)

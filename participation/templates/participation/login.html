@@ -90,7 +90,7 @@ $('#login_btn').on('click', function() {
 				    }
 				});
 			}
-			else if(data.status == 'fail') {
+			else if(data.status == 'error') {
 				weui.topTips(data.msg, 3000);
 			}
 			else {

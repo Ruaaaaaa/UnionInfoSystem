@@ -95,6 +95,7 @@ var id_re_1 = /^[0-9]{18}$/;
 var id_re_2 = /^[0-9]{17}X$/;
 var mobile_re = /^[0-9]{11}$/;
 var email_re = /^\S+@\S+$/;
+var id_number = null;
 function validateId(id_number) {
     if(id_re_1.exec(id_number) || id_re_2.exec(id_number)) {
         return true;
@@ -125,7 +126,7 @@ $('#verify_btn').on('click', function() {
     if($(this).attr('disabled') == true) {
         return;
     }
-    var id_number = $('input[name="id_number"]').val();
+    id_number = $('input[name="id_number"]').val();
     var is_valid = validateId(id_number);
     if(is_valid) {
         $('#verify_btn').attr('disabled', true);
@@ -175,7 +176,7 @@ $('#register_btn').on('click', function() {
         $('#register_btn').attr('disabled', true);
         $('.register-before').css('display', 'none');
         $('.register-loading').css('display', 'block');
-        $.post('/register', {username: username, pwd: pwd, mobile: mobile, email: email})
+        $.post('/register', {id_number: id_number, username: username, pwd: pwd, mobile: mobile, email: email})
         .done(function(data, status) {
             console.log(data);
             if(data.status == 'success') {
