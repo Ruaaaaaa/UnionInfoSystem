@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
 
 from base import sessions
@@ -15,8 +16,12 @@ from base import sessions
 # Create your views here.
 
 @require_http_methods(['GET', 'POST'])
+@csrf_exempt
 def login(request):
-	return render(request, 'participation/login.html', {})
+	if request.method == 'GET':
+		return render(request, 'participation/login.html', {})
+	else:
+		return JsonResponse({'status': 'success', 'msg': 'success'});
 
 
 @require_http_methods(['GET', 'POST'])

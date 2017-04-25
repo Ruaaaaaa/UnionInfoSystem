@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 
 {% block css %}
+{{ block.super }}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static "participation/css/weui.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "participation/css/global.css" %}">
 {% endblock %}
 
 {% block js %}
+{{ block.super }}
 {% load static %}
+<script type="text/javascript" src="{% static "base/js/jquery/jquery-3.2.1.js" %}"></script>
 <script type="text/javascript" src="{% static "participation/js/weui.js" %}"></script>
+<script type="text/javascript" src="{% static "participation/js/global.js" %}"></script>
 {% endblock %}

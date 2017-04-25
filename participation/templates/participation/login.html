@@ -7,41 +7,41 @@
 {% block css %}
 {{ block.super }}
 <style type="text/css">
-.weui-loading {
+.login-loading {
 	display: none;
 }
 .login-wrapper {
 	margin-top: 50px;
 	padding-top: 10px;
 }
-.navbar-header {
-	height: 50px;
-	background: purple;
-	position: fixed;
-	top: 0;
-	width: 100%;
-}
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="navbar-header"></div>
+<div class="navbar-header">
+	<span class="navbar-header-text">
+		用户登录
+	</span>
+</div>
 <div class="login-wrapper">
 	<div class="weui-cells__title">用户登录</div>
 	<div class="weui-cells">
 	    <div class="weui-cell">
 	        <div class="weui-cell__bd">
-	            <input class="weui-input" type="text" placeholder="请输入用户名" required id="username">
+	            <input class="weui-input" type="text" placeholder="请输入用户名" required name="username">
 	        </div>
 	    </div>
 	    <div class="weui-cell">
 	        <div class="weui-cell__bd">
-	            <input class="weui-input" type="password" placeholder="请输入密码" required id="password">
+	            <input class="weui-input" type="password" placeholder="请输入密码" required name="password">
 	        </div>
 	    </div>
 	</div>
 	<div class="weui-btn-area">
-	    <button class="weui-btn weui-btn_default" id="login_btn"><i class="weui-loading" id="login_loading"></i>登录</button>
+	    <button class="weui-btn weui-btn_default weui-btn_loading" id="login_btn">
+	    	<span class="login-before">登录</span>
+	    	<span class="login-loading"><i class="weui-loading"></i>登录中...<span>
+	    </button>
 	</div>	
 </div>
 
@@ -50,13 +50,62 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-// $('#login_btn').on('click', function() {
-// 	if($(this).hasClass('weui-btn_loading')) {
-// 		return;
-// 	}
-// 	$(this).addClass('weui-btn_loading');
-// 	$('#login_loading').css('display', 'block');
-// 	weui.topTips('用户名或密码错误', 3000);
-// })
+var from_re = /\?from=(\S*)/;
+function getFromUrl() {
+	var from_url = from_re.exec(window.location.search);
+	return from_url? from_url[1]: null;
+}
+function validateLogin(username, pwd) {
+	if(!username || !pwd) {
+		weui.topTips('用户名和密码不能为空', 3000);
+		return false;
+	}
+	return true;
+}
+$('#login_btn').on('click', function() {
+	if($(this).attr('disabled') == true) {
+		return;
+	}
+	var username = $('input[name="username"]').val();
+	var pwd = $('input[name="password"]').val();
+	var is_valid = validateLogin(username, pwd);
+	if(is_valid) {
+		$('#login_btn').attr('disabled', true);
+		$('.login-before').css('display', 'none');
+		$('.login-loading').css('display', 'block');
+		$.post('/login', {username: username, pwd: pwd})
+		.done(function(data, status) {
+			console.log(data);
+			if(data.status == 'success') {
+				weui.toast(data.msg, {
+				    duration: 1000,
+				    callback: function() {
+				    	var from_url = getFromUrl();
+				    	if (from_url) {
+				    		window.location.href = from_url;
+				    	}
+				    	else {
+				    		window.location.href = '/';
+				    	}
+				    }
+				});
+			}
+			else if(data.status == 'fail') {
+				weui.topTips(data.msg, 3000);
+			}
+			else {
+				weui.topTips('未知错误，请稍后再试', 3000);
+			}
+		})
+		.fail(function() {
+			weui.topTips('网络状况不佳，请稍后再试', 3000);
+		})
+		.always(function() {
+			$('#login_btn').attr('disabled', false);
+			$('.login-loading').css('display', 'none');	
+			$('.login-before').css('display', 'block');
+		})
+	}
+})
 </script>
 {% endblock %}
