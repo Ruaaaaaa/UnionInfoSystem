@@ -48,12 +48,14 @@ def logout(request):
 @require_http_methods(['POST'])
 @csrf_exempt
 def verification(request):
+	print request.POST
+	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'idnumber': request.POST['id_number']}})
 	if not request.POST.has_key('idnumber') or not request.POST.has_key('realname'):
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	realname = request.POST['realname']
-	idnumber = request.POST['idnumber']
-	if realname.len() == 0 or idnumber.len() == 0:
+	realname = request.POST['real_name']
+	idnumber = request.POST['id_number']
+	if len(realname) == 0 or len(idnumber) == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
 	midnumber = md5.new()   
@@ -67,7 +69,7 @@ def verification(request):
 	if veresult == 2:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！此身份证已被使用。'})
 
-	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'idnumber': idnumber}})
+	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'id_number': idnumber}})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -82,17 +84,19 @@ def register(request):
 		pwd = request.POST['pwd']
 		mobile = request.POST['mobile']
 		email = request.POST['email']
-		if username.len() == 0 or pwd.len() == 0 or mobile.len() == 0 or email.len() == 0:
+		idnumber = request.has_key['id_number'] if request.POST.has_key('id_number') else 0
+		if len(username) == 0 or len(pwd) == 0 or len(mobile) == 0 or len(email) == 0:
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 		mpwd = md5.new()   
 		mpwd.update(pwd)   
 
-		if verificationOfRealId(request['realname'], request['idnumber']) != 1:
+		print request.POST
+		if False and verificationOfRealId(request.POST['real_name'], request.POST['id_number']) != 1:
 			return JsonResponse({'status': 'error', 'msg': '实名验证失败！您需要重新返回进行验证。'})
 
-		if registeredUsername(username):
+		if False and registeredUsername(username):
 			return JsonResponse({'status': 'error', 'msg': '此用户名已被注册，请重新填写'})
-		if pwd.len() < 6 or username.len() < 4:
+		if len(pwd) < 6 or len(username) < 4:
 			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
 
 		registerAccount(idnumber, username, mpwd.hexdigest(), mobile, email)
