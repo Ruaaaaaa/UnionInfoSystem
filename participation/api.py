@@ -46,7 +46,7 @@ def verificationOfRealId(realname, idnumber):
     else:
         return 0
 
-def registerAccount(idnumber, username, pwd):
+def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
@@ -54,6 +54,8 @@ def registerAccount(idnumber, username, pwd):
         return 0
     user.username = usernanme
     user.password = pwd
+    user.mobile = mobile
+    user.email = email
     user.save()
     return 1
 
