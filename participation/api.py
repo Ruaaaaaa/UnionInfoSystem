@@ -36,6 +36,8 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
+        user = User(id_hash = idnumber)
+        user.save()
         print u"没有这个身份证号"
         return 0
     if user.registered :
@@ -49,10 +51,10 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        user = User(id_hash = idnumber)
-        user.save() 
+        #user = User(id_hash = idnumber)
+        #user.save() 
         print u"没有这个身份证号"
-        #return 0
+        return 0
     user.username = username
     user.password = pwd
     user.mobile = mobile
