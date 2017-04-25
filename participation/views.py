@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
 
 from base import sessions
+from api import *
 import md5
 
 # Create your views here.
@@ -20,12 +21,13 @@ import md5
 @csrf_exempt
 def login(request):
 	if request.method == 'GET': #GET METHOD
+		print sessions.getUser(request)
 		return render(request, 'participation/login.html', {})
 	else: #POST METHOD
-		if not request.has_key('username') or not request.has_key('pwd'):
+		if not request.POST.has_key('username') or not request.POST.has_key('pwd'):
 			return JsonResponse({'status': 'error', 'msg': '请输入用户名和密码。'})
-		username = request['username'] 
-		pwd = request['pwd']
+		username = request.POST['username'] 
+		pwd = request.POST['pwd']
 		uid = getUidByName(username)
 		if uid == -1: # no such username 
 			return JsonResponse({'status': 'error', 'msg': '没有这个账号!'})
@@ -38,19 +40,19 @@ def login(request):
 
 @require_http_methods(['GET'])
 @csrf_exempt
-@login_required 
 def logout(request):
+	print "Logout!"
 	sessions.logout(request) 
 	return HttpResponseRedirect('/login')
 
 @require_http_methods(['POST'])
 @csrf_exempt
 def verification(request):
-	if not request.has_key('idnumber') or not request.has_key('realname'):
+	if not request.POST.has_key('idnumber') or not request.POST.has_key('realname'):
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	realname = request['realname']
-	idnumber = request['idnumber']
+	realname = request.POST['realname']
+	idnumber = request.POST['idnumber']
 	if realname.len() == 0 or idnumber.len() == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
@@ -73,12 +75,14 @@ def register(request):
 	if request.method == 'GET':
 		return render(request, 'participation/register.html', {})
 	else:
-		if not request.has_key('username') or not request.has_key('pwd'):
+		if not request.POST.has_key('username') or not request.POST.has_key('pwd') or not request.POST.has_key('mobile') or not request.POST.has_key('email'):
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-		username = request['username']
-		pwd = request['pwd']
-		if username.len == 0 or pwd.len == 0:
+		username = request.POST['username']
+		pwd = request.POST['pwd']
+		mobile = request.POST['mobile']
+		email = request.POST['email']
+		if username.len() == 0 or pwd.len() == 0 or mobile.len() == 0 or email.len() == 0:
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 		mpwd = md5.new()   
 		mpwd.update(pwd)   
@@ -91,7 +95,7 @@ def register(request):
 		if pwd.len() < 6 or username.len() < 4:
 			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
 
-		registerAccount(idnumber, username, mpwd.hexdigest())
+		registerAccount(idnumber, username, mpwd.hexdigest(), mobile, email)
 
 @require_http_methods(['GET'])
 @csrf_exempt
@@ -108,7 +112,7 @@ def checkin(request, aaid):
 		return render(request, 'participation/checkin.html', {'aaid': aaid})
 	else:
 		uid = request.sessions['uid']
-		result = userCheckin(uid, aaid) ;
+		result = userCheckIn(uid, aaid) ;
 		if result == 0:
 			return JsonResponse({'status': 'error', 'msg': '签到失败！'})
 		elif result == 2:
@@ -128,4 +132,3 @@ def checkinSuccess(request):
 @login_required
 def checkinFail(request):
 	return render(request, 'participation/checkin_fail.html', {})
-

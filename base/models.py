@@ -41,6 +41,8 @@ class User(models.Model):
 
 class Activity(models.Model):
     aid = models.IntegerField(primary_key = True)
+    aaid = models.IntegerField()
+    content = models.CharField(max_length = 10000)
     creator = models.ForeignKey(User, null = True, related_name = 'activities_created')
     title = models.CharField(max_length = 256)
     description = models.CharField(max_length = 2048)
