@@ -107,7 +107,7 @@ def activity(request, aaid):
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
 @login_required
-def checkin(request, aaid):
+def checkIn(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'participation/checkin.html', {'aaid': aaid})
 	else:
@@ -124,11 +124,27 @@ def checkin(request, aaid):
 @require_http_methods(['GET'])
 @csrf_exempt
 @login_required
-def checkinSuccess(request):
+def checkInSuccess(request):
 	return render(request, 'participation/checkin_success.html', {})
 
 @require_http_methods(['GET'])
 @csrf_exempt
 @login_required
-def checkinFail(request):
+def checkInFail(request):
 	return render(request, 'participation/checkin_fail.html', {})
+
+@require_http_methods(['GET', 'POST'])
+@csrf_exempt
+@login_required
+def signIn(request, aaid):
+	if request.method == 'GET':
+		return render(request, 'participation/signin.html', {'aaid': aaid})
+	else:
+		uid = request.sessions['uid']
+		result = userSignIn(uid, aaid) ;
+		if result == 0:
+			return JsonResponse({'status': 'error', 'msg': '报名失败！'})
+		elif result == 2:
+			return JsonResponse({'status': 'error', 'msg': '您已报名。'})
+		else:
+			return JsonResponse({'status': 'error', 'msg': '报名成功！'})
