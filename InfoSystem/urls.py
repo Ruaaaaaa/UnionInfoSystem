@@ -23,8 +23,11 @@ urlpatterns = [
 	# User part
     url(r'^login', participation.login),
     url(r'^register', participation.register),
-
-
+    url(r'^activity/([0-9]{8})/$', participation.activity),
+    url(r'^activity/([0-9]{8})/checkin$', participation.checkin),
+    url(r'^activity/checkin/success$', participation.checkinSuccess),
+    url(r'^activity/checkin/fail$', participation.checkinFail),
+    
     # Admin part
-    url(r'^admin/login', dashboard.login)
+    url(r'^admin/login', dashboard.login),
 ]

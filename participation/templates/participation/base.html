@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 
 {% block css %}
-<style type="text/css">user_base</style>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "participation/css/weui.css" %}">
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript">//user_base</script>
+{% load static %}
+<script type="text/javascript" src="{% static "participation/js/weui.js" %}"></script>
 {% endblock %}

@@ -1,18 +1,62 @@
 {% extends 'participation/base.html' %}
 
 {% block title %}
-{{ title }}
+用户登录
 {% endblock %}
 
 {% block css %}
 {{ block.super }}
-<style type="text/css">login</style>
+<style type="text/css">
+.weui-loading {
+	display: none;
+}
+.login-wrapper {
+	margin-top: 50px;
+	padding-top: 10px;
+}
+.navbar-header {
+	height: 50px;
+	background: purple;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+</style>
 {% endblock %}
 
 {% block body %}
+<div class="navbar-header"></div>
+<div class="login-wrapper">
+	<div class="weui-cells__title">用户登录</div>
+	<div class="weui-cells">
+	    <div class="weui-cell">
+	        <div class="weui-cell__bd">
+	            <input class="weui-input" type="text" placeholder="请输入用户名" required id="username">
+	        </div>
+	    </div>
+	    <div class="weui-cell">
+	        <div class="weui-cell__bd">
+	            <input class="weui-input" type="password" placeholder="请输入密码" required id="password">
+	        </div>
+	    </div>
+	</div>
+	<div class="weui-btn-area">
+	    <button class="weui-btn weui-btn_default" id="login_btn"><i class="weui-loading" id="login_loading"></i>登录</button>
+	</div>	
+</div>
+
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript">//login</script>
+<script type="text/javascript">
+// $('#login_btn').on('click', function() {
+// 	if($(this).hasClass('weui-btn_loading')) {
+// 		return;
+// 	}
+// 	$(this).addClass('weui-btn_loading');
+// 	$('#login_loading').css('display', 'block');
+// 	weui.topTips('用户名或密码错误', 3000);
+// })
+</script>
 {% endblock %}
