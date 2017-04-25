@@ -25,25 +25,25 @@ def register(request):
 
 
 @require_http_methods(['GET'])
-#@login_required
+@login_required
 def activity(request, aaid):
 	return render(request, 'participation/activity.html', {'aaid': aaid})
 
 
 @require_http_methods(['GET', 'POST'])
-#@login_required
+@login_required
 def checkin(request, aaid):
 	return render(request, 'participation/checkin.html', {'aaid': aaid})
 
 
 @require_http_methods(['GET'])
-#@login_required
+@login_required
 def checkinSuccess(request):
 	return render(request, 'participation/checkin_success.html', {})
 
 
 @require_http_methods(['GET'])
-#@login_required
+@login_required
 def checkinFail(request):
 	return render(request, 'participation/checkin_fail.html', {})
 
