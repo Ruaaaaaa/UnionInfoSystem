@@ -20,6 +20,8 @@ import md5
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
 def login(request):
+	if sessions.getUser(request)[0] != None:
+		return HttpResponseRedirect("/") ;
 	if request.method == 'GET': #GET METHOD
 		print sessions.getUser(request)
 		return render(request, 'participation/login.html', {})
@@ -80,7 +82,8 @@ def register(request):
 		pwd = request.POST['pwd']
 		mobile = request.POST['mobile']
 		email = request.POST['email']
-		idnumber = request.has_key['id_number'] if request.POST.has_key('id_number') else 0
+		idnumber = request.POST['id_number'] if request.POST.has_key('id_number') else 0
+		print "!!!",username
 		if len(username) == 0 or len(pwd) == 0 or len(mobile) == 0 or len(email) == 0:
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
@@ -88,7 +91,7 @@ def register(request):
 		if False and verificationOfRealId(request.POST['real_name'], request.POST['id_number']) != 1:
 			return JsonResponse({'status': 'error', 'msg': '实名验证失败！您需要重新返回进行验证。'})
 
-		if False and registeredUsername(username):
+		if registeredUsername(username):
 			return JsonResponse({'status': 'error', 'msg': '此用户名已被注册，请重新填写'})
 		if len(pwd) < 6 or len(username) < 4:
 			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
@@ -111,7 +114,6 @@ def checkIn(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'participation/checkin.html', {'aaid': aaid})
 	else:
-		print 123
 		uid = request.sessions['uid']
 		result = userCheckIn(uid, aaid) ;
 		if result == 0:
