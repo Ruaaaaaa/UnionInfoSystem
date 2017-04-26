@@ -1,12 +1,16 @@
 {% extends 'dashboard/base.html' %}
 
 {% block title %}
-管理员登录
+{{ title }}
 {% endblock %}
 
 {% block css %}
 {{ block.super }}
-<style type="text/css">login</style>
+<style type="text/css">
+.content-wrapper {
+  margin-top: 70px;
+}
+</style>
 {% endblock %}
 
 {% block body %}
@@ -24,6 +28,11 @@
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">活动列表</a></li>
+        <li><a href="#">用户列表</a></li>
+        <li><a href="#">广播站</a></li>
+      </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#">Admin</a></li>
       </ul>
@@ -31,11 +40,11 @@
   </div><!-- /.container-fluid -->
 </nav>
 <div class="container-fluid content-wrapper">
-login
+broadcast
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript">//login</script>
+<script type="text/javascript"></script>
 {% endblock %}
