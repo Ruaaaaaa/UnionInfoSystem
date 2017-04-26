@@ -104,8 +104,8 @@ def register(request):
 @csrf_exempt
 @login_required
 def activity(request, aaid):
-	Act = getActivityByAaid(aaid) 
-	return render(request, 'participation/activity.html', {'aaid': Act})
+	activity = getActivityByAaid(aaid) 
+	return render(request, 'participation/activity.html', {'activity': activity})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
