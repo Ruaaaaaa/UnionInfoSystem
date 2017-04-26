@@ -17,6 +17,14 @@ def getUidByUsername(username):
         return -1
     return user.uid
 
+def getUsernameByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"没有这个用户名"
+        return -1
+    return user.username
+
 def verifyPassword(uid, pwd):
     try:
         user = User.objects.get(uid = uid)
