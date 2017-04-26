@@ -177,7 +177,7 @@ def createNewActivity(uid, act_attributes):
     if not user.is_admin:
         return {'status': 'error', 'msg': '不是管理员', 'aaid' : -1}
     m = hashlib.md5()
-    m.update('%Y%m%d%H%M%S',datetime.datetime.now())
+    m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
     aaid_md = m.hexdigest()
     aaid_md = aaid_md[0:7]
     datetime.datetime.fromtimestamp(timeStamp)
