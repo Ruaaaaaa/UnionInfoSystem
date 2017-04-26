@@ -33,4 +33,12 @@ urlpatterns = [
     
     # Admin part
     url(r'^admin/login', dashboard.login),
+    url(r'^admin/activity$', dashboard.activity),
+    url(r'^admin/activity/new$', dashboard.newActivity),
+    url(r'^admin/activity/([0-9]{8})/edit$', dashboard.editActivity),
+    url(r'^admin/activity/([0-9]{8})/download$', dashboard.downloadActivity),
+    url(r'^admin/users$', dashboard.users),
+    url(r'^admin/users/get', dashboard.getUsers),
+    url(r'^admin/users/download$', dashboard.downloadUsers),
+    url(r'^admin/broadcast$', dashboard.broadcast),
 ]
