@@ -8,7 +8,7 @@
 {{ block.super }}
 <style type="text/css">
 .verify-loading {
-	display: none;
+    display: none;
 }
 .register-loading {
     display: none;
@@ -30,22 +30,27 @@
     </span>
 </div>
 <div class="register-wrapper">
-	<div class="weui-cells__title">身份验证</div>
-	<div class="weui-cells">
-	    <div class="weui-cell">
-	        <div class="weui-cell__bd">
-	            <input class="weui-input" type="text" placeholder="请输入您的身份证号" required name="id_number">
-	        </div>
-	    </div>
-	</div>
-	<div class="weui-btn-area">
-	    <button class="weui-btn weui-btn_default" id="verify_btn">
+    <div class="weui-cells__title">身份验证</div>
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="text" placeholder="请输入您的身份证号" required name="id_number">
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="text" placeholder="请输入您的真实姓名" required name="real_name">
+            </div>
+        </div>
+    </div>
+    <div class="weui-btn-area">
+        <button class="weui-btn weui-btn_default" id="verify_btn">
             <span class="verify-loading"><i class="weui-loading"></i>验证中...</span>
             <span class="verify-before">立即验证</span>
         </button>
-	</div>
+    </div>
     <div class="info-wrapper">
-    	<div class="weui-cells__title">信息补全</div>
+        <div class="weui-cells__title">信息补全</div>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
@@ -96,7 +101,12 @@ var id_re_2 = /^[0-9]{17}X$/;
 var mobile_re = /^[0-9]{11}$/;
 var email_re = /^\S+@\S+$/;
 var id_number = null;
+var real_name = null;
 function validateId(id_number) {
+    if(!real_name) {
+        weui.topTips('真实姓名不能为空', 3000);
+        return false;
+    }
     if(id_re_1.exec(id_number) || id_re_2.exec(id_number)) {
         return true;
     }
@@ -127,12 +137,13 @@ $('#verify_btn').on('click', function() {
         return;
     }
     id_number = $('input[name="id_number"]').val();
-    var is_valid = validateId(id_number);
+    real_name = $('input[name="real_name"]').val();
+    var is_valid = validateId(id_number, real_name);
     if(is_valid) {
         $('#verify_btn').attr('disabled', true);
         $('.verify-before').css('display', 'none');
         $('.verify-loading').css('display', 'block');
-        $.post('/verification', {id_number: id_number})
+        $.post('/verification', {id_number: md5(id_number), name: real_name})
         .done(function(data, status) {
             console.log(data);
             if(data.status == 'success') {
@@ -176,7 +187,7 @@ $('#register_btn').on('click', function() {
         $('#register_btn').attr('disabled', true);
         $('.register-before').css('display', 'none');
         $('.register-loading').css('display', 'block');
-        $.post('/register', {id_number: id_number, username: username, pwd: pwd, mobile: mobile, email: email})
+        $.post('/register', {id_number: md5(id_number), username: username, pwd: md5(pwd), mobile: mobile, email: email})
         .done(function(data, status) {
             console.log(data);
             if(data.status == 'success') {
