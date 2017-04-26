@@ -247,3 +247,26 @@ def getBroadcastsReceivedByUid(uid):
     for message in massages:
         broadcastlist.append(model_to_dict(message.broadcast))
     return broadcastlist
+
+def editActivity(uid,act_attributes):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return 0
+    try:
+        act = Activity.objects.get(aaid = act_attributes[aaid])
+    except ObjectDoesNotExist:
+        return 0
+    if user != act.creator:
+        return 0
+    act.title = act_attributes['title']
+    act.description = act_attributes['description']
+    act.content = act_attributes['content']
+    act.signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at'])
+    act.signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at'])
+    act.begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at'])
+    act.end_at = datetime.datetime.fromtimestamp(act_attributes['end_at'])
+    act.signin_max = act_attributes['signin_max']
+    act.need_checkin = act_attributes['need_checkin']
+    act.save()
+    return 1
