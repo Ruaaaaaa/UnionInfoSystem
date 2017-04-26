@@ -222,3 +222,32 @@ def getUserListByPageAndNumber(page, number):
         userlist.append(model_to_dict(user))
     return userlist
 
+def getBroadcastsSendedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    if not user.is_admin:
+        print u"不是管理员"
+        return 0
+    broadcastlist = []
+    for broadcast in user.broadcasts.all():
+        broadcastlist.append(model_to_dict(broadcast))
+    return broadcastlist
+
+def getBroadcastsReceivedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    try:
+        messages = user.messages_received.all()
+    except ObjectDoesNotExist:
+        print u"没有消息"
+        return []
+    broadcastlist = []
+    for message in massages:
+        broadcastlist.append(model_to_dict(message.broadcast))
+    return broadcastlist
