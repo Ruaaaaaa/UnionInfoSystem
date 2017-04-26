@@ -41,11 +41,11 @@ class User(models.Model):
 
 class Activity(models.Model):
     aid = models.IntegerField(primary_key = True)
-    content = models.CharField(max_length = 10000)
-    aaid = models.IntegerField(null = True)
+    aaid = models.IntegerField(max_length = 8, null = True)
     creator = models.ForeignKey(User, null = True, related_name = 'activities_created')
     title = models.CharField(max_length = 256, null = True)
     description = models.CharField(max_length = 2048, null = True)
+    content = models.CharField(max_length = 10000, null = True)
     poster = models.CharField(max_length = 256, null = True)
     signin_begin_at = models.DateTimeField(null = True)
     signin_end_at = models.DateTimeField(null = True)
