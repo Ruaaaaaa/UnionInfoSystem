@@ -7,6 +7,7 @@ from base.models import *
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
 import datetime
+import hashlib
 
 def getUidByUsername(username):
     try:
@@ -149,3 +150,55 @@ def getActivitiesByUidSimple(uid):
         actlist.append(model_to_dict(rec.activity, exclude = ['content']))
     return actlist
 
+def createNewActivity(uid, act_attributes):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return {'status' : 'error', 'msg' : '无用户', 'aaid' : -1}
+    if not user.is_admin:
+        return {'status': 'error', 'msg': '不是管理员', 'aaid' : -1}
+    m = hashlib.md5()
+    m.update('%Y%m%d%H%M%S',datetime.datetime.now())
+    aaid_md = m.hexdigest()
+    aaid_md = aaid_md[0:7]
+    
+    act = Activity(
+        aaid = aaid_md,
+        creator = user,
+        title = act_attributes['title'],
+        description = act_attributes['description'],
+        content = act_attributes['content'],
+        signin_begin_at = act_attributes['signin_begin_at'],
+        signin_end_at = act_attributes['signin_end_at'],
+        begin_at = act_attributes['begin_at'],
+        end_at = act_attributes['end_at'],
+        signin_max = act_attributes['signin_max'],
+        need_checkin = act_attributes['need_checkin']
+    )
+    act.save()
+    return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
+
+def activityAuthorityCheck(uid, aaid):
+    try:
+        act = Activity.objects.get(aaid = aaid)
+    except ObjectDoesNotExist:
+        return -1
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return -1
+    return act.creator.uid == uid
+
+def getUserPageCount(number):
+    count = User.object.all().count()
+    return ((count-1) / number ) +1
+
+def getUserListByPageAndNumber(page, number):
+    userlist=[]
+    for i in range((page-1)*number+1,page*number) :
+        try:
+            user = User.objects.get(uid = i)
+        except ObjectDoesNotExist:
+            return userlist
+        userlist.append(model_to_dict(user))
+    return userlist
