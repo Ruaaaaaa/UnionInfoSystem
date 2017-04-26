@@ -1,0 +1,117 @@
+[
+  {
+    "model": "base.User",
+    "pk": 1,
+    "fields": {
+      "is_admin": true,
+      "name": "某管理员",
+      "sex": 0,
+      "wid": "2000100100",
+      "registered": true,
+      "username": "admin",
+      "password": "admin"
+    }
+  },
+  {
+    "model": "base.User",
+    "pk": 2,
+    "fields": {
+      "is_admin": false,
+      "name": "教师0号",
+      "sex": 0,
+      "wid": "2015000000",
+      "id_hash": "3ea032bf79e8c116b05f4698d5a8e044",
+      "id_partial": "0000000",
+      "registered": false,
+      "department_id": 1,
+      "subunion_id": 1
+    }
+  },
+  {
+    "model": "base.User",
+    "pk": 3,
+    "fields": {
+      "is_admin": false,
+      "name": "教师1号",
+      "sex": 1,
+      "wid": "2015000001",
+      "id_hash": "58583d76cd7f591f66fb4d4d0f125790",
+      "id_partial": "0000001",
+      "registered": false,
+      "department_id": 1,
+      "subunion_id": 2
+    }
+  },
+  {
+    "model": "base.User",
+    "pk": 4,
+    "fields": {
+      "is_admin": false,
+      "name": "教师2号",
+      "sex": 0,
+      "wid": "2015000002",
+      "id_hash": "b39b6bd96f57ed7a92421e1ecd39e91d",
+      "id_partial": "0000002",
+      "registered": false,
+      "department_id": 2,
+      "subunion_id": 1
+    }
+  },
+  {
+    "model": "base.User",
+    "pk": 5,
+    "fields": {
+      "is_admin": false,
+      "name": "教师3号",
+      "sex": 1,
+      "wid": "2015000003",
+      "id_hash": "5958df09966cb06b7411cb7cc96ab56a",
+      "id_partial": "0000003",
+      "registered": false,
+      "department_id": 2,
+      "subunion_id": 2
+    }
+  },
+  {
+    "model": "base.Department",
+    "pk": 1,
+    "fields": {
+      "name": "麻将部门"
+    }
+  },
+  {
+    "model": "base.Department",
+    "pk": 2,
+    "fields": {
+      "name": "火锅部门"
+    }
+  },
+  {
+    "model": "base.Subunion",
+    "pk": 1,
+    "fields": {
+      "name": "桌游分工会"
+    }
+  },
+  {
+    "model": "base.Subunion",
+    "pk": 2,
+    "fields": {
+      "name": "足球分工会"
+    }
+  },
+  {
+    "model": "base.Activity",
+    "pk": 1,
+    "fields" : {
+      "title": "长跑活动",
+      "description": "这是一次娱乐的长跑活动。",
+      "poster": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1493213376326&di=30802fc85ac40de316b1b0be56d69b0c&imgtype=0&src=http%3A%2F%2Fi10.topit.me%2Fl053%2F100537300422b8f5da.jpg",
+      "content": "This is content.",
+      "aaid": "10000000",
+      "creator_id": 1,
+      "signin_count": 1435,
+      "need_checkin": true
+    }
+  }
+]
