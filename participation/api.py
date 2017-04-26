@@ -55,10 +55,13 @@ def registerAccount(idnumber, username, pwd, mobile, email):
         #user.save() 
         print u"没有这个身份证号"
         return 0
+    #print 'id',idnumber,'username',username
     user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
+    user.registered = true
+    user.register_at = datetime.datetime.now()
     user.save()
     return 1
 
