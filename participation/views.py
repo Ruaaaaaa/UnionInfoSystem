@@ -51,17 +51,18 @@ def logout(request):
 @require_http_methods(['POST'])
 @csrf_exempt
 def verification(request):
-	print request.POST
-	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'idnumber': request.POST['id_number']}})
-	if not request.POST.has_key('idnumber') or not request.POST.has_key('realname'):
+	#print request.POST
+	#return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'idnumber': request.POST['id_number']}})
+	if not request.POST.has_key('id_number') or not request.POST.has_key('name'):
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	realname = request.POST['real_name']
+	name = request.POST['name']
 	idnumber = request.POST['id_number']
-	if len(realname) == 0 or len(idnumber) == 0:
+	if len(name) == 0 or len(idnumber) == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	veresult = verificationOfRealId(realname, idnumber) ;
+	veresult = verificationOfRealId(name, idnumber) ;
+	print name, idnumber 
 	if veresult == 0:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！实名或身份证号有误。'})
 	if veresult == 2:
@@ -88,15 +89,19 @@ def register(request):
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
 		print request.POST
-		if False and verificationOfRealId(request.POST['real_name'], request.POST['id_number']) != 1:
+		if False and verificationOfRealId(request.POST['name'], request.POST['id_number']) != 1:
 			return JsonResponse({'status': 'error', 'msg': '实名验证失败！您需要重新返回进行验证。'})
 
 		if registeredUsername(username):
 			return JsonResponse({'status': 'error', 'msg': '此用户名已被注册，请重新填写'})
 		if len(pwd) < 6 or len(username) < 4:
 			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
-		idnumber
 		registerAccount(idnumber, username, pwd, mobile, email)
+
+		uid = getUidByUsername(username)
+		identity = getIdentityByUid(uid)
+		sessions.login(request, uid, identity)
+
 		return JsonResponse({'status': 'success', 'msg': '注册成功'})
 
 

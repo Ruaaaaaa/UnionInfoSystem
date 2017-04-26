@@ -73,7 +73,7 @@ $('#login_btn').on('click', function() {
 		$('#login_btn').attr('disabled', true);
 		$('.login-before').css('display', 'none');
 		$('.login-loading').css('display', 'block');
-		$.post('/login', {username: username, pwd: pwd})
+		$.post('/login', {username: username, pwd: md5(pwd)})
 		.done(function(data, status) {
 			console.log(data);
 			if(data.status == 'success') {

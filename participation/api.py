@@ -7,6 +7,7 @@ from base.models import *
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
 import datetime
+import hashlib
 
 def getUidByUsername(username):
     try:
@@ -15,6 +16,14 @@ def getUidByUsername(username):
         print u"没有这个用户名"
         return -1
     return user.uid
+
+def getUsernameByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"没有这个用户名"
+        return -1
+    return user.username
 
 def verifyPassword(uid, pwd):
     try:
@@ -128,4 +137,136 @@ def registeredUsername(username):
         user = User.objects.get(username = username)
     except ObjectDoesNotExist:
         return 0
+    return 1
+
+def getActivitiesByUidSimple(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    actlist = []
+    for act in user.activities_created.all():
+        actlist.append(model_to_dict(act, exclude = ['content']))
+    return actlist
+
+def getActivitiesInvolvedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    try:
+        records = user.records.all()
+    except ObjectDoesNotExist:
+        print u"没有活动"
+        return []
+    actlist = []
+    for rec in records:
+        actlist.append(model_to_dict(rec.activity, exclude = ['content']))
+    return actlist
+
+def createNewActivity(uid, act_attributes):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return {'status' : 'error', 'msg' : '无用户', 'aaid' : -1}
+    if not user.is_admin:
+        return {'status': 'error', 'msg': '不是管理员', 'aaid' : -1}
+    m = hashlib.md5()
+    m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+    aaid_md = m.hexdigest()
+    aaid_md = aaid_md[0:7]
+    act = Activity(
+        aaid = aaid_md,
+        creator = user,
+        title = act_attributes['title'],
+        description = act_attributes['description'],
+        content = act_attributes['content'],
+        signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at']),
+        signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at']),
+        begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at']),
+        end_at = datetime.datetime.fromtimestamp(act_attributes['end_at']),
+        signin_max = act_attributes['signin_max'],
+        need_checkin = act_attributes['need_checkin']
+    )
+    act.save()
+    return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
+
+def activityAuthorityCheck(uid, aaid):
+    try:
+        act = Activity.objects.get(aaid = aaid)
+    except ObjectDoesNotExist:
+        return -1
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return -1
+    return act.creator.uid == uid
+
+def getUserPageCount(number):
+    count = User.object.all().count()
+    return ((count-1) / number ) +1
+
+def getUserListByPageAndNumber(page, number):
+    userlist=[]
+    for i in range((page-1)*number+1,page*number) :
+        try:
+            user = User.objects.get(uid = i)
+        except ObjectDoesNotExist:
+            return userlist
+        userlist.append(model_to_dict(user))
+    return userlist
+
+def getBroadcastsSendedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    if not user.is_admin:
+        print u"不是管理员"
+        return 0
+    broadcastlist = []
+    for broadcast in user.broadcasts.all():
+        broadcastlist.append(model_to_dict(broadcast))
+    return broadcastlist
+
+def getBroadcastsReceivedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    try:
+        messages = user.messages_received.all()
+    except ObjectDoesNotExist:
+        print u"没有消息"
+        return []
+    broadcastlist = []
+    for message in massages:
+        broadcastlist.append(model_to_dict(message.broadcast))
+    return broadcastlist
+
+def editActivity(uid,act_attributes):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return 0
+    try:
+        act = Activity.objects.get(aaid = act_attributes[aaid])
+    except ObjectDoesNotExist:
+        return 0
+    if user != act.creator:
+        return 0
+    act.title = act_attributes['title']
+    act.description = act_attributes['description']
+    act.content = act_attributes['content']
+    act.signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at'])
+    act.signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at'])
+    act.begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at'])
+    act.end_at = datetime.datetime.fromtimestamp(act_attributes['end_at'])
+    act.signin_max = act_attributes['signin_max']
+    act.need_checkin = act_attributes['need_checkin']
+    act.save()
     return 1

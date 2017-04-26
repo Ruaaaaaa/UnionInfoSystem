@@ -10,6 +10,12 @@
 .content-wrapper {
   margin-top: 70px;
 }
+.form-group {
+  position: relative;
+}
+#submit_btn_loading {
+  display: none;
+}
 </style>
 {% endblock %}
 
@@ -40,11 +46,165 @@
   </div><!-- /.container-fluid -->
 </nav>
 <div class="container-fluid content-wrapper">
-new activity, type: {{ type }}
+  <div class="row">
+    <div class="col-xs-12 col-sm-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">新建活动</h3>
+        </div>
+        <div class="panel-body">
+          <form>
+            <div class="form-group" id="title_form">
+              <label class="control-label">活动主题</label>
+              <input type="text" class="form-control" placeholder="在此输入活动主题" id="title">
+            </div>
+            <div class="form-group" id="description_form">
+              <label class="control-label">活动简介</label>
+              <textarea class="form-control" rows="2" id="description"></textarea>
+            </div>
+            <div class="form-group" id="content_form">
+              <label class="control-label">活动详情</label>
+              <textarea class="form-control" rows="6" id="content"></textarea>
+            </div>
+            <div class="form-group" id="poster_form">
+              <label class="control-label">宣传图</label>
+              <input type="file" id="poster">
+              <p class="help-block">如果你上传的图片不是1:1, 将会被自动裁剪。</p>
+            </div>
+            <div class="form-group" id="dtp_ss_form">
+              <label class="control-label">报名开始时间</label>
+              <input type="text" class="form-control" id="dtp_ss">
+            </div>
+            <div class="form-group" id="dtp_se_form">
+              <label class="control-label">报名结束时间</label>
+              <input type="text" class="form-control" id="dtp_se">
+            </div>
+            <div class="form-group" id="dtp_as_form">
+              <label class="control-label">活动开始时间</label>
+              <input type="text" class="form-control" id="dtp_as">
+            </div>
+            <div class="form-group" id="dtp_ae_form">
+              <label class="control-label">活动结束时间</label>
+              <input type="text" class="form-control" id="dtp_ae">
+            </div>
+            <div>
+              <div class="checkbox" id="signin_restrict_form">
+                <label>
+                  <input type="checkbox" id="signin_restrict">报名人数限制
+                </label>
+              </div>
+            </div>
+            <div class="form-group" id="signin_max_form">
+              <label class="control-label">报名人数上限</label>
+              <input type="text" class="form-control" placeholder="在此输入报名人数上限" id="signin_max">
+            </div>
+            <div>
+              <div class="checkbox" id="need_checkin_form">
+                <label>
+                  <input type="checkbox" id="need_checkin">需要现场签到
+                </label>
+              </div>
+            </div>
+            <button type="button" class="btn btn-default" id="submit_btn">立即创建</button>
+            <button type="button" class="btn btn-default btn-disabled" id="submit_btn_loading"><i class="fa fa-spinner fa-pulse fa-fw"></i>提交中...</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript"></script>
+<script type="text/javascript">
+var icons = {
+              time: 'fa fa-clock-o',
+              date: 'fa fa-calendar',
+              up: 'fa fa-chevron-up',
+              down: 'fa fa-chevron-down',
+              previous: 'fa fa-chevron-left',
+              next: '',
+              today: '',
+              clear: '',
+              close: ''
+            }
+$('#dtp_ss').datetimepicker({
+  icons: icons
+});
+$('#dtp_se').datetimepicker({
+  icons: icons
+});
+$('#dtp_as').datetimepicker({
+  icons: icons
+});
+$('#dtp_ae').datetimepicker({
+  icons: icons
+});
+function validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin) {
+  return true;
+}
+function toggleButton(status) {
+  if(status == 0) {
+    $('#submit_btn_loading').css('display', 'none');
+    $('#submit_btn').css('display', 'block');
+  }
+  else {
+    $('#submit_btn').css('display', 'none');
+    $('#submit_btn_loading').css('display', 'block');
+  }
+}
+$('#submit_btn').on('click', function() {
+  toggleButton(1);
+  var moment_tmp = null;
+  var title = $('#title').val();
+  var description = $('#description').val();
+  var content = $('#content').val();
+  moment_tmp = $('#dtp_ss').data('DateTimePicker').date();
+  var dtp_ss = moment_tmp? moment_tmp.unix() : null;
+  moment_tmp = $('#dtp_se').data('DateTimePicker').date();
+  var dtp_se = moment_tmp? moment_tmp.unix() : null;
+  moment_tmp = $('#dtp_as').data('DateTimePicker').date();
+  var dtp_as = moment_tmp? moment_tmp.unix() : null;
+  moment_tmp = $('#dtp_ae').data('DateTimePicker').date();
+  var dtp_ae = moment_tmp? moment_tmp.unix() : null;
+  var signin_restrict = $('#signin_restrict').get(0).checked;
+  var signin_max = $('#signin_max').val();
+  var need_checkin = $('#need_checkin').get(0).checked;
+  if(!validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
+    toggleButton(0);
+    return;
+  }
+  $.post('/admin/activity/new', {
+    title: title,
+    description: description,
+    content: content,
+    signin_begin_at: dtp_ss,
+    signin_end_at: dtp_se,
+    begin_at: dtp_as,
+    end_at: dtp_ae,
+    signin_restrict: signin_restrict,
+    signin_max: signin_max,
+    need_checkin: need_checkin
+  })
+  .done(function(data){
+    if(data.status == 'success') {
+      alert(data.msg);
+      window.href.location = '/admin/activity';
+    }
+    else if (data.status == 'error') {
+      alert(data.msg);
+    }
+    else {
+      alert('未知错误！');
+    }
+  })
+  .fail(function(){
+    alert('网络状况不佳，请稍后再试。');
+  })
+  .always(function(){
+    toggleButton(0);
+  })
+})
+</script>
 {% endblock %}
