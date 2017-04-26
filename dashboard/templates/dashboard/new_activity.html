@@ -56,15 +56,15 @@
           <form>
             <div class="form-group" id="title_form">
               <label class="control-label">活动主题</label>
-              <input type="text" class="form-control" placeholder="在此输入活动主题" id="title">
+              <input type="text" class="form-control" placeholder="在此输入活动主题" id="title" value="{{ activity.title|default:"" }}">
             </div>
             <div class="form-group" id="description_form">
               <label class="control-label">活动简介</label>
-              <textarea class="form-control" rows="2" id="description"></textarea>
+              <textarea class="form-control" rows="2" id="description" value="{{ activity.description|default:"" }}"></textarea>
             </div>
             <div class="form-group" id="content_form">
               <label class="control-label">活动详情</label>
-              <textarea class="form-control" rows="6" id="content"></textarea>
+              <textarea class="form-control" rows="6" id="content" value="{{ activity.content|default:"" }}"></textarea>
             </div>
             <div class="form-group" id="poster_form">
               <label class="control-label">宣传图</label>
@@ -90,18 +90,18 @@
             <div>
               <div class="checkbox" id="signin_restrict_form">
                 <label>
-                  <input type="checkbox" id="signin_restrict">报名人数限制
+                  <input type="checkbox" id="signin_restrict" {% if activity.signin_max %}checked{% endif %}>报名人数限制
                 </label>
               </div>
             </div>
             <div class="form-group" id="signin_max_form">
               <label class="control-label">报名人数上限</label>
-              <input type="text" class="form-control" placeholder="在此输入报名人数上限" id="signin_max">
+              <input type="text" class="form-control" placeholder="在此输入报名人数上限" id="signin_max" value="{{ activity.signin_max|default:"" }}">
             </div>
             <div>
               <div class="checkbox" id="need_checkin_form">
                 <label>
-                  <input type="checkbox" id="need_checkin">需要现场签到
+                  <input type="checkbox" id="need_checkin" {% if activity.need_checkin %}checked{% endif %}>需要现场签到
                 </label>
               </div>
             </div>
@@ -118,6 +118,11 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+var dtp_ss_init = '{{ activity.signin_begin_at }}',
+    dtp_se_init = '{{ activity.signin_end_at }}',
+    dtp_as_init = '{{ activity.begin_at }}',
+    dtp_ae_init = '{{ activity.end_at }}';
+var type = '{{ type }}';
 var icons = {
               time: 'fa fa-clock-o',
               date: 'fa fa-calendar',
@@ -141,6 +146,20 @@ $('#dtp_as').datetimepicker({
 $('#dtp_ae').datetimepicker({
   icons: icons
 });
+function setTime(ss, se, as, ae) {
+  if(ss) {
+    $('#dtp_ss').data('DateTimePicker').date(moment.unix(ss));
+  }
+  if(se) {
+    $('#dtp_se').data('DateTimePicker').date(moment.unix(se));
+  }
+  if(as) {
+    $('#dtp_as').data('DateTimePicker').date(moment.unix(as));
+  }
+  if(ae) {
+    $('#dtp_ae').data('DateTimePicker').date(moment.unix(ae));
+  }
+}
 function validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin) {
   return true;
 }
