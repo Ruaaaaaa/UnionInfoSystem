@@ -55,12 +55,12 @@ def registerAccount(idnumber, username, pwd, mobile, email):
         #user.save() 
         print u"没有这个身份证号"
         return 0
-    #print 'id',idnumber,'username',username
+    print 'id',idnumber,'username',username
     user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
-    user.registered = true
+    user.registered = 1
     user.register_at = datetime.datetime.now()
     user.save()
     return 1
@@ -132,3 +132,20 @@ def registeredUsername(username):
     except ObjectDoesNotExist:
         return 0
     return 1
+
+def getActivitiesByUidSimple(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    try:
+        records = user.records.all()
+    except ObjectDoesNotExist:
+        print u"没有活动"
+        return []
+    actlist = []
+    for rec in records:
+        actlist.append(model_to_dict(rec.activity, exclude = ['content']))
+    return actlist
+
