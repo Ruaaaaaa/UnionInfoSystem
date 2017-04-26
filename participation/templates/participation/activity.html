@@ -7,25 +7,129 @@
 {% block css %}
 {{ block.super }}
 <style type="text/css">
-
+.content-wrapper {
+	margin-top: 50px;
+}
+.act-title {
+	background: white;
+	height: 30px;
+	padding: 10px;
+	color: purple;
+}
+.act-title-hint {
+	height: 30px;
+	line-height: 30px;
+	font-size: 10px;
+	color: #999999;
+	float: right;
+}
+.act-title-text {
+	height: 30px;
+	line-height: 30px;
+	font-size: 18px;
+	color: purple;
+	float: left;
+}
+.act-title-text i {
+	margin-right: 5px; 
+}
+.act-img-wrapper {
+	width: 40% !important;
+	height: auto !important;
+}
+.act-info {
+	color: #999999;
+	font-size: 13px;
+}
+.act-info i {
+	color: purple;
+	margin-right: 3px;
+}
+.act-hint {
+	position: fixed;
+	width: 100%;
+	height: 50px;
+	bottom: 0;
+}
+.act-hint .act-time {
+	width: 60%;
+	height: 50px;
+	float: left;
+	background: purple;
+	color: white;
+}
+.act-hint .act-op {
+	width: 40%;
+	height: 50px;
+	line-height: 50px;
+	font-size: 20px;
+	float: right;
+	background: #5cb85c;
+	color: white;
+	text-align: center;
+}
+.act-hint .act-time .act-time-text {
+	line-height: 20px;
+	font-size: 10px;
+	text-align: center;
+}
+.act-hint .act-time .act-time-time {
+	line-height: 30px;
+	font-size: 25px;
+	text-align: center;
+}
 </style>
 {% endblock %}
 
 {% block body %}
-<p>title: {{ activity.title }}</p>
-<p>aaid: {{ activity.aaid }}</p>
-<p>creator: {{ activity.creator }}</p>
-<p>description: {{ activity.description }}</p>
-<p>content: {{ activity.content }}</p>
-<p>poster_url: {{ activity.poster }}</p>
-<p>signin_begin_at: {{ activity.signin_begin_at }}</p>
-<p>signin_end_at: {{ activity.signin_end_at }}</p>
-<p>begin_at: {{ activity.begin_at }}</p>
-<p>end_at: {{ activity.end_at }}</p>
-<p>signin_count: {{ activity.signin_count }}</p>
-<p>signin_max: {{ activity.signin_max }}</p>
-<p>checkin_count: {{ activity.checkin_count }}</p>
-<p>need_checkin: {{ activity.need_checkin }}</p>
+<div class="navbar-header">
+	<span class="navbar-header-text">
+		活动详情
+	</span>
+</div>
+<div class="content-wrapper">
+	<div class="act-title">
+		<p class="act-title-text"><i class="fa fa-heart"></i>阳光短跑活动光短跑跑短</p>
+		<p class="act-title-hint">#12345678</p>
+	</div>
+	<div class="weui-panel weui-panel_access">
+	    <div class="weui-panel__bd">
+	        <div class="weui-media-box weui-media-box_appmsg">
+	            <div class="weui-media-box__hd act-img-wrapper">
+	                <img class="weui-media-box__thumb" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1048738130,2435557076&fm=23&gp=0.jpg">
+	            </div>
+	            <div class="weui-media-box__bd">
+					<p class="act-info"><i class="fa fa-eye"></i>不需要签到</p>
+					<p class="act-info"><i class="fa fa-eye"></i>无报名人数限制</p>
+					<p class="act-info"><i class="fa fa-eye"></i>已有 200 人报名</p>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+</div>
+<div class="weui-panel weui-panel_access">
+    <div class="weui-panel__hd">活动简介</div>
+    <div class="weui-panel__bd">
+        <div class="weui-media-box weui-media-box_text">
+            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+        </div>
+    </div>
+</div>
+<div class="weui-panel weui-panel_access">
+    <div class="weui-panel__hd">活动详情</div>
+    <div class="weui-panel__bd">
+        <div class="weui-media-box weui-media-box_text">
+            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+        </div>
+    </div>
+</div>
+<div class="act-hint">
+	<div class="act-time">
+		<p class="act-time-text">距离报名结束还有</p>
+		<p class="act-time-time">01 : 26 : 08</p>
+	</div>
+	<div class="act-op">立即报名</div>
+</div>
 {% endblock %}
 
 {% block js %}
