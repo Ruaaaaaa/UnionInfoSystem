@@ -161,17 +161,17 @@ def createNewActivity(uid, act_attributes):
     m.update('%Y%m%d%H%M%S',datetime.datetime.now())
     aaid_md = m.hexdigest()
     aaid_md = aaid_md[0:7]
-    
+    datetime.datetime.fromtimestamp(timeStamp)
     act = Activity(
         aaid = aaid_md,
         creator = user,
         title = act_attributes['title'],
         description = act_attributes['description'],
         content = act_attributes['content'],
-        signin_begin_at = act_attributes['signin_begin_at'],
-        signin_end_at = act_attributes['signin_end_at'],
-        begin_at = act_attributes['begin_at'],
-        end_at = act_attributes['end_at'],
+        signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at']),
+        signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at']),
+        begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at']),
+        end_at = datetime.datetime.fromtimestamp(act_attributes['end_at']),
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
