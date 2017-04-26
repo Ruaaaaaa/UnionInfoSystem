@@ -148,6 +148,17 @@ def getActivitiesByUidSimple(uid):
     except ObjectDoesNotExist:
         print u"无用户"
         return 0
+    actlist = []
+    for act in user.activities_created.all():
+        actlist.append(model_to_dict(act, exclude = ['content']))
+    return actlist
+
+def getActivitiesInvolvedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
     try:
         records = user.records.all()
     except ObjectDoesNotExist:
@@ -210,3 +221,4 @@ def getUserListByPageAndNumber(page, number):
             return userlist
         userlist.append(model_to_dict(user))
     return userlist
+
