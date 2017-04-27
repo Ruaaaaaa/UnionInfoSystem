@@ -76,7 +76,7 @@ class Record(models.Model):
     activity = models.ForeignKey(Activity, null = True, related_name = 'records')
     uid = models.IntegerField(null = True)
     aid = models.IntegerField(null = True)
-    aaid = models.IntegerField(null = True)
+    aaid = models.CharField(max_length = 10, null = True)
     signin_at = models.IntegerField(null = True)
     checked_in = models.BooleanField(default = 0)
     checkin_at = models.IntegerField(null = True)

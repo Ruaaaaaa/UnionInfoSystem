@@ -38,7 +38,6 @@ def purifyActivity(cursedactivity):
 	purified['signin_restrict'] = (False if purified['signin_restrict'] == u'false' else True) if purified.has_key('signin_restrict') else None
 	purified['need_checkin'] = (False if purified['need_checkin'] == u'false' else True) if purified.has_key('need_checkin') else None
 	purified['signin_max'] = int(purified['signin_max']) if purified.has_key('signin_max') and purified['signin_restrict'] == True else None
-	purified['aaid'] = int(purified['aaid']) if purified.has_key('aaid') else None
 	purified['begin_at'] = int(purified['begin_at']) if purified.has_key('begin_at') else None
 	purified['end_at'] = int(purified['end_at']) if purified.has_key('end_at') else None
 	purified['signin_begin_at'] = int(purified['signin_begin_at']) if purified.has_key('signin_begin_at') else None

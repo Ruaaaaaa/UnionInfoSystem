@@ -146,6 +146,7 @@ def checkInFail(request):
 @login_required
 def signIn(request, aaid):
 	uid, identity = sessions.getUser(request)
+	print type(aaid)
 	if(uid == None):
 		return JsonResponse({'status': 'error', 'msg': '身份验证出错，请重新登录！'})
 	result = userSignIn(uid, aaid) ;

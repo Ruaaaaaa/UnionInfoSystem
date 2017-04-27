@@ -100,7 +100,7 @@ def userCheckIn(uid, aaid):
         print u"签到过了"
         return 2
     rec.check_in = 1
-    rec.checkin_at = datetime2timestamp(datetime.datetime.now())
+    rec.checkin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     rec.save()
     print "签到成功"
     return 1
@@ -116,6 +116,7 @@ def userSignIn(uid, aaid):
     except ObjectDoesNotExist:
         print u"无活动"
         return 0
+    #print datetime.datetime.timetuple()
     try:
         user.records.get(aaid=aaid)
     except ObjectDoesNotExist:
@@ -125,7 +126,7 @@ def userSignIn(uid, aaid):
             uid = user.uid,
             user = user,
             activity = act,
-            signin_at = datetime2timestamp(datetime.datetime.now())
+            signin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
         )
         rec.save()
         return 1

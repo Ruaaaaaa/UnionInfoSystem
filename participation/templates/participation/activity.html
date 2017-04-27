@@ -207,7 +207,7 @@ $('#op_btn').on('click', function() {
 				duration: 1000
 			});
 		}
-		else if(data.status == 'fail') {
+		else if(data.status == 'error') {
 			weui.topTips(data.msg, 3000);
 		}
 		else {
