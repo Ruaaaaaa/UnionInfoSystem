@@ -15,6 +15,7 @@ from base.decorators import login_required, admin_required
 
 import json
 
+from InfoSystem.shared import dashboard_tabs
 from base import sessions
 from participation.api import *
 from dashboard.api import *
@@ -89,7 +90,7 @@ def activity(request):
 	username = getUsernameByUid(uid)
 	act_list = getActivitiesByUidSimple(uid)
 	print act_list
-	return render(request, 'dashboard/activity.html', {'username':username, 'activities':act_list})
+	return render(request, 'dashboard/activity.html', {'tab': dashboard_tabs['activity'], 'username': username, 'activities': act_list})
 
 
 
@@ -101,7 +102,7 @@ def newActivity(request):
 	uid = sessions.getUser(request)[0] 
 	username = getUsernameByUid(uid)
 	if request.method == 'GET':
-		return render(request, 'dashboard/new_activity.html', {'type': 'new', 'username': username})
+		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'type': 'new', 'username': username})
 	else:
 		#$act_attributes = request.POST
 		act_attributes = purifyActivity(request.POST)
@@ -124,7 +125,7 @@ def editActivity(request, aaid):
 	if activity == -1: 
 		raise Http404
 	if request.method == 'GET':
-		return render(request, 'dashboard/new_activity.html', {'activity': activity, 'username': username, 'type': 'edit'})
+		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'activity': activity, 'username': username, 'type': 'edit'})
 	else:
 		act_attributes = purifyActivity(request.POST)
 		authority = activityAuthorityCheck(uid, aaid)
@@ -154,7 +155,7 @@ def downloadActivity(request, aaid):
 def users(request):
 	uid = sessions.getUser(request)[0] 
 	username = getUsernameByUid(uid)
-	return render(request, 'dashboard/users.html', {'username': username})
+	return render(request, 'dashboard/users.html', {'tab': dashboard_tabs['users'], 'username': username})
 
 
 
@@ -190,4 +191,4 @@ def downloadUsers(request):
 @login_required
 @admin_required
 def broadcast(request):
-	return render(request, 'dashboard/broadcast.html', {})
+	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
