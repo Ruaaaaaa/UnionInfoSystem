@@ -128,14 +128,16 @@ def editActivity(request, aaid):
 		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'activity': activity, 'username': username, 'type': 'edit'})
 	else:
 		act_attributes = purifyActivity(request.POST)
+		act_attributes ['aaid'] = aaid
 		authority = activityAuthorityCheck(uid, aaid)
 		if authority == -1:
 			return JsonResponse({'status': 'error', 'msg': '无此活动！'})
 		elif authority == 0:
 			return JsonResponse({'status': 'error', 'msg': '您无权修改此活动！'})
-		editresult = editActivity(uid, act_attributes)
-		if create_result['status'] == 0:
-			JsonResponse({'status': 'error', 'msg': '修改活动失败！'})
+		editresult = doEditActivity(uid, act_attributes)
+		print '!!!', editresult
+		if editresult == 0:
+			return JsonResponse({'status': 'error', 'msg': '修改活动失败！'})
 		else: 
 			return JsonResponse({'status': 'success', 'msg': '修改活动成功!'})	
 

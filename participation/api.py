@@ -248,16 +248,20 @@ def getBroadcastsReceivedByUid(uid):
         broadcastlist.append(model_to_dict(message.broadcast))
     return broadcastlist
 
-def editActivity(uid,act_attributes):
+def doEditActivity(uid,act_attributes):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
+        print 'no user'
         return 0
     try:
-        act = Activity.objects.get(aaid = act_attributes[aaid])
+        print act_attributes['aaid']
+        act = Activity.objects.get(aaid = act_attributes['aaid'])
     except ObjectDoesNotExist:
+        print 'no activity'
         return 0
     if user != act.creator:
+        print 'not match'
         return 0
     act.title = act_attributes['title']
     act.description = act_attributes['description']
