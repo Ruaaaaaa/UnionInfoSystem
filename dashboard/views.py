@@ -13,6 +13,8 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
 
+import json
+
 from base import sessions
 from participation.api import *
 from dashboard.api import *
@@ -28,7 +30,19 @@ def file_iterator(file_name, chunk_size=512):
 				yield c
 			else:
 				break
-
+def purifyActivity(cursedactivity):
+	purified = {}
+	for x in cursedactivity.keys():
+		purified[x] = cursedactivity[x]
+	purified['signin_restrict'] = (False if purified['signin_restrict'] == u'false' else True) if purified.has_key('signin_restrict') else None
+	purified['need_checkin'] = (False if purified['need_checkin'] == u'false' else True) if purified.has_key('need_checkin') else None
+	purified['signin_max'] = int(purified['signin_max']) if purified.has_key('signin_max') and purified['signin_restrict'] == True else None
+	purified['aaid'] = int(purified['aaid']) if purified.has_key('aaid') else None
+	purified['begin_at'] = int(purified['begin_at']) if purified.has_key('begin_at') else None
+	purified['end_at'] = int(purified['end_at']) if purified.has_key('end_at') else None
+	purified['signin_begin_at'] = int(purified['signin_begin_at']) if purified.has_key('signin_begin_at') else None
+	purified['signin_end_at'] = int(purified['signin_end_at']) if purified.has_key('signin_end_at') else None
+	return purified
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -89,7 +103,8 @@ def newActivity(request):
 	if request.method == 'GET':
 		return render(request, 'dashboard/new_activity.html', {'type': 'new', 'username': username})
 	else:
-		act_attributes = request.POST
+		#$act_attributes = request.POST
+		act_attributes = purifyActivity(request.POST)
 		create_result = createNewActivity(uid, act_attributes)
 		if create_result['status'] == "error":
 			JsonResponse({'status': 'error', 'msg': create_result['msg']})
@@ -111,7 +126,7 @@ def editActivity(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'dashboard/new_activity.html', {'activity': activity, 'username': username, 'type': 'edit'})
 	else:
-		act_attributes = request.POST
+		act_attributes = purifyActivity(request.POST)
 		authority = activityAuthorityCheck(uid, aaid)
 		if authority == -1:
 			return JsonResponse({'status': 'error', 'msg': '无此活动！'})

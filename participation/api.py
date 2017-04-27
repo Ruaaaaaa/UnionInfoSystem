@@ -45,8 +45,8 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-       # user = User(id_hash = idnumber)
-       # user.save()
+        user = User(id_hash = idnumber)
+        user.save()
         print u"没有这个身份证号"
         return 0
     if user.registered :
@@ -64,13 +64,10 @@ def registerAccount(idnumber, username, pwd, mobile, email):
         #user.save() 
         print u"没有这个身份证号"
         return 0
-    print 'id',idnumber,'username',username
     user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
-    user.registered = 1
-    user.register_at = datetime.datetime.now()
     user.save()
     return 1
 
@@ -177,10 +174,9 @@ def createNewActivity(uid, act_attributes):
     if not user.is_admin:
         return {'status': 'error', 'msg': '不是管理员', 'aaid' : -1}
     m = hashlib.md5()
-    m.update('%Y%m%d%H%M%S',datetime.datetime.now())
+    m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
     aaid_md = m.hexdigest()
     aaid_md = aaid_md[0:7]
-    datetime.datetime.fromtimestamp(timeStamp)
     act = Activity(
         aaid = aaid_md,
         creator = user,
@@ -222,3 +218,55 @@ def getUserListByPageAndNumber(page, number):
         userlist.append(model_to_dict(user))
     return userlist
 
+def getBroadcastsSendedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    if not user.is_admin:
+        print u"不是管理员"
+        return 0
+    broadcastlist = []
+    for broadcast in user.broadcasts.all():
+        broadcastlist.append(model_to_dict(broadcast))
+    return broadcastlist
+
+def getBroadcastsReceivedByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+        return 0
+    try:
+        messages = user.messages_received.all()
+    except ObjectDoesNotExist:
+        print u"没有消息"
+        return []
+    broadcastlist = []
+    for message in massages:
+        broadcastlist.append(model_to_dict(message.broadcast))
+    return broadcastlist
+
+def editActivity(uid,act_attributes):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        return 0
+    try:
+        act = Activity.objects.get(aaid = act_attributes[aaid])
+    except ObjectDoesNotExist:
+        return 0
+    if user != act.creator:
+        return 0
+    act.title = act_attributes['title']
+    act.description = act_attributes['description']
+    act.content = act_attributes['content']
+    act.signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at'])
+    act.signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at'])
+    act.begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at'])
+    act.end_at = datetime.datetime.fromtimestamp(act_attributes['end_at'])
+    act.signin_max = act_attributes['signin_max']
+    act.need_checkin = act_attributes['need_checkin']
+    act.save()
+    return 1
