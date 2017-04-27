@@ -89,8 +89,8 @@
 </div>
 <div class="content-wrapper">
 	<div class="act-title">
-		<p class="act-title-text"><i class="fa fa-heart"></i>阳光短跑活动光短跑跑短</p>
-		<p class="act-title-hint">#12345678</p>
+		<p class="act-title-text"><i class="fa fa-heart"></i>{{ activity.title }}</p>
+		<p class="act-title-hint">#{{ activity.aaid }}</p>
 	</div>
 	<div class="weui-panel weui-panel_access">
 	    <div class="weui-panel__bd">
@@ -99,9 +99,9 @@
 	                <img class="weui-media-box__thumb" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1048738130,2435557076&fm=23&gp=0.jpg">
 	            </div>
 	            <div class="weui-media-box__bd">
-					<p class="act-info"><i class="fa fa-eye"></i>不需要签到</p>
-					<p class="act-info"><i class="fa fa-eye"></i>无报名人数限制</p>
-					<p class="act-info"><i class="fa fa-eye"></i>已有 200 人报名</p>
+					<p class="act-info"><i class="fa fa-eye"></i>{% if not activity.need_checkin %}不{% endif %}需要签到</p>
+					<p class="act-info"><i class="fa fa-eye"></i>{% if activity.signin_max %}限 {{ activity.signin_max }} 报名{% else %}无名额限制{% endif %}</p>
+					<p class="act-info"><i class="fa fa-eye"></i>已有 {{ activity.signin_count }} 人报名</p>
 	            </div>
 	        </div>
 	    </div>
@@ -111,7 +111,7 @@
     <div class="weui-panel__hd">活动简介</div>
     <div class="weui-panel__bd">
         <div class="weui-media-box weui-media-box_text">
-            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+            <p class="weui-media-box__desc">{{ activity.description }}</p>
         </div>
     </div>
 </div>
@@ -119,7 +119,7 @@
     <div class="weui-panel__hd">活动详情</div>
     <div class="weui-panel__bd">
         <div class="weui-media-box weui-media-box_text">
-            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+            <p class="weui-media-box__desc">{{ activity.content }}</p>
         </div>
     </div>
 </div>

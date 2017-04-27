@@ -24,23 +24,24 @@
 {% block body %}
 {% include 'dashboard/header.html' %}
 <div class="container-fluid content-wrapper" id="root">
-	<ul class="nav nav-tabs">
-	  <li role="presentation" class="active"><a href="#">进行中活动</a></li>
-	  <li role="presentation"><a href="#">已结束活动</a></li>
-	</ul>
-  <div class="row">
-    <div class="col-xs-12 col-sm-8">
-      <ul class="act-list">
-        {% for act in activities %}
-        <li class="act-item" v-for="act in activities">
-        <h2>{{ act.title }}</h2>
-        <h3>{{ act.aaid }}</h3>
-        <button onclick="generateQRCode({{ act.aaid }})">生成二维码</button>
-        </li>
-        {% endfor %}
-      </ul>
+  	<ul class="nav nav-tabs">
+  	  <li role="presentation" class="active"><a href="#">进行中活动</a></li>
+  	  <li role="presentation"><a href="#">已结束活动</a></li>
+  	</ul>
+    <div class="row">
+      {% for act in activities %}
+      <div class="col-xs-12 col-sm-4 col-md-3">
+        <div class="thumbnail">
+          <img src="http://s.amazeui.org/media/i/demos/bw-2014-06-19.jpg?imageView/1/w/1000/h/1000/q/80" alt="...">
+          <div class="caption">
+            <h3>{{ act.title }}</h3>
+            <h2>{{ act.aaid }}</h2>
+            <p>{{ act.description }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-  </div>
 </div>
 {% endblock %}
 
