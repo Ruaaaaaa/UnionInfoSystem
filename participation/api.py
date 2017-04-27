@@ -176,7 +176,7 @@ def createNewActivity(uid, act_attributes):
     m = hashlib.md5()
     m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
     aaid_md = m.hexdigest()
-    aaid_md = aaid_md[0:7]
+    aaid_md = aaid_md[0:10]
     act = Activity(
         aaid = aaid_md,
         creator = user,
@@ -205,7 +205,7 @@ def activityAuthorityCheck(uid, aaid):
     return act.creator.uid == uid
 
 def getUserPageCount(number):
-    count = User.object.all().count()
+    count = User.objects.all().count()
     return ((count-1) / number ) +1
 
 def getUserListByPageAndNumber(page, number):
