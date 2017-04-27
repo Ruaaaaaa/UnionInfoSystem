@@ -18,6 +18,12 @@
   height: 200px;
   margin: 5px 0 5px 0;
 }
+.btn-group {
+  width: 100%;
+}
+.btn-group .btn {
+  width: 50%;
+}
 </style>
 {% endblock %}
 
@@ -34,13 +40,38 @@
         <div class="thumbnail">
           <img src="http://s.amazeui.org/media/i/demos/bw-2014-06-19.jpg?imageView/1/w/1000/h/1000/q/80" alt="...">
           <div class="caption">
-            <h3>{{ act.title }}</h3>
-            <h2>{{ act.aaid }}</h2>
+            <p>#{{ act.aaid }}</p>
+            <h4>{{ act.title }}</h4>
+            <p>{% if act.signin_max %}报名人数上限: {{ act.signin_max }}{% else %}无报名人数限制{% endif %}</p>
+            <p>报名人数: {{ act.signin_count }}</p>
+            <p>{% if not act.need_checkin %}不{% endif %}需要现场签到</p>
+            <p>报名开始: <span class="act-time">{{ act.signin_begin_at }}</span></p>
+            <p>报名结束: <span class="act-time">{{ act.signin_end_at }}</span></p>
+            <p>活动开始: <span class="act-time">{{ act.begin_at }}</span></p>
+            <p>活动结束: <span class="act-time">{{ act.end_at }}</span></p>
             <p>{{ act.description }}</p>
+            <div class="btn-group" role="group" aria-label="...">
+              <button type="button" class="btn btn-default" @click="showContent('{{ act.aaid }}')">活动内容</button>
+              <button type="button" class="btn btn-default" @click="showQR('{{ act.aaid }}')">二维码</button>
+            </div>
+            <button class="btn btn-default btn-block" @click="downloadInfo('{{ act.aaid }}')">导出用户数据</button>
           </div>
         </div>
       </div>
       {% endfor %}
+    </div>
+    <div class="modal fade" id="qr_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">活动二维码</h4>
+          </div>
+          <div class="modal-body">
+            <div id="qr_div"></div>
+          </div>
+        </div>
+      </div>
     </div>
 </div>
 {% endblock %}
@@ -53,5 +84,42 @@ function generateQRCode(aaid) {
     console.log(url);
     window.location.href = url;
 }
+$('.act-time').each(function() {
+    var time_stamp = $(this).text();
+    $(this).text(moment.unix(time_stamp).format('YYYY-MM-DD HH:mm:ss'));
+})
+var app = new Vue({
+  el: '#root',
+  delimiters: ["[[","]]"],
+  data: {
+    QRCode: null,
+  },
+  methods: {
+    showContent: function(aaid) {
+      console.log('show content' + aaid);
+    },
+    showQR: function(aaid) {
+      if(!this.QRCode) {
+        this.QRCode = new QRCode(document.getElementById('qr_div'), {
+            // 域名没有传！
+            text: "http://127.0.0.1:8000/activity/" + aaid,
+            width: 200,
+            height: 200
+        });
+        console.log(this.QRCode);
+      }
+      else {
+        this.QRCode.clear();
+        console.log(this.QRCode);
+        this.QRCode.makeCode("http://127.0.0.1:8000/activity/" + aaid);
+        console.log(this.QRCode);
+      }
+      $('#qr_modal').modal('show');
+    },
+    downloadInfo: function(aaid) {
+      console.log('download ' + aaid);
+    }
+  }
+})
 </script>
 {% endblock %}
