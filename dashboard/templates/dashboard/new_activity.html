@@ -60,11 +60,11 @@
             </div>
             <div class="form-group" id="description_form">
               <label class="control-label">活动简介</label>
-              <textarea class="form-control" rows="2" id="description" value="{{ activity.description|default:"" }}"></textarea>
+              <textarea class="form-control" rows="2" id="description">{{ activity.description|default:"" }}</textarea>
             </div>
             <div class="form-group" id="content_form">
               <label class="control-label">活动详情</label>
-              <textarea class="form-control" rows="6" id="content" value="{{ activity.content|default:"" }}"></textarea>
+              <textarea class="form-control" rows="6" id="content">{{ activity.content|default:"" }}</textarea>
             </div>
             <div class="form-group" id="poster_form">
               <label class="control-label">宣传图</label>
@@ -105,7 +105,7 @@
                 </label>
               </div>
             </div>
-            <button type="button" class="btn btn-default" id="submit_btn">立即创建</button>
+            <button type="button" class="btn btn-default" id="submit_btn">{% if type == "new" %}立即创建{% else %}确认修改{% endif %}</button>
             <button type="button" class="btn btn-default btn-disabled" id="submit_btn_loading"><i class="fa fa-spinner fa-pulse fa-fw"></i>提交中...</button>
           </form>
         </div>
@@ -118,34 +118,6 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-var dtp_ss_init = '{{ activity.signin_begin_at }}',
-    dtp_se_init = '{{ activity.signin_end_at }}',
-    dtp_as_init = '{{ activity.begin_at }}',
-    dtp_ae_init = '{{ activity.end_at }}';
-var type = '{{ type }}';
-var icons = {
-              time: 'fa fa-clock-o',
-              date: 'fa fa-calendar',
-              up: 'fa fa-chevron-up',
-              down: 'fa fa-chevron-down',
-              previous: 'fa fa-chevron-left',
-              next: '',
-              today: '',
-              clear: '',
-              close: ''
-            }
-$('#dtp_ss').datetimepicker({
-  icons: icons
-});
-$('#dtp_se').datetimepicker({
-  icons: icons
-});
-$('#dtp_as').datetimepicker({
-  icons: icons
-});
-$('#dtp_ae').datetimepicker({
-  icons: icons
-});
 function setTime(ss, se, as, ae) {
   if(ss) {
     $('#dtp_ss').data('DateTimePicker').date(moment.unix(ss));
@@ -160,9 +132,11 @@ function setTime(ss, se, as, ae) {
     $('#dtp_ae').data('DateTimePicker').date(moment.unix(ae));
   }
 }
+
 function validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin) {
   return true;
 }
+
 function toggleButton(status) {
   if(status == 0) {
     $('#submit_btn_loading').css('display', 'none');
@@ -173,57 +147,93 @@ function toggleButton(status) {
     $('#submit_btn_loading').css('display', 'block');
   }
 }
-$('#submit_btn').on('click', function() {
-  toggleButton(1);
-  var moment_tmp = null;
-  var title = $('#title').val();
-  var description = $('#description').val();
-  var content = $('#content').val();
-  moment_tmp = $('#dtp_ss').data('DateTimePicker').date();
-  var dtp_ss = moment_tmp? moment_tmp.unix() : null;
-  moment_tmp = $('#dtp_se').data('DateTimePicker').date();
-  var dtp_se = moment_tmp? moment_tmp.unix() : null;
-  moment_tmp = $('#dtp_as').data('DateTimePicker').date();
-  var dtp_as = moment_tmp? moment_tmp.unix() : null;
-  moment_tmp = $('#dtp_ae').data('DateTimePicker').date();
-  var dtp_ae = moment_tmp? moment_tmp.unix() : null;
-  var signin_restrict = $('#signin_restrict').get(0).checked;
-  var signin_max = $('#signin_max').val();
-  var need_checkin = $('#need_checkin').get(0).checked;
-  if(!validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
-    toggleButton(0);
-    return;
-  }
-  $.post('/admin/activity/new', {
-    title: title,
-    description: description,
-    content: content,
-    signin_begin_at: dtp_ss,
-    signin_end_at: dtp_se,
-    begin_at: dtp_as,
-    end_at: dtp_ae,
-    signin_restrict: signin_restrict,
-    signin_max: signin_max,
-    need_checkin: need_checkin
-  })
-  .done(function(data){
-    if(data.status == 'success') {
-      alert(data.msg);
-      window.href.location = '/admin/activity';
+
+function init() {
+  var dtp_ss_init = '{{ activity.signin_begin_at }}',
+      dtp_se_init = '{{ activity.signin_end_at }}',
+      dtp_as_init = '{{ activity.begin_at }}',
+      dtp_ae_init = '{{ activity.end_at }}';
+  var type = '{{ type }}';
+  var icons = {
+                time: 'fa fa-clock-o',
+                date: 'fa fa-calendar',
+                up: 'fa fa-chevron-up',
+                down: 'fa fa-chevron-down',
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: '',
+                clear: '',
+                close: ''
+              }
+  $('#dtp_ss').datetimepicker({
+    icons: icons
+  });
+  $('#dtp_se').datetimepicker({
+    icons: icons
+  });
+  $('#dtp_as').datetimepicker({
+    icons: icons
+  });
+  $('#dtp_ae').datetimepicker({
+    icons: icons
+  });
+
+  setTime(dtp_ss_init, dtp_se_init, dtp_as_init, dtp_as_init);
+
+  $('#submit_btn').on('click', function() {
+    toggleButton(1);
+    var moment_tmp = null;
+    var title = $('#title').val();
+    var description = $('#description').val();
+    var content = $('#content').val();
+    moment_tmp = $('#dtp_ss').data('DateTimePicker').date();
+    var dtp_ss = moment_tmp? moment_tmp.unix() : null;
+    moment_tmp = $('#dtp_se').data('DateTimePicker').date();
+    var dtp_se = moment_tmp? moment_tmp.unix() : null;
+    moment_tmp = $('#dtp_as').data('DateTimePicker').date();
+    var dtp_as = moment_tmp? moment_tmp.unix() : null;
+    moment_tmp = $('#dtp_ae').data('DateTimePicker').date();
+    var dtp_ae = moment_tmp? moment_tmp.unix() : null;
+    var signin_restrict = $('#signin_restrict').get(0).checked;
+    var signin_max = $('#signin_max').val();
+    var need_checkin = $('#need_checkin').get(0).checked;
+    if(!validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
+      toggleButton(0);
+      return;
     }
-    else if (data.status == 'error') {
-      alert(data.msg);
-    }
-    else {
-      alert('未知错误！');
-    }
+    $.post(window.location.pathname, {
+      title: title,
+      description: description,
+      content: content,
+      signin_begin_at: dtp_ss,
+      signin_end_at: dtp_se,
+      begin_at: dtp_as,
+      end_at: dtp_ae,
+      signin_restrict: signin_restrict,
+      signin_max: signin_max,
+      need_checkin: need_checkin
+    })
+    .done(function(data){
+      if(data.status == 'success') {
+        alert(data.msg);
+        window.location.href = '/admin/activity';
+      }
+      else if (data.status == 'error') {
+        alert(data.msg);
+      }
+      else {
+        alert('未知错误！');
+      }
+    })
+    .fail(function(){
+      alert('网络状况不佳，请稍后再试。');
+    })
+    .always(function(){
+      toggleButton(0);
+    })
   })
-  .fail(function(){
-    alert('网络状况不佳，请稍后再试。');
-  })
-  .always(function(){
-    toggleButton(0);
-  })
-})
+}
+
+init();
 </script>
 {% endblock %}
