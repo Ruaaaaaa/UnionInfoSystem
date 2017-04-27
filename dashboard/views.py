@@ -88,6 +88,7 @@ def activity(request):
 	uid = sessions.getUser(request)[0] 
 	username = getUsernameByUid(uid)
 	act_list = getActivitiesByUidSimple(uid)
+	print act_list
 	return render(request, 'dashboard/activity.html', {'username':username, 'activities':act_list})
 
 

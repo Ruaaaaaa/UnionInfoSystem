@@ -10,6 +10,14 @@
 .content-wrapper {
   margin-top: 70px;
 }
+.act-list {
+  list-style: none;
+  padding: 0;
+}
+.act-list .act-item {
+  height: 200px;
+  margin: 5px 0 5px 0;
+}
 </style>
 {% endblock %}
 
@@ -39,15 +47,34 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-<div class="container-fluid content-wrapper">
+<div class="container-fluid content-wrapper" id="root">
 	<ul class="nav nav-tabs">
 	  <li role="presentation" class="active"><a href="#">进行中活动</a></li>
 	  <li role="presentation"><a href="#">已结束活动</a></li>
 	</ul>
+  <div class="row">
+    <div class="col-xs-12 col-sm-8">
+      <ul class="act-list">
+        {% for act in activities %}
+        <li class="act-item" v-for="act in activities">
+        <h2>{{ act.title }}</h2>
+        <h3>{{ act.aaid }}</h3>
+        <button onclick="generateQRCode({{ act.aaid }})">生成二维码</button>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript"></script>
+<script type="text/javascript">
+function generateQRCode(aaid) {
+    var url = '/activity/' + aaid + '/';
+    console.log(url);
+    window.location.href = url;
+}
+</script>
 {% endblock %}
