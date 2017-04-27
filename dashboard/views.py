@@ -165,8 +165,8 @@ def users(request):
 @login_required
 @admin_required
 def getUsers(request):
-	page = request.GET['page']
-	number = request.GET['number']
+	page = int(request.GET['page'])
+	number = int(request.GET['number'])
 	page_total = getUserPageCount(number)
 	user_list = getUserListByPageAndNumber(page, number)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'user_list':user_list}})

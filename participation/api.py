@@ -206,6 +206,7 @@ def activityAuthorityCheck(uid, aaid):
 
 def getUserPageCount(number):
     count = User.objects.all().count()
+    print number, type(number)
     return ((count-1) / number ) +1
 
 def getUserListByPageAndNumber(page, number):

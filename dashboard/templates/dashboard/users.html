@@ -121,10 +121,10 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-// $.get('/admin/users/get', {page: 1, number: 20})
-// .done(function(data) {
-//     console.log(data);
-// })
+ $.get('/admin/users/get', {page: 1, number: 20})
+ .done(function(data) {
+     console.log(data);
+ })
 $('#dpm_selector').select2();
 $('#su_selector').select2();
 </script>
