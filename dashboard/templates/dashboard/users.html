@@ -121,10 +121,20 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
- $.get('/admin/users/get', {page: 1, number: 20})
- .done(function(data) {
-     console.log(data);
- })
+$.get('/admin/users/get', {
+  page: 1, 
+  number: 20,
+  departments: [1],
+  sub_unions: [2],
+  activities: [],
+  checked_in: false
+})
+.done(function(data) {
+    alert(data);
+})
+.fall(function() {
+    alert('请求失败！')
+})
 $('#dpm_selector').select2();
 $('#su_selector').select2();
 </script>
