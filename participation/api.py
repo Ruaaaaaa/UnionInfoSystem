@@ -100,7 +100,7 @@ def userCheckIn(uid, aaid):
         print u"签到过了"
         return 2
     rec.check_in = 1
-    rec.checkin_at = datetime.datetime.now()
+    rec.checkin_at = datetime2timestamp(datetime.datetime.now())
     rec.save()
     print "签到成功"
     return 1
@@ -125,7 +125,7 @@ def userSignIn(uid, aaid):
             uid = user.uid,
             user = user,
             activity = act,
-            signin_at = datetime.datetime.now()
+            signin_at = datetime2timestamp(datetime.datetime.now())
         )
         rec.save()
         return 1
@@ -183,10 +183,10 @@ def createNewActivity(uid, act_attributes):
         title = act_attributes['title'],
         description = act_attributes['description'],
         content = act_attributes['content'],
-        signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at']),
-        signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at']),
-        begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at']),
-        end_at = datetime.datetime.fromtimestamp(act_attributes['end_at']),
+        signin_begin_at = act_attributes['signin_begin_at'],
+        signin_end_at = act_attributes['signin_end_at'],
+        begin_at = act_attributes['begin_at'],
+        end_at = act_attributes['end_at'],
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
@@ -262,10 +262,10 @@ def editActivity(uid,act_attributes):
     act.title = act_attributes['title']
     act.description = act_attributes['description']
     act.content = act_attributes['content']
-    act.signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at'])
-    act.signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at'])
-    act.begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at'])
-    act.end_at = datetime.datetime.fromtimestamp(act_attributes['end_at'])
+    act.signin_begin_at = act_attributes['signin_begin_at']
+    act.signin_end_at = act_attributes['signin_end_at']
+    act.begin_at = act_attributes['begin_at']
+    act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
     act.save()
