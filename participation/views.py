@@ -126,7 +126,7 @@ def checkIn(request, aaid):
 		elif result == 2:
 			return JsonResponse({'status': 'error', 'msg': '您已签到。'})
 		else:
-			return JsonResponse({'status': 'error', 'msg': '签到成功！'})
+			return JsonResponse({'status': 'success', 'msg': '签到成功！'})
 
 
 @require_http_methods(['GET'])
@@ -141,18 +141,17 @@ def checkInSuccess(request):
 def checkInFail(request):
 	return render(request, 'participation/checkin_fail.html', {})
 
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['POST'])
 @csrf_exempt
 @login_required
 def signIn(request, aaid):
-	if request.method == 'GET':
-		return render(request, 'participation/signin.html', {'aaid': aaid})
+	uid, identity = sessions.getUser(request)
+	if(uid == None):
+		return JsonResponse({'status': 'error', 'msg': '身份验证出错，请重新登录！'})
+	result = userSignIn(uid, aaid) ;
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '报名失败！'})
+	elif result == 2:
+		return JsonResponse({'status': 'error', 'msg': '您已报名。'})
 	else:
-		uid = request.sessions['uid']
-		result = userSignIn(uid, aaid) ;
-		if result == 0:
-			return JsonResponse({'status': 'error', 'msg': '报名失败！'})
-		elif result == 2:
-			return JsonResponse({'status': 'error', 'msg': '您已报名。'})
-		else:
-			return JsonResponse({'status': 'error', 'msg': '报名成功！'})
+		return JsonResponse({'status': 'success', 'msg': '报名成功！'})
