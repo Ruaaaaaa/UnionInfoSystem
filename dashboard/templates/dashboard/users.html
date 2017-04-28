@@ -35,14 +35,14 @@
 
 {% block body %}
 {% include 'dashboard/header.html' %}
-<div class="container-fluid content-wrapper">
+<div class="container-fluid content-wrapper" id="root">
     <div class="row">
         <div class="col-xs-12 col-sm-9">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">用户列表</h3>
                 </div>
-                <div class="panel-body" id="root">
+                <div class="panel-body" >
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead>
@@ -104,22 +104,16 @@
                       <div class="form-group">
                           <label>单位</label>
                           <select id="dpm_selector" class="form-control" multiple="multiple">
-                              <option value="MJ">麻将</option>
-                              <option value="HG">火锅</option>
                           </select>
                       </div>
                       <div class="form-group">
                           <label>分工会</label>
                           <select id="su_selector" class="form-control" multiple="multiple">
-                              <option value="MJQ">麻将</option>
-                              <option value="HGE">火锅</option>
                           </select>
                       </div>
                       <div class="form-group">
                           <label>报名活动</label>
                           <select id="act_selector" class="form-control" multiple="multiple">
-                              <option value="MJA">吃香锅</option>
-                              <option value="HGR">打麻将</option>
                           </select>
                       </div>
                       <div class="checkbox">
@@ -127,7 +121,7 @@
                               <input type="checkbox" name="checked_in">已经签到
                           </label>
                       </div>
-                      <button type="button" class="btn btn-default">筛选</button>
+                      <button type="button" class="btn btn-default" v-on:click="filt">筛选</button>
                   </form>
               </div>
             </div>
@@ -163,20 +157,32 @@ new Vue({
     n_pages: 10,
     current_page: 1,
     request_url: '/admin/users/get',
-    departments_selected: [],
-    sub_unions_selected: [],
-    activities_selected: [],
     checked_in: false,
     number_per_page: 20,
   },
   created: function() {
-    // get departments
-    // get sub_unions
-    // get activities
-    $('#dpm_selector').select2();
-    $('#su_selector').select2();
-    $('#act_selector').select2();
-    // this.getUserList();
+    window.departments_selected = [];
+    window.sub_unions_selected = [];
+    window.activities_selected = [];
+    $.get('/admin/departments/get')
+    .done(function(data) {
+      $('#dpm_selector').select2({
+        data: data.data.departments
+      });
+    });
+    $.get('/admin/subunions/get')
+    .done(function(data) {
+      $('#su_selector').select2({
+        data: data.data.subunions
+      });
+    });
+    $.get('/admin/activities/get')
+    .done(function(data) {
+      $('#act_selector').select2({
+        data: data.data.activities
+      });
+    })
+    this.getUserList();
   },
   methods: {
     showFilters: function() {
@@ -189,11 +195,11 @@ new Vue({
         type: 'POST',
         url: '/admin/users/get',
         data: JSON.stringify({
-            page: this.page,
+            page: this.current_page,
             number: this.number_per_page,
-            departments: this.departments_selected,
-            sub_unions: this.sub_unions_selected,
-            activities: this.activities_selected,
+            departments: window.departments_selected,
+            sub_unions: window.sub_unions_selected,
+            activities: window.activities_selected,
             checked_in: this.checked_in
           }),
         contentType: 'application/json'
@@ -214,7 +220,16 @@ new Vue({
     },
     toPage: function(page) {
       this.current_page = page;
-      //this.getUserList();
+      this.getUserList();
+    },
+    filt: function() {
+      window.departments_selected = $('#dpm_selector').val().map(Number);
+      window.sub_unions_selected = $('#su_selector').val().map(Number);
+      window.activities_selected = $('#act_selector').val().map(Number);
+      console.log(window.departments_selected);
+      console.log(window.sub_unions_selected);
+      console.log(window.activities_selected);
+      this.toPage(1);
     }
   }
 })
