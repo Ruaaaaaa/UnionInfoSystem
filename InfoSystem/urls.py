@@ -36,9 +36,13 @@ urlpatterns = [
     url(r'^admin/activity$', dashboard.activity),
     url(r'^admin/activity/new$', dashboard.newActivity),
     url(r'^admin/activity/([0-9, a-z]{10})/edit$', dashboard.editActivity),
+    url(r'^admin/activity/([0-9, a-z]{10})/delete', dashboard.deleteActivity),
     url(r'^admin/activity/([0-9, a-z]{10})/download$', dashboard.downloadActivity),
     url(r'^admin/users$', dashboard.users),
     url(r'^admin/users/get', dashboard.getUsers),
+    url(r'^admin/activities/get', dashboard.getActivities),
+    url(r'^admin/departments/get', dashboard.getDepartments),
+    url(r'^admin/subunions/get', dashboard.getSubUnions),
     url(r'^admin/users/download$', dashboard.downloadUsers),
     url(r'^admin/broadcast$', dashboard.broadcast),
 ]

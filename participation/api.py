@@ -45,8 +45,6 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        user = User(id_hash = idnumber)
-        user.save()
         print u"没有这个身份证号"
         return 0
     if user.registered :
@@ -60,14 +58,14 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        #user = User(id_hash = idnumber)
-        #user.save() 
         print u"没有这个身份证号"
         return 0
+    user.registered = 1
     user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
+    user.register_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     user.save()
     return 1
 
@@ -210,13 +208,42 @@ def getUserPageCount(number):
     print number, type(number)
     return ((count-1) / number ) +1
 
-def getUserListByPageAndNumber(page, number):
+def filterUsers(departments, activities, checked_in):
     userlist=[]
-    for i in range((page-1)*number+1,page*number) :
+
+    for i in range(1,100000000):
         try:
             user = User.objects.get(uid = i)
         except ObjectDoesNotExist:
-            return userlist
+            break
+
+        if len(departments) > 0:
+            flag = 0
+            for i in range(0, len(departments)):
+                if departments[i] == user['department']:
+                    flag = 1
+                    break
+            if not flag: continue 
+        if len(sub_unions) > 0:
+            flag = 0
+            for i in range(0, len(sub_unions)):
+                if sub_unions[i] == user['sub_union']:
+                    flag = 1
+                    break
+            if not flag: continue 
+        if len(activities) > 0:
+            flag = 0
+            for i in range(0, len(activities)):
+                try:
+                    record = user.records.get(aid = activities[i])
+                except ObjectDoesNotExist:
+                    continue 
+                if record['checked_in'] == False:
+                    continue
+                flag = 1
+                break
+            if not flag: continue   
+
         userlist.append(model_to_dict(user))
     return userlist
 
@@ -276,3 +303,12 @@ def doEditActivity(uid,act_attributes):
     act.need_checkin = act_attributes['need_checkin']
     act.save()
     return 1
+
+def updateUserLoginTime(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无此用户"
+        return 0
+    user.last_login_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
+    user.save()

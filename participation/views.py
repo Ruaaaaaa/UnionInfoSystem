@@ -39,6 +39,7 @@ def login(request):
 		identity = getIdentityByUid(uid)
 		if sessions.login(request, uid, identity) == False:
 			return JsonResponse({'status': 'error', 'msg': '登录失败!'})
+		updateUserLoginTime(uid)
 		return JsonResponse({'status': 'success', 'msg': '登陆成功!'})
 
 @require_http_methods(['GET'])
@@ -146,7 +147,6 @@ def checkInFail(request):
 @login_required
 def signIn(request, aaid):
 	uid, identity = sessions.getUser(request)
-	print type(aaid)
 	if(uid == None):
 		return JsonResponse({'status': 'error', 'msg': '身份验证出错，请重新登录！'})
 	result = userSignIn(uid, aaid) ;
