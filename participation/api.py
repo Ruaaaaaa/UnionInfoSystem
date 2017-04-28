@@ -308,4 +308,18 @@ def updateUserLoginTime(uid):
 
 def getUserInformationListByActivity(aaid):
     list = []
+    try:
+        activity = Activity.objects.get(aaid = aaid)
+    except ObjectDoesNotExist:
+        print u"无此活动"
+        return []
+    records = activity.records.all()
+    for record in records :
+        user = record.user
+        dic = model_to_dict(user)
+        dic['rid'] = record.rid
+        dic['signin_at'] = record.signin_at
+        dic['checked_in'] = record.checked_in
+        dic['checkin_at'] = record.checkin_at
+        list.append(dic)
     return list
