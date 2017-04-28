@@ -59,7 +59,7 @@
       {% for act in activities %}
       <div class="col-xs-12 col-sm-4 col-md-3">
         <div class="thumbnail">
-          <img src="http://s.amazeui.org/media/i/demos/bw-2014-06-19.jpg?imageView/1/w/1000/h/1000/q/80" alt="...">
+          <img src="{{ act.poster.url }}">
           <div class="caption">
             <p>#{{ act.aaid }}</p>
             <h4>{{ act.title }}</h4>

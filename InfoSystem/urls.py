@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.views import static
 from dashboard import views as dashboard
 from participation import views as participation
 from base import views as base
+import settings
 
 urlpatterns = [
+    url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
 	# User part
     url(r'^login', participation.login),
     url(r'^logout', participation.logout),
