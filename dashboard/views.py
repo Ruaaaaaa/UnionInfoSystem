@@ -14,17 +14,19 @@ from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
 
 import json
+import os
+import xlrd
+import xlwt
 
 from InfoSystem.shared import dashboard_tabs
 from base import sessions
 from participation.api import *
 from dashboard.api import *
-
 # Create your views here.
 
 
-def file_iterator(file_name, chunk_size=512):
-	with open(file_name) as f:
+def file_iterator(file_name, chunk_size=8192):
+	with open(file_name, "rb") as f:
 		while True:
 			c = f.read(chunk_size)
 			if c:
@@ -156,9 +158,40 @@ def deleteActivity(request, aaid):
 @login_required
 @admin_required
 def downloadActivity(request, aaid): 
-	return JsonResponse({'status': 'success', 'msg': 'download'})
+
+	uid = sessions.getUser(request)[0] 
+	username = getUsernameByUid(uid)
+	if activityAuthorityCheck(uid, aaid) != 1:
+		return JsonResponse({'status': 'error', 'msg': '无权下载此活动信息！'})
+
+	#excel part
+	dirpath = r"dashboard/files/%s"%aaid
+	print dirpath
+	if not os.path.exists(dirpath):
+		os.makedirs(dirpath)
+	xlpath = dirpath+"/userinfo.xls"
+	style0 = xlwt.easyxf('font: name Times New Roman, color-index red, bold on',
+	    num_format_str='#,##0.00')
+	style1 = xlwt.easyxf(num_format_str='D-MMM-YY')
+
+	wb = xlwt.Workbook()
+	ws = wb.add_sheet('A Test Sheet')
+
+	ws.write(0, 0, 1234.56, style0)
+	ws.write(1, 0, datetime.datetime.now(), style1)
+	ws.write(2, 0, 1)
+	ws.write(2, 1, 1)
+	ws.write(2, 2, xlwt.Formula("A3+B3"))
+	wb.save(xlpath)
+
+	#txt part
+
+	#packagepart
 
 
+	response = StreamingHttpResponse(file_iterator(xlpath))
+	response['Content-Disposition'] = 'attachment;filename="userinfo_%s.xls"'%aaid
+	return response
 
 @require_http_methods(['GET'])
 @login_required
@@ -187,11 +220,7 @@ def getUsers(request):
 	except Exception,e:  
 		return JsonResponse({'status': 'error', 'msg': e})
 	#page_total = getUserPageCount(number)
-	full_user_list = filterUsers(departments, sub_unions, activities, checked_in)
-	page_total = len(full_user_list)/number
-	user_list = []
-	for i in range((page-1)*number, min(len(full_user_list), page*number)):
-		user_list.append(full_user_list[i])
+	user_list, page_total = getUserListByFilter(page, number, departments, sub_unions, activities, checked_in)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'user_list':user_list}})
 
 

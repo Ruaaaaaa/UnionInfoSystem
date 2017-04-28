@@ -99,19 +99,5 @@
     "fields": {
       "name": "足球分工会"
     }
-  },
-  {
-    "model": "base.Activity",
-    "pk": 1,
-    "fields" : {
-      "title": "长跑活动",
-      "description": "这是一次娱乐的长跑活动。",
-      "poster": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1493213376326&di=30802fc85ac40de316b1b0be56d69b0c&imgtype=0&src=http%3A%2F%2Fi10.topit.me%2Fl053%2F100537300422b8f5da.jpg",
-      "content": "This is content.",
-      "aaid": "1000000000",
-      "creator_id": 1,
-      "signin_count": 1435,
-      "need_checkin": true
-    }
   }
 ]
