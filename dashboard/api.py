@@ -40,7 +40,7 @@ def getDepartmentListSimple():
 	departments = Department.objects.all()
 	deplist = []
 	for depart in departments:
-		temp = model_to_dict(dep)
+		temp = model_to_dict(depart)
 		result = {}
 		result['id'] = temp['did']
 		result['text'] = temp['name']
