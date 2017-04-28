@@ -189,6 +189,7 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
+    print model_to_dict(act)
     act.save()
     return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
 
