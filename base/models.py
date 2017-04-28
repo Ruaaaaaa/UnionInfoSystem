@@ -24,7 +24,7 @@ class User(models.Model):
     name = models.CharField(max_length = 32)
     sex = models.BooleanField(default = 0)
     wid = models.CharField(max_length = 32, null = True)
-    photo = models.CharField(max_length = 256, null = True)
+    photo = models.ImageField(upload_to = 'photos/', default = 'photos/None/no-img.jpg')
     id_hash = models.CharField(max_length = 256, null = True)
     id_partial = models.CharField(max_length = 32, null = True)
     mobile = models.CharField(max_length = 11, null = True)

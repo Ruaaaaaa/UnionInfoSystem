@@ -55,6 +55,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'InfoSystem.urls'
 
+MEDIA_ROOT = 'media/'
+
+MEDIA_URL = 'media/'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
