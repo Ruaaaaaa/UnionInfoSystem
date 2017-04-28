@@ -210,13 +210,42 @@ def getUserPageCount(number):
     print number, type(number)
     return ((count-1) / number ) +1
 
-def getUserListByPageAndNumber(page, number):
+def filterUsers(departments, activities, checked_in):
     userlist=[]
-    for i in range((page-1)*number+1,page*number) :
+
+    for i in range(1,100000000):
         try:
             user = User.objects.get(uid = i)
         except ObjectDoesNotExist:
-            return userlist
+            break
+
+        if len(departments) > 0:
+            flag = 0
+            for i in range(0, len(departments)):
+                if departments[i] == user['department']:
+                    flag = 1
+                    break
+            if not flag: continue 
+        if len(sub_unions) > 0:
+            flag = 0
+            for i in range(0, len(sub_unions)):
+                if sub_unions[i] == user['sub_union']:
+                    flag = 1
+                    break
+            if not flag: continue 
+        if len(activities) > 0:
+            flag = 0
+            for i in range(0, len(activities)):
+                try:
+                    record = user.records.get(aid = activities[i])
+                except ObjectDoesNotExist:
+                    continue 
+                if record['checked_in'] == False:
+                    continue
+                flag = 1
+                break
+            if not flag: continue   
+
         userlist.append(model_to_dict(user))
     return userlist
 

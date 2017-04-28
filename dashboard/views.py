@@ -160,14 +160,25 @@ def users(request):
 
 
 
-@require_http_methods(['GET'])
+
+@require_http_methods(['POST'])
+@csrf_exempt
 @login_required
 @admin_required
 def getUsers(request):
-	page = int(request.GET['page'])
-	number = int(request.GET['number'])
-	page_total = getUserPageCount(number)
-	user_list = getUserListByPageAndNumber(page, number)
+	print request.POST['departments[]']
+	page = int(request.POST['page'])
+	number = int(request.POST['number'])
+	departments = list(request.POST['departments'])
+	sub_unions = list(request.POST['sub_unions'])
+	activities = list(request.POST['activities'])
+	checked_in = True if request.POST['checked_in'][0] == 'T' else False
+	#page_total = getUserPageCount(number)
+	full_user_list = filterUsers(departments, sub_unions, activities, checked_in)
+	page_total = len(full_user_list)/number
+	user_list = []
+	for i in range((page-1)*number, min(len(full_user_list), page*number)):
+		user_list.append(full_user_list[i])
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'user_list':user_list}})
 
 
