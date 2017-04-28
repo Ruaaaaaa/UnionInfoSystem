@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
 import datetime
 import hashlib
+import os
 
 def getUidByUsername(username):
     try:
@@ -189,7 +190,9 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
-    act.poster.save(aaid_md+'.jpg',act_attributes['image'],0)
+    print 'name?',act_attributes['filename']
+    (pre,suf) = os.path.splitext(act_attributes['filename'])
+    act.poster.save(aaid_md+'.'+suf,act_attributes['image'],0)
     act.save()
     return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
 
