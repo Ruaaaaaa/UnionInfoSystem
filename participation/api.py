@@ -289,7 +289,7 @@ def doEditActivity(uid,act_attributes):
     act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
-    act.poster.save(aaid_md+'.jpg',act_attributes['image'],0)
+    act.poster.save(act.aaid+'.jpg',act_attributes['image'],0)
     act.save()
     return 1
 
@@ -301,3 +301,7 @@ def updateUserLoginTime(uid):
         return 0
     user.last_login_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     user.save()
+
+def getUserInformationListByActivity(aaid):
+    list = []
+    return list
