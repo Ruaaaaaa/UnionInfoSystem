@@ -21,14 +21,28 @@
 .btn-group {
   width: 100%;
 }
-.btn-group .btn {
+.btn-group .group-btn-2{
   width: 50%;
+}
+.btn-group .group-btn-3{
+  width: 33.33%;
 }
 #qr_div {
   text-align: center;
 }
+#qr_div img {
+  width: 100%;
+}
 .content-loading {
   text-align: center;
+}
+.qr-modal-body {
+  width: 60%;
+}
+@media (min-width: 768px) {
+  .qr-modal-body {
+    width: 40%;
+  }
 }
 </style>
 {% endblock %}
@@ -56,18 +70,22 @@
             <p>活动开始: <span class="act-time">{{ act.begin_at }}</span></p>
             <p>活动结束: <span class="act-time">{{ act.end_at }}</span></p>
             <p>{{ act.description }}</p>
-            <div class="btn-group" role="group" aria-label="...">
-              <button type="button" class="btn btn-default" @click="showContent('{{ act.aaid }}')">活动内容</button>
-              <button type="button" class="btn btn-default" @click="showQR('{{ act.aaid }}')">二维码</button>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default group-btn-3" @click="showContent('{{ act.aaid }}')">活动内容</button>
+              <button type="button" class="btn btn-default group-btn-3" @click="showQR('{{ act.aaid }}')">二维码</button>
+              <button type="button" class="btn btn-default group-btn-3" @click="downloadInfo('{{ act.aaid }}')">导出数据</button>
             </div>
-            <button class="btn btn-default btn-block" @click="downloadInfo('{{ act.aaid }}')">导出用户数据</button>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default group-btn-2" @click="edit('{{ act.aaid }}')">修改</button>
+              <button type="button" class="btn btn-default group-btn-2" @click="remove('{{ act.aaid }}')">删除</button>
+            </div>
           </div>
         </div>
       </div>
       {% endfor %}
     </div>
     <div class="modal fade" id="qr_modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog qr-modal-body" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -133,18 +151,21 @@ var app = new Vue({
             width: 200,
             height: 200
         });
-        console.log(this.QRCode);
       }
       else {
         this.QRCode.clear();
-        console.log(this.QRCode);
         this.QRCode.makeCode("http://127.0.0.1:8000/activity/" + aaid);
-        console.log(this.QRCode);
       }
       $('#qr_modal').modal('show');
     },
     downloadInfo: function(aaid) {
       console.log('download ' + aaid);
+    },
+    edit: function(aaid) {
+      window.open('/admin/activity/' + aaid + '/edit');
+    },
+    remove: function(aaid) {
+      console.log('remove');
     }
   }
 })

@@ -177,17 +177,22 @@ function init() {
       toggleButton(0);
       return;
     }
-    $.post(window.location.pathname, {
-      title: title,
-      description: description,
-      content: content,
-      signin_begin_at: dtp_ss,
-      signin_end_at: dtp_se,
-      begin_at: dtp_as,
-      end_at: dtp_ae,
-      signin_restrict: signin_restrict,
-      signin_max: signin_max,
-      need_checkin: need_checkin
+    $.ajax({
+      type: 'POST',
+      url: window.location.pathname,
+      contentType: 'application/json',
+      data: JSON.stringify({
+        title: title,
+        description: description,
+        content: content,
+        signin_begin_at: dtp_ss,
+        signin_end_at: dtp_se,
+        begin_at: dtp_as,
+        end_at: dtp_ae,
+        signin_restrict: signin_restrict,
+        signin_max: signin_max,
+        need_checkin: need_checkin
+      })
     })
     .done(function(data){
       if(data.status == 'success') {
