@@ -95,6 +95,7 @@ def newActivity(request):
 	else:
 		act_attributes = json.loads(request.POST['data'])
 		imagefile = request.FILES['poster']
+		act_attributes['filename'] = imagefile.name
 		act_attributes['image'] = ContentFile(imagefile.read())
 		create_result = createNewActivity(uid, act_attributes)
 		if create_result['status'] == "error":
