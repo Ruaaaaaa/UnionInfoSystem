@@ -39,6 +39,7 @@ def login(request):
 		identity = getIdentityByUid(uid)
 		if sessions.login(request, uid, identity) == False:
 			return JsonResponse({'status': 'error', 'msg': '登录失败!'})
+		updateUserLoginTime(uid)
 		return JsonResponse({'status': 'success', 'msg': '登陆成功!'})
 
 @require_http_methods(['GET'])

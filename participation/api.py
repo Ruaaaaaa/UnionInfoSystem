@@ -45,8 +45,6 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        user = User(id_hash = idnumber)
-        user.save()
         print u"没有这个身份证号"
         return 0
     if user.registered :
@@ -60,14 +58,14 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        #user = User(id_hash = idnumber)
-        #user.save() 
         print u"没有这个身份证号"
         return 0
+    user.registered = 1
     user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
+    user.register_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     user.save()
     return 1
 
@@ -305,3 +303,12 @@ def doEditActivity(uid,act_attributes):
     act.need_checkin = act_attributes['need_checkin']
     act.save()
     return 1
+
+def updateUserLoginTime(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无此用户"
+        return 0
+    user.last_login_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
+    user.save()

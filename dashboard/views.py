@@ -123,11 +123,29 @@ def editActivity(request, aaid):
 		elif authority == 0:
 			return JsonResponse({'status': 'error', 'msg': '您无权修改此活动！'})
 		editresult = doEditActivity(uid, act_attributes)
-		print '!!!', editresult
 		if editresult == 0:
 			return JsonResponse({'status': 'error', 'msg': '修改活动失败！'})
 		else: 
 			return JsonResponse({'status': 'success', 'msg': '修改活动成功!'})	
+
+
+
+@require_http_methods(['GET'])
+@csrf_exempt
+@login_required
+@admin_required
+def deleteActivity(request, aaid):
+	uid = sessions.getUser(request)[0] 
+	authority = activityAuthorityCheck(uid, aaid)
+	if authority == -1:
+		return JsonResponse({'status': 'error', 'msg': '无此活动！'})
+	elif authority == 0:
+		return JsonResponse({'status': 'error', 'msg': '您无权删除此活动！'})
+	deleteresult = doDeleteActivity(uid, aaid)
+	if deleteresult == 0:
+		return JsonResponse({'status': 'error', 'msg': '删除活动失败！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '删除活动成功!'})	
 
 
 # 先不管这个了，弃疗
@@ -155,13 +173,16 @@ def users(request):
 @login_required
 @admin_required
 def getUsers(request):
-	print request.POST['departments[]']
-	page = int(request.POST['page'])
-	number = int(request.POST['number'])
-	departments = list(request.POST['departments'])
-	sub_unions = list(request.POST['sub_unions'])
-	activities = list(request.POST['activities'])
-	checked_in = True if request.POST['checked_in'][0] == 'T' else False
+	dic = json.loads(request.body)
+	try:
+		page = dic['page']
+		number = dic['number']
+		departments = dic['departments']
+		sub_unions = dic['sub_unions']
+		activities = dic['activities']
+		checked_in = dic['checked_in']
+	except Exception,e:  
+		return JsonResponse({'status': 'error', 'msg': e})
 	#page_total = getUserPageCount(number)
 	full_user_list = filterUsers(departments, sub_unions, activities, checked_in)
 	page_total = len(full_user_list)/number
@@ -193,3 +214,23 @@ def downloadUsers(request):
 @admin_required
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getActivities(request):
+	return JsonResponse({'status':'success', 'msg': '获取活动列表成功！', 'data': {'activities': getActivityListSimple()}})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getSubUnions(request):
+	return JsonResponse({'status':'success', 'msg': '获取分工会列表成功！', 'data': {'subunions': getSubUnionListSimple()}})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getDepartments(request):
+	return JsonResponse({'status':'success', 'msg': '获取部门列表成功！', 'data': {'departments': getDepartmentListSimple()}})
