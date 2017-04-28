@@ -44,6 +44,7 @@ class Activity(models.Model):
     aaid = models.CharField(max_length = 10, null = True)
     creator = models.ForeignKey(User, null = True, related_name = 'activities_created')
     title = models.CharField(max_length = 256, null = True)
+    poster = models.ImageField(upload_to = 'poster/', default = 'poster/None/no-img.jpg')
     description = models.CharField(max_length = 2048, null = True)
     content = models.CharField(max_length = 10000, null = True)
     poster = models.CharField(max_length = 256, null = True)

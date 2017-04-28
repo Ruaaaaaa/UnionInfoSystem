@@ -189,6 +189,7 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
+    act.poster.save(aaid_md+'.jpg',act_attributes['image'],0)
     act.save()
     return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
 
@@ -288,6 +289,7 @@ def doEditActivity(uid,act_attributes):
     act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
+    act.poster.save(aaid_md+'.jpg',act_attributes['image'],0)
     act.save()
     return 1
 
