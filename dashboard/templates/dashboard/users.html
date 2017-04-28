@@ -205,7 +205,8 @@ new Vue({
         contentType: 'application/json'
       })
       .done(function(data) {
-        self.n_pages = data.data.n_pages;
+        console.log(data.data.user_list)
+        self.n_pages = data.data.page_total;
         self.user_list = data.data.user_list;
       })
       .fail(function() {

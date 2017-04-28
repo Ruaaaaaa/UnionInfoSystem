@@ -207,31 +207,32 @@ def activityAuthorityCheck(uid, aaid):
 
 def getUserListByFilter(page, number, departments, sub_unions, activities, check_in):
     userlist=[]
+    users = User.objects.all().exclude(is_admin = 1)
     if len(departments) > 0:
         deps = Department.objects.filter(did__in = departments)
         users = User.objects.filter(department__in = deps)
     if len(sub_unions) > 0:
-        subs = Subunion.objects.filter(sid__in = sub_unioins)
-        users = users.objects.filter(sub_unions__in = subs)
+        subs = Subunion.objects.filter(suid__in = sub_unions)
+        users = users.filter(subunion__in = subs)
     if len(activities) > 0:
         acts = Activity.objects.filter(aid__in = activities)
         recs = Record.objects.fillter(activity__in = acts)
         if check_in :
-            recs = recs.objects.fillter(checked_in = 1)
+            recs = recs.fillter(checked_in = 1)
         uids = []
         for rec in recs:
             uids.append(rec.user.uid)
-        users = users.objects.filter(uid__in = uids)
+        users = users.filter(uid__in = uids)
     count = 0
-    number*(page-1)+1 , page*number
     for user in users:
         count = count + 1
         if (count >= number*(page-1)+1 and count <= number*page):
             dict = model_to_dict(user)
-            dict['set_text'] = u'男' if user.sex else u'女'
+            dict['sex_text'] = u'男' if user.sex else u'女'
             dict['department_text'] = user.department.name
             dict['sub_union_text'] = user.subunion.name
-            uesrlist.append(dict)
+            dict['photo'] = ''
+            userlist.append(dict)
     return (userlist, (count-1)/number+1)
 
 

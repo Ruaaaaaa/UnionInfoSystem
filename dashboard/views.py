@@ -187,11 +187,7 @@ def getUsers(request):
 	except Exception,e:  
 		return JsonResponse({'status': 'error', 'msg': e})
 	#page_total = getUserPageCount(number)
-	full_user_list = filterUsers(departments, sub_unions, activities, checked_in)
-	page_total = len(full_user_list)/number
-	user_list = []
-	for i in range((page-1)*number, min(len(full_user_list), page*number)):
-		user_list.append(full_user_list[i])
+	user_list, page_total = getUserListByFilter(page, number, departments, sub_unions, activities, checked_in)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'user_list':user_list}})
 
 
