@@ -16,7 +16,11 @@ def getActivityListSimple():
 	activities = Activity.objects.all()
 	actlist = []
 	for act in activities:
-		actlist.append(model_to_dict(act, fields = ['aid', 'title']))
+		temp = model_to_dict(act, fields = ['aid', 'title'])
+		result = {}
+		result['id'] = temp['aid']
+		result['text'] = temp['title']
+		actlist.append(result)
 	return actlist
 
 
@@ -24,7 +28,11 @@ def getSubUnionListSimple():
 	subunions = Subunion.objects.all()
 	sublist = []
 	for sub in subunions:
-		sublist.append(model_to_dict(sub))
+		temp = model_to_dict(sub)
+		result = {}
+		result['id'] = temp['suid']
+		result['text'] = temp['name']
+		sublist.append(result)
 	return sublist
 
 
@@ -32,7 +40,11 @@ def getDepartmentListSimple():
 	departments = Department.objects.all()
 	deplist = []
 	for depart in departments:
-		deplist.append(model_to_dict(depart))
+		temp = model_to_dict(dep)
+		result = {}
+		result['id'] = temp['did']
+		result['text'] = temp['name']
+		deplist.append(result)
 	return deplist
 
 

@@ -8,7 +8,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.http import StreamingHttpResponse
-
+from django.core.files.base import ContentFile
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
@@ -77,7 +77,6 @@ def activity(request):
 	uid = sessions.getUser(request)[0] 
 	username = getUsernameByUid(uid)
 	act_list = getActivitiesByUidSimple(uid)
-	print act_list
 	return render(request, 'dashboard/activity.html', {'tab': dashboard_tabs['activity'], 'username': username, 'activities': act_list})
 
 
@@ -92,8 +91,9 @@ def newActivity(request):
 	if request.method == 'GET':
 		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'type': 'new', 'username': username})
 	else:
-		act_attributes = json.loads(request.body)
-		print request.body
+		act_attributes = json.loads(request.POST['data'])
+		imagefile = request.FILES['poster']
+		act_attributes['image'] = ContentFile(imagefile.read())
 		create_result = createNewActivity(uid, act_attributes)
 		if create_result['status'] == "error":
 			JsonResponse({'status': 'error', 'msg': create_result['msg']})
@@ -115,13 +115,16 @@ def editActivity(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'activity': activity, 'username': username, 'type': 'edit'})
 	else:
-		act_attributes = json.loads(request.body)
+		act_attributes = json.loads(request.POST['data'])
 		act_attributes ['aaid'] = aaid
 		authority = activityAuthorityCheck(uid, aaid)
 		if authority == -1:
 			return JsonResponse({'status': 'error', 'msg': '无此活动！'})
 		elif authority == 0:
 			return JsonResponse({'status': 'error', 'msg': '您无权修改此活动！'})
+
+		imagefile = request.FILES['poster']
+		act_attributes['image'] = ContentFile(imagefile.read())
 		editresult = doEditActivity(uid, act_attributes)
 		if editresult == 0:
 			return JsonResponse({'status': 'error', 'msg': '修改活动失败！'})
