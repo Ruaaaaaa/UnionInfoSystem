@@ -133,8 +133,7 @@ function validateForm(title, description, content, poster, dtp_ss, dtp_se, dtp_a
     alert('活动时间不能为空！'); return;
   }
   if(signin_restrict) {
-    signin_max_int = parseInt(signin_max, 10);
-    if(isNaN(signin_max_int) || signin_max_int <= 0) {
+    if(isNaN(signin_max) || signin_max_int <= 0) {
       alert('报名人数上限必须是正整数！');
       return;
     }
@@ -212,7 +211,7 @@ function init() {
     moment_tmp = $('#dtp_ae').data('DateTimePicker').date();
     var dtp_ae = moment_tmp? moment_tmp.unix() : null;
     var signin_restrict = $('#signin_restrict').get(0).checked;
-    var signin_max = $('#signin_max').val();
+    var signin_max = parseInt($('#signin_max').val(), 10);
     var need_checkin = $('#need_checkin').get(0).checked;
     var poster = $('#poster')[0].files[0];
     if(!validateForm(title, description, content, poster, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
@@ -230,8 +229,8 @@ function init() {
         begin_at: dtp_as,
         end_at: dtp_ae,
         signin_restrict: signin_restrict,
-        signin_max: signin_max,
-        need_checkin: need_checkin      
+        signin_max: signin_restrict? signin_max: null,
+        need_checkin: need_checkin
     }));
     $.ajax({
       type: 'POST',
