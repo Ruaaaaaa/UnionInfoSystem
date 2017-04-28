@@ -15,7 +15,7 @@
 
 {% block body %}
 {% include 'dashboard/header.html' %}
-<div class="container-fluid content-wrapper">
+<div class="container-fluid content-wrapper" id="root">
     <div class="row">
         <div class="col-xs-12 col-sm-9">
             <div class="panel panel-default">
@@ -121,21 +121,34 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-$.get('/admin/users/get', {
-  page: 1, 
-  number: 20,
-  departments: [1],
-  sub_unions: [2],
-  activities: [],
-  checked_in: false
+$.ajax({
+  type: 'POST',
+  url: '/admin/users/get',
+  data: JSON.stringify({
+      page: 1,
+      number: 20,
+      departments: [1, 2],
+      sub_unions: [2],
+      activities: [],
+      checked_in: false
+    }),
+  contentType: 'application/json'
 })
 .done(function(data) {
-    alert(data);
+  console.log(data);
 })
-.fall(function() {
-    alert('请求失败！')
+.fail(function() {
+  console.log('fail');
 })
+
 $('#dpm_selector').select2();
 $('#su_selector').select2();
+new Vue({
+  el: '#root',
+  delimiters: ["[[", "]]"],
+  data: {
+    msg: 'shit'
+  }
+})
 </script>
 {% endblock %}

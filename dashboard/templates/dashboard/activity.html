@@ -24,6 +24,12 @@
 .btn-group .btn {
   width: 50%;
 }
+#qr_div {
+  text-align: center;
+}
+.content-loading {
+  text-align: center;
+}
 </style>
 {% endblock %}
 
@@ -73,6 +79,24 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="content_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">活动详情</h4>
+          </div>
+          <div class="modal-body">
+              <div class="content-loading" v-if="contentLoading">
+                  <i class="fa fa-spinner fa-pulse fa-fw"></i> 内容获取中...
+              </div>
+              <div class="act-content" v-if="!contentLoading">
+                  Content
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -93,10 +117,13 @@ var app = new Vue({
   delimiters: ["[[","]]"],
   data: {
     QRCode: null,
+    contentLoading: true
   },
   methods: {
     showContent: function(aaid) {
-      console.log('show content' + aaid);
+      //fetch data from server
+      //fill in 
+      $('#content_modal').modal('show');
     },
     showQR: function(aaid) {
       if(!this.QRCode) {

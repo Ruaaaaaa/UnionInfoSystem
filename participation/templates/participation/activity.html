@@ -50,6 +50,7 @@
 	width: 100%;
 	height: 50px;
 	bottom: 0;
+	display: none;
 }
 .act-hint .act-time {
 	width: 60%;
@@ -141,7 +142,7 @@ var signin_begin_at = {{ activity.signin_begin_at }},
 	end_at = {{ activity.end_at }};
 var aaid = '{{ activity.aaid }}';
 var has_signed_in = false;
-var can_signed_in = true;
+var can_signed_in = false;
 function formatTimeParam(p) {
 	if(p < 10) return '0' + p;
 	else return p;
@@ -191,11 +192,12 @@ function updateStatus() {
 	}
 	else {
 		$('#op_btn').css('background', 'gray').html('活动已结束');
-		$('.act-hint').css('width', '0');
+		$('.act-time').css('display', 'none');
 		$('.act-op').css('width', '100%');
 	}	
 }
 updateStatus();
+$('.act-hint').css('display', 'block');
 $('#op_btn').on('click', function() {
 	var now = moment.unix();
 	if(!can_signed_in)
