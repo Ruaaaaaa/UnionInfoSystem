@@ -189,6 +189,7 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
+    act.poster.save(aaid_md+'.jpg',act_attributes['image'],0)
     act.save()
     return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
 
@@ -203,49 +204,36 @@ def activityAuthorityCheck(uid, aaid):
         return -1
     return act.creator.uid == uid
 
-def getUserPageCount(number):
-    count = User.objects.all().count()
-    print number, type(number)
-    return ((count-1) / number ) +1
 
-def filterUsers(departments, activities, checked_in):
+def getUserListByFilter(page, number, departments, sub_unions, activities, check_in):
     userlist=[]
+    if len(departments) > 0:
+        deps = Department.objects.filter(did__in = departments)
+        users = User.objects.filter(department__in = deps)
+    if len(sub_unions) > 0:
+        subs = Subunion.objects.filter(sid__in = sub_unioins)
+        users = users.objects.filter(sub_unions__in = subs)
+    if len(activities) > 0:
+        acts = Activity.objects.filter(aid__in = activities)
+        recs = Record.objects.fillter(activity__in = acts)
+        if check_in :
+            recs = recs.objects.fillter(checked_in = 1)
+        uids = []
+        for rec in recs:
+            uids.append(rec.user.uid)
+        users = users.objects.filter(uid__in = uids)
+    count = 0
+    number*(page-1)+1 , page*number
+    for user in users:
+        count = count + 1
+        if (count >= number*(page-1)+1 and count <= number*page):
+            dict = model_to_dict(user)
+            dict['set_text'] = u'男' if user.sex else u'女'
+            dict['department_text'] = user.department.name
+            dict['sub_union_text'] = user.subunion.name
+            uesrlist.append(dict)
+    return (userlist, (count-1)/number+1)
 
-    for i in range(1,100000000):
-        try:
-            user = User.objects.get(uid = i)
-        except ObjectDoesNotExist:
-            break
-
-        if len(departments) > 0:
-            flag = 0
-            for i in range(0, len(departments)):
-                if departments[i] == user['department']:
-                    flag = 1
-                    break
-            if not flag: continue 
-        if len(sub_unions) > 0:
-            flag = 0
-            for i in range(0, len(sub_unions)):
-                if sub_unions[i] == user['sub_union']:
-                    flag = 1
-                    break
-            if not flag: continue 
-        if len(activities) > 0:
-            flag = 0
-            for i in range(0, len(activities)):
-                try:
-                    record = user.records.get(aid = activities[i])
-                except ObjectDoesNotExist:
-                    continue 
-                if record['checked_in'] == False:
-                    continue
-                flag = 1
-                break
-            if not flag: continue   
-
-        userlist.append(model_to_dict(user))
-    return userlist
 
 def getBroadcastsSendedByUid(uid):
     try:
@@ -301,6 +289,7 @@ def doEditActivity(uid,act_attributes):
     act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
+    act.poster.save(aaid_md+'.jpg',act_attributes['image'],0)
     act.save()
     return 1
 
