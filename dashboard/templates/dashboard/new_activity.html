@@ -16,6 +16,12 @@
 #submit_btn_loading {
   display: none;
 }
+#poster_canvas {
+  display: none;
+}
+#signin_max_form {
+  display: none;
+}
 </style>
 {% endblock %}
 
@@ -45,7 +51,8 @@
             <div class="form-group" id="poster_form">
               <label class="control-label">宣传图</label>
               <input type="file" id="poster">
-              <p class="help-block">如果你上传的图片不是1:1, 将会被自动裁剪。</p>
+              <p class="help-block">如果你上传的图片不是1:1, 将会被自动压缩比例。</p>
+              <canvas id="poster_canvas" width="200" height="200"></canvas>
             </div>
             <div class="form-group" id="dtp_ss_form">
               <label class="control-label">报名开始时间</label>
@@ -109,7 +116,29 @@ function setTime(ss, se, as, ae) {
   }
 }
 
-function validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin) {
+function validateForm(title, description, content, poster, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin) {
+  if(!title) {
+    alert('标题不能为空！'); return;
+  }
+  if(!description) {
+    alert('活动简介不能为空！'); return;
+  }
+  if(!content) {
+    alert('活动详情不能为空！'); return;
+  }
+  if(!poster) {
+    alert('请上传活动海报！'); return;
+  }
+  if(!dtp_ss || !dtp_se || !dtp_as || !dtp_ae) {
+    alert('活动时间不能为空！'); return;
+  }
+  if(signin_restrict) {
+    signin_max_int = parseInt(signin_max, 10);
+    if(isNaN(signin_max_int) || signin_max_int <= 0) {
+      alert('报名人数上限必须是正整数！');
+      return;
+    }
+  }
   return true;
 }
 
@@ -154,6 +183,18 @@ function init() {
     icons: icons
   });
 
+  {% if activity.signin_max %}
+  $('#signin_max_form').css('display', 'block');
+  {% endif %}
+  $('#signin_restrict').on('click', function() {
+    if(this.checked) {
+      $('#signin_max_form').css('display', 'block');
+    }
+    else {
+      $('#signin_max_form').css('display', 'none');
+    }
+  });
+
   setTime(dtp_ss_init, dtp_se_init, dtp_as_init, dtp_as_init);
 
   $('#submit_btn').on('click', function() {
@@ -173,7 +214,8 @@ function init() {
     var signin_restrict = $('#signin_restrict').get(0).checked;
     var signin_max = $('#signin_max').val();
     var need_checkin = $('#need_checkin').get(0).checked;
-    if(!validateForm(title, description, content, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
+    var poster = $('#poster')[0].files[0];
+    if(!validateForm(title, description, content, poster, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
       toggleButton(0);
       return;
     }
@@ -212,7 +254,22 @@ function init() {
     .always(function(){
       toggleButton(0);
     })
-  })
+  });
+
+  window.reader = new FileReader();
+  window.posterImg = new Image();
+
+  $('#poster').on('change', function() {
+    $('#poster_canvas').css('display', 'block');
+    var file = this.files[0];
+    window.reader.readAsDataURL(file);
+  });
+  window.reader.onload = function() {
+    window.posterImg.src = window.reader.result;
+  };
+  window.posterImg.onload = function() {
+    $('#poster_canvas')[0].getContext('2d').drawImage(window.posterImg, 0, 0, 200, 200);
+  };
 }
 
 init();
