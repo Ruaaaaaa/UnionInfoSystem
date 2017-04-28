@@ -31,19 +31,7 @@ def file_iterator(file_name, chunk_size=512):
 				yield c
 			else:
 				break
-def purifyActivity(cursedactivity):
-	purified = {}
-	for x in cursedactivity.keys():
-		purified[x] = cursedactivity[x]
-	purified['signin_restrict'] = (False if purified['signin_restrict'] == u'false' else True) if purified.has_key('signin_restrict') else None
-	purified['need_checkin'] = (False if purified['need_checkin'] == u'false' else True) if purified.has_key('need_checkin') else None
-	purified['signin_max'] = int(purified['signin_max']) if purified.has_key('signin_max') and purified['signin_restrict'] == True else None
-	purified['aaid'] = int(purified['aaid']) if purified.has_key('aaid') else None
-	purified['begin_at'] = int(purified['begin_at']) if purified.has_key('begin_at') else None
-	purified['end_at'] = int(purified['end_at']) if purified.has_key('end_at') else None
-	purified['signin_begin_at'] = int(purified['signin_begin_at']) if purified.has_key('signin_begin_at') else None
-	purified['signin_end_at'] = int(purified['signin_end_at']) if purified.has_key('signin_end_at') else None
-	return purified
+
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -104,8 +92,8 @@ def newActivity(request):
 	if request.method == 'GET':
 		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'type': 'new', 'username': username})
 	else:
-		#$act_attributes = request.POST
-		act_attributes = purifyActivity(request.POST)
+		act_attributes = json.loads(request.body)
+		print request.body
 		create_result = createNewActivity(uid, act_attributes)
 		if create_result['status'] == "error":
 			JsonResponse({'status': 'error', 'msg': create_result['msg']})
@@ -127,17 +115,37 @@ def editActivity(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'dashboard/new_activity.html', {'tab': dashboard_tabs['activity'], 'activity': activity, 'username': username, 'type': 'edit'})
 	else:
-		act_attributes = purifyActivity(request.POST)
+		act_attributes = json.loads(request.body)
+		act_attributes ['aaid'] = aaid
 		authority = activityAuthorityCheck(uid, aaid)
 		if authority == -1:
 			return JsonResponse({'status': 'error', 'msg': '无此活动！'})
 		elif authority == 0:
 			return JsonResponse({'status': 'error', 'msg': '您无权修改此活动！'})
-		editresult = editActivity(uid, act_attributes)
-		if create_result['status'] == 0:
-			JsonResponse({'status': 'error', 'msg': '修改活动失败！'})
+		editresult = doEditActivity(uid, act_attributes)
+		if editresult == 0:
+			return JsonResponse({'status': 'error', 'msg': '修改活动失败！'})
 		else: 
 			return JsonResponse({'status': 'success', 'msg': '修改活动成功!'})	
+
+
+
+@require_http_methods(['GET'])
+@csrf_exempt
+@login_required
+@admin_required
+def deleteActivity(request, aaid):
+	uid = sessions.getUser(request)[0] 
+	authority = activityAuthorityCheck(uid, aaid)
+	if authority == -1:
+		return JsonResponse({'status': 'error', 'msg': '无此活动！'})
+	elif authority == 0:
+		return JsonResponse({'status': 'error', 'msg': '您无权删除此活动！'})
+	deleteresult = doDeleteActivity(uid, aaid)
+	if deleteresult == 0:
+		return JsonResponse({'status': 'error', 'msg': '删除活动失败！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '删除活动成功!'})	
 
 
 # 先不管这个了，弃疗
@@ -159,14 +167,28 @@ def users(request):
 
 
 
-@require_http_methods(['GET'])
+
+@require_http_methods(['POST'])
+@csrf_exempt
 @login_required
 @admin_required
 def getUsers(request):
-	page = request.GET['page']
-	number = request.GET['number']
-	page_total = getUserPageCount(number)
-	user_list = getUserListByPageAndNumber(page, number)
+	dic = json.loads(request.body)
+	try:
+		page = dic['page']
+		number = dic['number']
+		departments = dic['departments']
+		sub_unions = dic['sub_unions']
+		activities = dic['activities']
+		checked_in = dic['checked_in']
+	except Exception,e:  
+		return JsonResponse({'status': 'error', 'msg': e})
+	#page_total = getUserPageCount(number)
+	full_user_list = filterUsers(departments, sub_unions, activities, checked_in)
+	page_total = len(full_user_list)/number
+	user_list = []
+	for i in range((page-1)*number, min(len(full_user_list), page*number)):
+		user_list.append(full_user_list[i])
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'user_list':user_list}})
 
 
@@ -192,3 +214,23 @@ def downloadUsers(request):
 @admin_required
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getActivities(request):
+	return JsonResponse({'status':'success', 'msg': '获取活动列表成功！', 'data': {'activities': getActivityListSimple()}})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getSubUnions(request):
+	return JsonResponse({'status':'success', 'msg': '获取分工会列表成功！', 'data': {'subunions': getSubUnionListSimple()}})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getDepartments(request):
+	return JsonResponse({'status':'success', 'msg': '获取部门列表成功！', 'data': {'departments': getDepartmentListSimple()}})

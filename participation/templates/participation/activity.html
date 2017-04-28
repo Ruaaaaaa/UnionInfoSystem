@@ -50,6 +50,7 @@
 	width: 100%;
 	height: 50px;
 	bottom: 0;
+	display: none;
 }
 .act-hint .act-time {
 	width: 60%;
@@ -89,8 +90,8 @@
 </div>
 <div class="content-wrapper">
 	<div class="act-title">
-		<p class="act-title-text"><i class="fa fa-heart"></i>阳光短跑活动光短跑跑短</p>
-		<p class="act-title-hint">#12345678</p>
+		<p class="act-title-text"><i class="fa fa-heart"></i>{{ activity.title }}</p>
+		<p class="act-title-hint">#{{ activity.aaid }}</p>
 	</div>
 	<div class="weui-panel weui-panel_access">
 	    <div class="weui-panel__bd">
@@ -99,9 +100,9 @@
 	                <img class="weui-media-box__thumb" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1048738130,2435557076&fm=23&gp=0.jpg">
 	            </div>
 	            <div class="weui-media-box__bd">
-					<p class="act-info"><i class="fa fa-eye"></i>不需要签到</p>
-					<p class="act-info"><i class="fa fa-eye"></i>无报名人数限制</p>
-					<p class="act-info"><i class="fa fa-eye"></i>已有 200 人报名</p>
+					<p class="act-info"><i class="fa fa-eye"></i>{% if not activity.need_checkin %}不{% endif %}需要签到</p>
+					<p class="act-info"><i class="fa fa-eye"></i>{% if activity.signin_max %}限 {{ activity.signin_max }} 报名{% else %}无名额限制{% endif %}</p>
+					<p class="act-info"><i class="fa fa-eye"></i>已有 {{ activity.signin_count }} 人报名</p>
 	            </div>
 	        </div>
 	    </div>
@@ -111,7 +112,7 @@
     <div class="weui-panel__hd">活动简介</div>
     <div class="weui-panel__bd">
         <div class="weui-media-box weui-media-box_text">
-            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+            <p class="weui-media-box__desc">{{ activity.description }}</p>
         </div>
     </div>
 </div>
@@ -119,22 +120,108 @@
     <div class="weui-panel__hd">活动详情</div>
     <div class="weui-panel__bd">
         <div class="weui-media-box weui-media-box_text">
-            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+            <p class="weui-media-box__desc">{{ activity.content }}</p>
         </div>
     </div>
 </div>
 <div class="act-hint">
 	<div class="act-time">
-		<p class="act-time-text">距离报名结束还有</p>
-		<p class="act-time-time">01 : 26 : 08</p>
+		<p class="act-time-text" id="act_time_text">距离<span id="status_label">报名结束</span>还有</p>
+		<p class="act-time-time"><span id="hours">01</span> : <span id="minutes">26</span> : <span id="seconds">08</span></p>
 	</div>
-	<div class="act-op">立即报名</div>
+	<div class="act-op" id="op_btn">立即报名</div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-
+var signin_begin_at = {{ activity.signin_begin_at }},
+	signin_end_at = {{ activity.signin_end_at }},
+	begin_at = {{ activity.begin_at }},
+	end_at = {{ activity.end_at }};
+var aaid = '{{ activity.aaid }}';
+var has_signed_in = false;
+var can_signed_in = false;
+function formatTimeParam(p) {
+	if(p < 10) return '0' + p;
+	else return p;
+}
+function updateTime(interval) {
+	var hh = formatTimeParam(Math.round(interval / 3600)),
+		mm = formatTimeParam(Math.round((interval % 3600) / 60)), 
+		ss = formatTimeParam(Math.round(ss = interval % 60));
+	$('#hours').html(hh);
+	$('#minutes').html(mm);
+	$('#seconds').html(ss);
+}
+function updateStatus() {
+	var current = moment().unix();
+	if (current < signin_begin_at) {
+		$('#op_btn').css('background', 'blue').html('报名未开始');
+		$('#status_label').html('报名开始');
+		var interval = signin_begin_at - current;
+		updateTime(interval);
+	}
+	else if (current > signin_begin_at && current < signin_end_at) {
+		can_signed_in = true;
+		if(has_signed_in) {
+			$('#op_btn').css('background', 'gray').html('已报名');
+			$('#status_label').html('活动开始');
+			var interval = begin_at - current;
+			updateTime(interval);
+		}
+		else {
+			$('#op_btn').css('background', 'green').html('立即报名');
+			$('#status_label').html('报名结束');
+			var interval = signin_end_at - current;
+			updateTime(interval);
+		}
+	}
+	else if (current > begin_at && current < end_at) {
+		$('#op_btn').css('background', 'red').html('活动进行中');
+		$('#status_label').html('活动结束');
+		var interval = end_at - current;
+		updateTime(interval);
+	}
+	else if (current < begin_at){
+		$('#op_btn').css('background', 'gray').html('活动未开始');
+		$('#status_label').html('活动开始');
+		var interval = begin_at - current;
+		updateTime(interval);
+	}
+	else {
+		$('#op_btn').css('background', 'gray').html('活动已结束');
+		$('.act-time').css('display', 'none');
+		$('.act-op').css('width', '100%');
+	}	
+}
+updateStatus();
+$('.act-hint').css('display', 'block');
+$('#op_btn').on('click', function() {
+	var now = moment.unix();
+	if(!can_signed_in)
+		return;
+	$.post('/activity/' + aaid + '/signin')
+	.done(function(data) {
+		if(data.status == 'success') {
+			weui.toast(data.msg, {
+				duration: 1000
+			});
+		}
+		else if(data.status == 'error') {
+			weui.topTips(data.msg, 3000);
+		}
+		else {
+			weui.topTips('未知错误, 请稍后再试', 3000);
+		}
+	})
+	.fail(function(){
+		weui.topTips('网络状况不佳, 请稍后再试', 3000);
+	})
+})
+setInterval(function() {
+	updateStatus();
+}, 1000);
 </script>
 {% endblock %}

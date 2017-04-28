@@ -10,22 +10,213 @@
 .content-wrapper {
   margin-top: 70px;
 }
+/*#filter_init {
+  text-align: center;
+  line-height: 40px;
+  font-size: 20px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  top: 0;
+  left: 0;
+}
+#filter_form {
+  visibility: hidden;
+}
+.panel-body {
+  position: relative;
+}*/
+#filter_init {
+  display: none;
+}
 </style>
 {% endblock %}
 
 {% block body %}
 {% include 'dashboard/header.html' %}
 <div class="container-fluid content-wrapper">
-users
+    <div class="row">
+        <div class="col-xs-12 col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">用户列表</h3>
+                </div>
+                <div class="panel-body" id="root">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <td>#</td>
+                                <td>真实姓名</td>
+                                <td>性别</td>
+                                <td>工号</td>
+                                <td>单位</td>
+                                <td>分工会</td>
+                                <td>手机</td>
+                                <td>邮箱</td>
+                                <td>照片</td>
+                            </thead>
+                            <tbody>
+                                <tr v-for="user in user_list">
+                                  <td>[[ user.uid ]]</td>
+                                  <td>[[ user.name ]]</td>
+                                  <td>[[ user.sex_text ]]</td>
+                                  <td>[[ user.wid ]]</td>
+                                  <td>[[ user.department_text ]]</td>
+                                  <td>[[ user.sub_union_text ]]</td>
+                                  <td>[[ user.mobile ]]</td>
+                                  <td>[[ user.email ]]</td>
+                                  <td>查看照片</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                      <ul class="pagination">
+                          <li v-if="current_page != 1" @click="prevPage">
+                            <a href="#" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;</span>
+                            </a>
+                          </li>
+                          <li v-for="n in n_pages" :class="{'active': current_page == n}" @click="toPage(n)"><a href="#">[[ n ]]</a></li>
+                          <li v-if="current_page != n_pages" @click="nextPage">
+                              <a href="#" aria-label="Next">
+                                  <span aria-hidden="true">&raquo;</span>
+                              </a>
+                          </li>
+                      </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-xs col-sm-3">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                  <h3 class="panel-title">筛选器</h3>
+              </div>
+              <div class="panel-body">
+                  <div id="filter_init">
+                      <span>
+                        <i class="fa fa-spinner fa-pulse fa-fw"></i> 筛选器加载中 ...
+                      </span>
+                  </div>                  
+                  <form id="filter_form">
+                      <div class="form-group">
+                          <label>单位</label>
+                          <select id="dpm_selector" class="form-control" multiple="multiple">
+                              <option value="MJ">麻将</option>
+                              <option value="HG">火锅</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label>分工会</label>
+                          <select id="su_selector" class="form-control" multiple="multiple">
+                              <option value="MJQ">麻将</option>
+                              <option value="HGE">火锅</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label>报名活动</label>
+                          <select id="act_selector" class="form-control" multiple="multiple">
+                              <option value="MJA">吃香锅</option>
+                              <option value="HGR">打麻将</option>
+                          </select>
+                      </div>
+                      <div class="checkbox">
+                          <label>
+                              <input type="checkbox" name="checked_in">已经签到
+                          </label>
+                      </div>
+                      <button type="button" class="btn btn-default">筛选</button>
+                  </form>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                  <h3 class="panel-title">一些功能</h3>
+              </div>
+              <div class="panel-body">
+                  <form>
+                      <button type="button" class="btn btn-default btn-block">导出所有用户数据</button>
+                      <button type="button" class="btn btn-default btn-block">导出当前筛选下用户数据</button>
+                  </form>
+              </div>
+            </div>              
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-$.get('/admin/users/get', {page: 1, number: 20})
-.done(function(data) {
-  console.log(data);
+var fake_users = [
+  {uid: 1, name: '郭元晨', sex_text: '男', wid: '2015011111', department_text: '单位1', sub_union_text: '分工会1', mobile: '18810022222', email: 'bennyguo@163.com'},
+  {uid: 2, name: '伦理学', sex_text: '女', wid: '2017777111', department_text: '单位2', sub_union_text: '分工会2', mobile: '18810987622', email: 'llx@163.com'},
+]
+
+new Vue({
+  el: '#root',
+  delimiters: ["[[", "]]"],
+  data: {
+    user_list: fake_users,
+    n_pages: 10,
+    current_page: 1,
+    request_url: '/admin/users/get',
+    departments_selected: [],
+    sub_unions_selected: [],
+    activities_selected: [],
+    checked_in: false,
+    number_per_page: 20,
+  },
+  created: function() {
+    // get departments
+    // get sub_unions
+    // get activities
+    $('#dpm_selector').select2();
+    $('#su_selector').select2();
+    $('#act_selector').select2();
+    // this.getUserList();
+  },
+  methods: {
+    showFilters: function() {
+      $('#filter_init').css('display', 'none');
+      $('#filter_form').css('visibility', 'visible');
+    },
+    getUserList: function() {
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: '/admin/users/get',
+        data: JSON.stringify({
+            page: this.page,
+            number: this.number_per_page,
+            departments: this.departments_selected,
+            sub_unions: this.sub_unions_selected,
+            activities: this.activities_selected,
+            checked_in: this.checked_in
+          }),
+        contentType: 'application/json'
+      })
+      .done(function(data) {
+        self.n_pages = data.data.n_pages;
+        self.user_list = data.data.user_list;
+      })
+      .fail(function() {
+        console.log('fail');
+      })
+    },
+    prevPage: function() {
+      this.toPage(this.current_page - 1);
+    },
+    nextPage: function() {
+      this.toPage(this.current_page + 1);
+    },
+    toPage: function(page) {
+      this.current_page = page;
+      //this.getUserList();
+    }
+  }
 })
 </script>
 {% endblock %}

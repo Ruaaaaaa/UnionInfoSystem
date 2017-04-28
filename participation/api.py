@@ -45,8 +45,6 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        user = User(id_hash = idnumber)
-        user.save()
         print u"没有这个身份证号"
         return 0
     if user.registered :
@@ -60,14 +58,14 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        #user = User(id_hash = idnumber)
-        #user.save() 
         print u"没有这个身份证号"
         return 0
+    user.registered = 1
     user.username = username
     user.password = pwd
     user.mobile = mobile
     user.email = email
+    user.register_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     user.save()
     return 1
 
@@ -100,7 +98,7 @@ def userCheckIn(uid, aaid):
         print u"签到过了"
         return 2
     rec.check_in = 1
-    rec.checkin_at = datetime.datetime.now()
+    rec.checkin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     rec.save()
     print "签到成功"
     return 1
@@ -116,6 +114,7 @@ def userSignIn(uid, aaid):
     except ObjectDoesNotExist:
         print u"无活动"
         return 0
+    #print datetime.datetime.timetuple()
     try:
         user.records.get(aaid=aaid)
     except ObjectDoesNotExist:
@@ -125,7 +124,7 @@ def userSignIn(uid, aaid):
             uid = user.uid,
             user = user,
             activity = act,
-            signin_at = datetime.datetime.now()
+            signin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
         )
         rec.save()
         return 1
@@ -183,10 +182,10 @@ def createNewActivity(uid, act_attributes):
         title = act_attributes['title'],
         description = act_attributes['description'],
         content = act_attributes['content'],
-        signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at']),
-        signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at']),
-        begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at']),
-        end_at = datetime.datetime.fromtimestamp(act_attributes['end_at']),
+        signin_begin_at = act_attributes['signin_begin_at'],
+        signin_end_at = act_attributes['signin_end_at'],
+        begin_at = act_attributes['begin_at'],
+        end_at = act_attributes['end_at'],
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
@@ -206,15 +205,45 @@ def activityAuthorityCheck(uid, aaid):
 
 def getUserPageCount(number):
     count = User.objects.all().count()
+    print number, type(number)
     return ((count-1) / number ) +1
 
-def getUserListByPageAndNumber(page, number):
+def filterUsers(departments, activities, checked_in):
     userlist=[]
-    for i in range((page-1)*number+1,page*number) :
+
+    for i in range(1,100000000):
         try:
             user = User.objects.get(uid = i)
         except ObjectDoesNotExist:
-            return userlist
+            break
+
+        if len(departments) > 0:
+            flag = 0
+            for i in range(0, len(departments)):
+                if departments[i] == user['department']:
+                    flag = 1
+                    break
+            if not flag: continue 
+        if len(sub_unions) > 0:
+            flag = 0
+            for i in range(0, len(sub_unions)):
+                if sub_unions[i] == user['sub_union']:
+                    flag = 1
+                    break
+            if not flag: continue 
+        if len(activities) > 0:
+            flag = 0
+            for i in range(0, len(activities)):
+                try:
+                    record = user.records.get(aid = activities[i])
+                except ObjectDoesNotExist:
+                    continue 
+                if record['checked_in'] == False:
+                    continue
+                flag = 1
+                break
+            if not flag: continue   
+
         userlist.append(model_to_dict(user))
     return userlist
 
@@ -248,25 +277,38 @@ def getBroadcastsReceivedByUid(uid):
         broadcastlist.append(model_to_dict(message.broadcast))
     return broadcastlist
 
-def editActivity(uid,act_attributes):
+def doEditActivity(uid,act_attributes):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
+        print 'no user'
         return 0
     try:
-        act = Activity.objects.get(aaid = act_attributes[aaid])
+        print act_attributes['aaid']
+        act = Activity.objects.get(aaid = act_attributes['aaid'])
     except ObjectDoesNotExist:
+        print 'no activity'
         return 0
     if user != act.creator:
+        print 'not match'
         return 0
     act.title = act_attributes['title']
     act.description = act_attributes['description']
     act.content = act_attributes['content']
-    act.signin_begin_at = datetime.datetime.fromtimestamp(act_attributes['signin_begin_at'])
-    act.signin_end_at = datetime.datetime.fromtimestamp(act_attributes['signin_end_at'])
-    act.begin_at = datetime.datetime.fromtimestamp(act_attributes['begin_at'])
-    act.end_at = datetime.datetime.fromtimestamp(act_attributes['end_at'])
+    act.signin_begin_at = act_attributes['signin_begin_at']
+    act.signin_end_at = act_attributes['signin_end_at']
+    act.begin_at = act_attributes['begin_at']
+    act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
     act.save()
     return 1
+
+def updateUserLoginTime(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无此用户"
+        return 0
+    user.last_login_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
+    user.save()

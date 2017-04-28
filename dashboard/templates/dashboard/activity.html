@@ -18,29 +18,103 @@
   height: 200px;
   margin: 5px 0 5px 0;
 }
+.btn-group {
+  width: 100%;
+}
+.btn-group .group-btn-2{
+  width: 50%;
+}
+.btn-group .group-btn-3{
+  width: 33.33%;
+}
+#qr_div {
+  text-align: center;
+}
+#qr_div img {
+  width: 100%;
+}
+.content-loading {
+  text-align: center;
+}
+.qr-modal-body {
+  width: 60%;
+}
+@media (min-width: 768px) {
+  .qr-modal-body {
+    width: 40%;
+  }
+}
 </style>
 {% endblock %}
 
 {% block body %}
 {% include 'dashboard/header.html' %}
 <div class="container-fluid content-wrapper" id="root">
-	<ul class="nav nav-tabs">
-	  <li role="presentation" class="active"><a href="#">进行中活动</a></li>
-	  <li role="presentation"><a href="#">已结束活动</a></li>
-	</ul>
-  <div class="row">
-    <div class="col-xs-12 col-sm-8">
-      <ul class="act-list">
-        {% for act in activities %}
-        <li class="act-item" v-for="act in activities">
-        <h2>{{ act.title }}</h2>
-        <h3>{{ act.aaid }}</h3>
-        <button onclick="generateQRCode({{ act.aaid }})">生成二维码</button>
-        </li>
-        {% endfor %}
-      </ul>
+  	<ul class="nav nav-tabs">
+  	  <li role="presentation" class="active"><a href="#">进行中活动</a></li>
+  	  <li role="presentation"><a href="#">已结束活动</a></li>
+  	</ul>
+    <div class="row">
+      {% for act in activities %}
+      <div class="col-xs-12 col-sm-4 col-md-3">
+        <div class="thumbnail">
+          <img src="http://s.amazeui.org/media/i/demos/bw-2014-06-19.jpg?imageView/1/w/1000/h/1000/q/80" alt="...">
+          <div class="caption">
+            <p>#{{ act.aaid }}</p>
+            <h4>{{ act.title }}</h4>
+            <p>{% if act.signin_max %}报名人数上限: {{ act.signin_max }}{% else %}无报名人数限制{% endif %}</p>
+            <p>报名人数: {{ act.signin_count }}</p>
+            <p>{% if not act.need_checkin %}不{% endif %}需要现场签到</p>
+            <p>报名开始: <span class="act-time">{{ act.signin_begin_at }}</span></p>
+            <p>报名结束: <span class="act-time">{{ act.signin_end_at }}</span></p>
+            <p>活动开始: <span class="act-time">{{ act.begin_at }}</span></p>
+            <p>活动结束: <span class="act-time">{{ act.end_at }}</span></p>
+            <p>{{ act.description }}</p>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default group-btn-3" @click="showContent('{{ act.aaid }}')">活动内容</button>
+              <button type="button" class="btn btn-default group-btn-3" @click="showQR('{{ act.aaid }}')">二维码</button>
+              <button type="button" class="btn btn-default group-btn-3" @click="downloadInfo('{{ act.aaid }}')">导出数据</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default group-btn-2" @click="edit('{{ act.aaid }}')">修改</button>
+              <button type="button" class="btn btn-default group-btn-2" @click="remove('{{ act.aaid }}')">删除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-  </div>
+    <div class="modal fade" id="qr_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog qr-modal-body" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">活动二维码</h4>
+          </div>
+          <div class="modal-body">
+            <div id="qr_div"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="content_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">活动详情</h4>
+          </div>
+          <div class="modal-body">
+              <div class="content-loading" v-if="contentLoading">
+                  <i class="fa fa-spinner fa-pulse fa-fw"></i> 内容获取中...
+              </div>
+              <div class="act-content" v-if="!contentLoading">
+                  Content
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -52,5 +126,48 @@ function generateQRCode(aaid) {
     console.log(url);
     window.location.href = url;
 }
+$('.act-time').each(function() {
+    var time_stamp = $(this).text();
+    $(this).text(moment.unix(time_stamp).format('YYYY-MM-DD HH:mm:ss'));
+})
+var app = new Vue({
+  el: '#root',
+  delimiters: ["[[","]]"],
+  data: {
+    QRCode: null,
+    contentLoading: true
+  },
+  methods: {
+    showContent: function(aaid) {
+      //fetch data from server
+      //fill in 
+      $('#content_modal').modal('show');
+    },
+    showQR: function(aaid) {
+      if(!this.QRCode) {
+        this.QRCode = new QRCode(document.getElementById('qr_div'), {
+            // 域名没有传！
+            text: "http://127.0.0.1:8000/activity/" + aaid,
+            width: 200,
+            height: 200
+        });
+      }
+      else {
+        this.QRCode.clear();
+        this.QRCode.makeCode("http://127.0.0.1:8000/activity/" + aaid);
+      }
+      $('#qr_modal').modal('show');
+    },
+    downloadInfo: function(aaid) {
+      console.log('download ' + aaid);
+    },
+    edit: function(aaid) {
+      window.open('/admin/activity/' + aaid + '/edit');
+    },
+    remove: function(aaid) {
+      console.log('remove');
+    }
+  }
+})
 </script>
 {% endblock %}
