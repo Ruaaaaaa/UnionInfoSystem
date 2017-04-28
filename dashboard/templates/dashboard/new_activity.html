@@ -126,7 +126,7 @@ function validateForm(title, description, content, poster, dtp_ss, dtp_se, dtp_a
   if(!content) {
     alert('活动详情不能为空！'); return;
   }
-  if(!poster) {
+  if(window.type == 'new' && !poster) {
     alert('请上传活动海报！'); return;
   }
   if(!dtp_ss || !dtp_se || !dtp_as || !dtp_ae) {
@@ -158,7 +158,7 @@ function init() {
       dtp_se_init = '{{ activity.signin_end_at }}',
       dtp_as_init = '{{ activity.begin_at }}',
       dtp_ae_init = '{{ activity.end_at }}';
-  var type = '{{ type }}';
+  window.type = '{{ type }}';
   var icons = {
                 time: 'fa fa-clock-o',
                 date: 'fa fa-calendar',
@@ -219,11 +219,9 @@ function init() {
       toggleButton(0);
       return;
     }
-    $.ajax({
-      type: 'POST',
-      url: window.location.pathname,
-      contentType: 'application/json',
-      data: JSON.stringify({
+    var formData = new FormData();
+    formData.append('poster', poster);
+    formData.append('data', JSON.stringify({
         title: title,
         description: description,
         content: content,
@@ -233,8 +231,15 @@ function init() {
         end_at: dtp_ae,
         signin_restrict: signin_restrict,
         signin_max: signin_max,
-        need_checkin: need_checkin
-      })
+        need_checkin: need_checkin      
+    }));
+    $.ajax({
+      type: 'POST',
+      url: window.location.pathname,
+      cache: false,
+      data: formData,
+      processData: false,
+      contentType: false
     })
     .done(function(data){
       if(data.status == 'success') {
