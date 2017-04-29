@@ -10,17 +10,257 @@
 .content-wrapper {
   margin-top: 70px;
 }
+/*#filter_init {
+  text-align: center;
+  line-height: 40px;
+  font-size: 20px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  top: 0;
+  left: 0;
+}
+#filter_form {
+  visibility: hidden;
+}
+.panel-body {
+  position: relative;
+}*/
+#filter_init {
+  display: none;
+}
 </style>
 {% endblock %}
 
 {% block body %}
 {% include 'dashboard/header.html' %}
-<div class="container-fluid content-wrapper">
-broadcast
+<div class="container-fluid content-wrapper" id="root">
+    <div class="row">
+        <div class="col-xs-12 col-sm-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">历史消息</h3>
+                </div>
+                <div class="panel-body" >
+                  <div class="panel panel-default">
+                    <div class="panel-heading">Panel heading without title <span class="label label-default">麻将部门</span></div>
+                    <div class="panel-body">
+                        Panel content
+                        <hr>
+                      <p class="text-muted" style = "text-align : right">
+                        <input type="checkbox" name="checked_in" checked disabled>发送站内信 
+                        <input type="checkbox" name="checked_in" checked disabled>发送邮件 
+                        <input type="checkbox" name="checked_in" disabled>发送短信 
+                        <br>
+                        发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
+                      </p> 
+                    </div>
+                  </div>
+
+                  <div class="panel panel-default">
+                    <div class="panel-heading">Panel heading without title <span class="label label-default">火锅部门</span></div>
+                    <div class="panel-body">
+                        Panel content
+                        <hr>
+                      <p class="text-muted" style = "text-align : right">
+                        <input type="checkbox" name="checked_in" checked disabled>发送站内信 
+                        <input type="checkbox" name="checked_in" checked disabled>发送邮件 
+                        <input type="checkbox" name="checked_in" disabled>发送短信 
+                        <br>
+                        发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
+                      </p> 
+                    </div>
+                  </div>
+
+                  <div class="panel panel-default">
+                    <div class="panel-heading">校庆high起来
+                      <span class="label label-default">麻将部门</span> 
+                      <span class="label label-default">校庆三缺一</span> 
+                      <span class="label label-default">已签到</span></div>
+                    <div class="panel-body">
+                        校庆了，我们去搓麻将吧
+                        <hr>
+                      <p class="text-muted" style = "text-align : right">
+                        <input type="checkbox" name="checked_in" checked disabled>发送站内信 
+                        <input type="checkbox" name="checked_in" checked disabled>发送邮件 
+                        <input type="checkbox" name="checked_in" disabled>发送短信 
+                        <br>
+                        发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
+                      </p> 
+                    </div>
+                  </div>
+                    
+                    <nav>
+                      <ul class="pagination">
+                          <li v-if="current_page != 1" @click="prevPage">
+                            <a href="#" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;</span>
+                            </a>
+                          </li>
+                          <li v-for="n in n_pages" :class="{'active': current_page == n}" @click="toPage(n)"><a href="#">[[ n ]]</a></li>
+                          <li v-if="current_page != n_pages" @click="nextPage">
+                              <a href="#" aria-label="Next">
+                                  <span aria-hidden="true">&raquo;</span>
+                              </a>
+                          </li>
+                      </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-xs col-sm-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                  <h3 class="panel-title">新消息</h3>
+              </div>
+              <div class="panel-body">
+                  <div id="filter_init">
+                      <span>
+                        <i class="fa fa-spinner fa-pulse fa-fw"></i> 筛选器加载中 ...
+                      </span>
+                  </div>                  
+                  <form id="filter_form">
+                      <div class="form-group">
+                        <input type = "text" class=" form-control" placeholder="请输入消息标题">
+                      </div>
+                      <hr>
+                      <h5>发送给 <small>留空表示无限制</small></h5>
+                      <div class="form-group">
+                          <select id="dpm_selector"  data-placeholder="请选择收信人所属单位"  class=" form-control" multiple="multiple" >
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <select id="su_selector" data-placeholder="请选择收信人所属分工会" class="form-control" multiple="multiple">
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <select id="act_selector" data-placeholder="请选择收信人已报名活动" class="form-control" multiple="multiple">
+                          </select>
+                      </div>
+                      <div class="checkbox">
+                          <label>
+                              <input type="checkbox" name="checked_in">已签到
+                          </label>
+                      </div>
+                      
+                      <hr>
+                      <textarea class = "form-control" style = "height : 190px" placeholder = "请输入消息内容"> </textarea>
+                      
+                      <hr>
+                      <div class="form-group">
+                        <input type = "text" class=" form-control" placeholder="请输入发件人，如“校工会”。">
+                      </div>
+                      <div class = "form-group form-inline">                          
+                              <input type="checkbox" name="checked_in">发送站内信 
+                              <input type="checkbox" name="checked_in">发送邮件 
+                              <input type="checkbox" name="checked_in">发送短信 
+                      </div>
+                      <div style = "text-align:center">
+                        <button type="button" class="btn btn-default" v-on:click="filt">发送</button>
+                      </div>
+                    </div>
+                  </form>
+              </div>
+            </div>             
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript"></script>
+<script type="text/javascript">
+var fake_users = [
+  {uid: 1, name: '郭元晨', sex_text: '男', wid: '2015011111', department_text: '单位1', sub_union_text: '分工会1', mobile: '18810022222', email: 'bennyguo@163.com'},
+  {uid: 2, name: '伦理学', sex_text: '女', wid: '2017777111', department_text: '单位2', sub_union_text: '分工会2', mobile: '18810987622', email: 'llx@163.com'},
+]
+
+new Vue({
+  el: '#root',
+  delimiters: ["[[", "]]"],
+  data: {
+    user_list: fake_users,
+    n_pages: 10,
+    current_page: 1,
+    request_url: '/admin/users/get',
+    checked_in: false,
+    number_per_page: 20,
+  },
+  created: function() {
+    window.departments_selected = [];
+    window.sub_unions_selected = [];
+    window.activities_selected = [];
+    $.get('/admin/departments/get')
+    .done(function(data) {
+      $('#dpm_selector').select2({
+        data: data.data.departments
+      });
+    });
+    $.get('/admin/subunions/get')
+    .done(function(data) {
+      $('#su_selector').select2({
+        data: data.data.subunions
+      });
+    });
+    $.get('/admin/activities/get')
+    .done(function(data) {
+      $('#act_selector').select2({
+        data: data.data.activities
+      });
+    })
+    this.getUserList();
+  },
+  methods: {
+    showFilters: function() {
+      $('#filter_init').css('display', 'none');
+      $('#filter_form').css('visibility', 'visible');
+    },
+    getUserList: function() {
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: '/admin/users/get',
+        data: JSON.stringify({
+            page: this.current_page,
+            number: this.number_per_page,
+            departments: window.departments_selected,
+            sub_unions: window.sub_unions_selected,
+            activities: window.activities_selected,
+            checked_in: this.checked_in
+          }),
+        contentType: 'application/json'
+      })
+      .done(function(data) {
+        console.log(data.data.user_list)
+        self.n_pages = data.data.page_total;
+        self.user_list = data.data.user_list;
+      })
+      .fail(function() {
+        console.log('fail');
+      })
+    },
+    prevPage: function() {
+      this.toPage(this.current_page - 1);
+    },
+    nextPage: function() {
+      this.toPage(this.current_page + 1);
+    },
+    toPage: function(page) {
+      this.current_page = page;
+      this.getUserList();
+    },
+    filt: function() {
+      window.departments_selected = $('#dpm_selector').val().map(Number);
+      window.sub_unions_selected = $('#su_selector').val().map(Number);
+      window.activities_selected = $('#act_selector').val().map(Number);
+      console.log(window.departments_selected);
+      console.log(window.sub_unions_selected);
+      console.log(window.activities_selected);
+      this.toPage(1);
+    }
+  }
+})
+</script>
 {% endblock %}
