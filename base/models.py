@@ -67,6 +67,7 @@ class Broadcast(models.Model):
     send_notice = models.BooleanField(default = 0)
     send_email = models.BooleanField(default = 0)
     send_sms = models.BooleanField(default = 0)
+    tags =  models.CharField(max_length = 4096, null = True)
 
 
 
