@@ -23,6 +23,7 @@ import settings
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
+    url(r'^administrator/', admin.site.urls),
 	# User part
     url(r'^login', participation.login),
     url(r'^logout', participation.logout),
