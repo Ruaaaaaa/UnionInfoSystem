@@ -219,7 +219,7 @@ def getUserListByFilter(page, number, departments, sub_unions, activities, check
         users = users.filter(subunion__in = subs)
     if len(activities) > 0:
         acts = Activity.objects.filter(aid__in = activities)
-        recs = Record.objects.fillter(activity__in = acts)
+        recs = Record.objects.filter(activity__in = acts)
         if check_in :
             recs = recs.fillter(checked_in = 1)
         uids = []
