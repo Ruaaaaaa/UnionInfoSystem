@@ -196,6 +196,46 @@ def createNewActivity(uid, act_attributes):
     act.save()
     return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
 
+def createBroadcast(dic):
+    try:
+        user = User.objects.get(uid = dic['uid'])
+    except ObjectDoesNotExist:
+        return {'status' : 'error', 'msg' : '用户不存在。'}
+    if not user.is_admin:
+        return {'status': 'error', 'msg': '该用户没有发布消息的权利。'}
+    m = hashlib.md5()
+    m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+    bid_md = m.hexdigest()
+    bid_md = bid_md[0:10]
+    deps = Department.objects.filter(did__in = dic['departments'])
+    subs = Subunion.objects.filter(suid__in = dic['sub_unions'])
+    tags_list = []
+    for dep in deps:
+        tags_list += [dep.name]
+    for sub in subs:
+        tags_list += [sub.name]
+    if dic['checked_in'] :
+        tags_list += ['已签到']
+    st = ","
+    tags = st.join(tags_list)
+    print tags
+    print dic
+    broadcast = Broadcast(
+        bid = bid_md,
+        title = dic['title'],
+        content = dic['content'],
+        sender = user,
+        sender_name = dic['sender'],
+        send_at = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'),
+        send_notice = dic['send_notice'],
+        send_email = dic['send_email'],
+        send_sms = dic['send_sms'],
+        tags = tags
+    )
+    broadcast.save()
+    print broadcast
+    return {'status' : 'success', 'msg' : '创建成功'}
+
 def activityAuthorityCheck(uid, aaid):
     try:
         act = Activity.objects.get(aaid = aaid)
