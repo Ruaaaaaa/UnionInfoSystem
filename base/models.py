@@ -63,6 +63,7 @@ class Broadcast(models.Model):
     title = models.CharField(max_length = 256, null = True)
     content =  models.CharField(max_length = 4096, null = True)
     sender =  models.ForeignKey(User, null = True , related_name = 'broadcasts')
+    sender_name = models.CharField(max_length = 256, null = True)
     send_at = models.IntegerField(null = True)
     send_notice = models.BooleanField(default = 0)
     send_email = models.BooleanField(default = 0)
