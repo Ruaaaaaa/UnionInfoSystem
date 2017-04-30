@@ -82,11 +82,13 @@
                         校庆了，我们去搓麻将吧
                         <hr>
                       <p class="text-muted" style = "text-align : right">
+                        <small>
                         <input type="checkbox" name="checked_in" checked disabled>发送站内信 
                         <input type="checkbox" name="checked_in" checked disabled>发送邮件 
                         <input type="checkbox" name="checked_in" disabled>发送短信 
                         <br>
                         发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
+                        </small>
                       </p> 
                     </div>
                   </div>
@@ -114,15 +116,11 @@
               <div class="panel-heading">
                   <h3 class="panel-title">新消息</h3>
               </div>
-              <div class="panel-body">
-                  <div id="filter_init">
-                      <span>
-                        <i class="fa fa-spinner fa-pulse fa-fw"></i> 筛选器加载中 ...
-                      </span>
-                  </div>                  
+              <div class="panel-body">               
                   <form id="filter_form">
+                    {% csrf_token %}
                       <div class="form-group">
-                        <input type = "text" class=" form-control" placeholder="请输入消息标题">
+                        <input type = "text" class=" form-control" v-model = "title" placeholder="请输入消息标题">
                       </div>
                       <hr>
                       <h5>发送给 <small>留空表示无限制</small></h5>
@@ -141,24 +139,24 @@
                       </div>
                       <div class="checkbox">
                           <label>
-                              <input type="checkbox" name="checked_in">已签到
+                              <input type="checkbox" id="checked_in" v-model = "checked_in">已签到
                           </label>
                       </div>
                       
                       <hr>
-                      <textarea class = "form-control" style = "height : 190px" placeholder = "请输入消息内容"> </textarea>
+                      <textarea class = "form-control" style = "height : 190px" placeholder = "请输入消息内容" v-model = "content"> </textarea>
                       
                       <hr>
                       <div class="form-group">
-                        <input type = "text" class=" form-control" placeholder="请输入发件人，如“校工会”。">
+                        <input type = "text" class=" form-control" v-model = "sender" placeholder="请输入发件人，如“校工会”。">
                       </div>
                       <div class = "form-group form-inline">                          
-                              <input type="checkbox" name="checked_in">发送站内信 
-                              <input type="checkbox" name="checked_in">发送邮件 
-                              <input type="checkbox" name="checked_in">发送短信 
+                              <input type="checkbox" name="checked_in" v-model = "send_notice">发送站内信 
+                              <input type="checkbox" name="checked_in" v-model = "send_email">发送邮件 
+                              <input type="checkbox" name="checked_in" v-model = "send_sms">发送短信 
                       </div>
                       <div style = "text-align:center">
-                        <button type="button" class="btn btn-default" v-on:click="filt">发送</button>
+                        <button type="button" class="btn btn-default" v-on:click="send">发送</button>
                       </div>
                     </div>
                   </form>
@@ -181,17 +179,23 @@ new Vue({
   el: '#root',
   delimiters: ["[[", "]]"],
   data: {
-    user_list: fake_users,
-    n_pages: 10,
-    current_page: 1,
-    request_url: '/admin/users/get',
-    checked_in: false,
-    number_per_page: 20,
+    title : "",
+    content : "",
+    checked_in : false,
+    sender : "",
+    send_notice : true,
+    send_email : false,
+    send_sms : false,
+    n_pages : 10,
+    current_page : 1,
+    number_per_page : 5,
+    request_url : '/admin/broadcast/new',
   },
   created: function() {
     window.departments_selected = [];
     window.sub_unions_selected = [];
     window.activities_selected = [];
+    this.getBroadcast();
     $.get('/admin/departments/get')
     .done(function(data) {
       $('#dpm_selector').select2({
@@ -210,25 +214,39 @@ new Vue({
         data: data.data.activities
       });
     })
-    this.getUserList();
   },
   methods: {
-    showFilters: function() {
-      $('#filter_init').css('display', 'none');
-      $('#filter_form').css('visibility', 'visible');
+    getBroadcast: function() {
     },
-    getUserList: function() {
+    prevPage: function() {
+      this.toPage(this.current_page - 1);
+    },
+    nextPage: function() {
+      this.toPage(this.current_page + 1);
+    },
+    toPage: function(page) {
+      this.current_page = page;
+      this.getBroadcast();
+    },
+    send: function() {
+      window.departments_selected = $('#dpm_selector').val().map(Number);
+      window.sub_unions_selected = $('#su_selector').val().map(Number);
+      window.activities_selected = $('#act_selector').val().map(Number);
       var self = this;
       $.ajax({
         type: 'POST',
-        url: '/admin/users/get',
+        url: '/admin/broadcast/new',
         data: JSON.stringify({
-            page: this.current_page,
-            number: this.number_per_page,
+            title : this.title,
             departments: window.departments_selected,
             sub_unions: window.sub_unions_selected,
             activities: window.activities_selected,
-            checked_in: this.checked_in
+            checked_in: this.checked_in,
+            content : this.content,
+            sender : this.sender,
+            send_notice : this.send_notice,
+            send_email : this.send_email,
+            send_sms : this.send_sms
           }),
         contentType: 'application/json'
       })
@@ -239,27 +257,8 @@ new Vue({
       })
       .fail(function() {
         console.log('fail');
-      })
-    },
-    prevPage: function() {
-      this.toPage(this.current_page - 1);
-    },
-    nextPage: function() {
-      this.toPage(this.current_page + 1);
-    },
-    toPage: function(page) {
-      this.current_page = page;
-      this.getUserList();
-    },
-    filt: function() {
-      window.departments_selected = $('#dpm_selector').val().map(Number);
-      window.sub_unions_selected = $('#su_selector').val().map(Number);
-      window.activities_selected = $('#act_selector').val().map(Number);
-      console.log(window.departments_selected);
-      console.log(window.sub_unions_selected);
-      console.log(window.activities_selected);
-      this.toPage(1);
-    }
+      })      
+    } 
   }
 })
 </script>

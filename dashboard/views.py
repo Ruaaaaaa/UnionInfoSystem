@@ -267,3 +267,16 @@ def getSubUnions(request):
 @admin_required
 def getDepartments(request):
 	return JsonResponse({'status':'success', 'msg': '获取部门列表成功！', 'data': {'departments': getDepartmentListSimple()}})
+
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def newBroadcast(request):
+	dic = json.loads(request.body)
+	dic['uid'] = sessions.getUser(request)[0]
+	create_result = createBroadcast(dic)
+	if create_result['status'] == "error":
+		JsonResponse({'status': 'error', 'msg': create_result['msg']})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '消息发送成功！'})

@@ -49,4 +49,5 @@ urlpatterns = [
     url(r'^admin/subunions/get', dashboard.getSubUnions),
     url(r'^admin/users/download$', dashboard.downloadUsers),
     url(r'^admin/broadcast$', dashboard.broadcast),
+    url(r'^admin/broadcast/new', dashboard.newBroadcast)
 ]
