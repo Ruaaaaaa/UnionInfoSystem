@@ -363,3 +363,18 @@ def getUserInformationListByActivity(aaid):
         dic['checkin_at'] = record.checkin_at
         list.append(dic)
     return list
+
+def getBroadcastByPage(page, number):
+    old_news_list=[]
+    broadcasts = Broadcast.objects.all().order_by("-send_at")
+    count = 0
+    for broadcast in broadcasts:
+        count = count + 1
+        if (count >= number * (page - 1) + 1 and count <= number * page):
+            dict = model_to_dict(broadcast)
+            if dict['tags'] == "" :
+                dict['tags'] = ['所有人']
+            else:
+                dict['tags'] = dict['tags'].split(',')
+            old_news_list.append(dict)
+    return (old_news_list, (count - 1) / number + 1)
