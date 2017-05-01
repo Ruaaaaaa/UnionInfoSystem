@@ -17,6 +17,7 @@ import json
 import os
 import xlrd
 import xlwt
+import datetime
 
 from InfoSystem.shared import dashboard_tabs
 from base import sessions
@@ -280,3 +281,23 @@ def newBroadcast(request):
 		JsonResponse({'status': 'error', 'msg': create_result['msg']})
 	else:
 		return JsonResponse({'status': 'success', 'msg': '消息发送成功！'})
+
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def getBroadcast(request):
+	dic = json.loads(request.body)
+	try:
+		page = dic['page']
+		number = dic['number']
+	except Exception,e:  
+		return JsonResponse({'status': 'error', 'msg': e})
+	old_news_list, page_total = getBroadcastByPage(page, number)
+	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'old_news_list':old_news_list}})
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getDateTime(request):
+	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})

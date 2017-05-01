@@ -35,59 +35,30 @@
 
 {% block body %}
 {% include 'dashboard/header.html' %}
-<div class="container-fluid content-wrapper" id="root">
-    <div class="row">
+<div id = "root">
+<div class="container-fluid content-wrapper">
         <div class="col-xs-12 col-sm-8">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">历史消息</h3>
                 </div>
                 <div class="panel-body" >
-                  <div class="panel panel-default">
-                    <div class="panel-heading">Panel heading without title <span class="label label-default">麻将部门</span></div>
-                    <div class="panel-body">
-                        Panel content
-                        <hr>
-                      <p class="text-muted" style = "text-align : right">
-                        <input type="checkbox" name="checked_in" checked disabled>发送站内信 
-                        <input type="checkbox" name="checked_in" checked disabled>发送邮件 
-                        <input type="checkbox" name="checked_in" disabled>发送短信 
-                        <br>
-                        发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
-                      </p> 
-                    </div>
-                  </div>
+                  
 
-                  <div class="panel panel-default">
-                    <div class="panel-heading">Panel heading without title <span class="label label-default">火锅部门</span></div>
-                    <div class="panel-body">
-                        Panel content
-                        <hr>
-                      <p class="text-muted" style = "text-align : right">
-                        <input type="checkbox" name="checked_in" checked disabled>发送站内信 
-                        <input type="checkbox" name="checked_in" checked disabled>发送邮件 
-                        <input type="checkbox" name="checked_in" disabled>发送短信 
-                        <br>
-                        发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
-                      </p> 
+                  <div class="panel panel-default" v-for="old_news in old_news_list">
+                    <div class="panel-heading">[[ old_news.title ]]
+                      <span class="label label-default" v-for="tag in old_news.tags" style = "margin-right : 2px;"> [[ tag ]] </span> 
                     </div>
-                  </div>
-
-                  <div class="panel panel-default">
-                    <div class="panel-heading">校庆high起来
-                      <span class="label label-default">麻将部门</span> 
-                      <span class="label label-default">校庆三缺一</span> 
-                      <span class="label label-default">已签到</span></div>
                     <div class="panel-body">
-                        校庆了，我们去搓麻将吧
+                        [[ old_news.content ]]
                         <hr>
                       <p class="text-muted" style = "text-align : right">
                         <small>
-                        <input type="checkbox" name="checked_in" checked disabled>发送站内信 
-                        <input type="checkbox" name="checked_in" checked disabled>发送邮件 
-                        <input type="checkbox" name="checked_in" disabled>发送短信 
+                        <input type="checkbox" name="checked_in"   disabled v-bind:checked = "old_news.send_notice">发送站内信 
+                        <input type="checkbox" name="checked_in"  disabled v-bind:checked = "old_news.send_email">发送邮件 
+                        <input type="checkbox" name="checked_in"  disabled v-bind:checked = "old_news.send_sms">发送短信 
                         <br>
-                        发件人：校工会 &nbsp &nbsp 发送时间：2017年4月29日 23:49 
+                        发件人：[[old_news.sender_name]] &nbsp &nbsp 发送时间：[[old_news.send_at]]
                         </small>
                       </p> 
                     </div>
@@ -156,24 +127,59 @@
                               <input type="checkbox" name="checked_in" v-model = "send_sms">发送短信 
                       </div>
                       <div style = "text-align:center">
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#preview" v-on:click="preview"> 预览 </button>
                         <button type="button" class="btn btn-default" v-on:click="send">发送</button>
                       </div>
-                    </div>
                   </form>
               </div>
             </div>             
         </div>
+</div>
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="preview" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">消息预览</h4>
+      </div>
+      <div class="modal-body">
+
+                  <div class="panel panel-default" >
+                    <div class="panel-heading"><font id = "preview_title"> </font>
+                    </div>
+                    <div class="panel-body">
+                        <font id = "preview_content"> </font>
+                        <hr>
+                      <p class="text-muted" style = "text-align : right">
+                        <small>
+                        <input type="checkbox" name="checked_in"   disabled id = "preview_notice">发送站内信 
+                        <input type="checkbox" name="checked_in"  disabled id = "preview_email">发送邮件 
+                        <input type="checkbox" name="checked_in"  disabled id = "preview_sms">发送短信 
+                        <br>
+                        发件人：<font id = "preview_sender"> </font> &nbsp; &nbsp; 发送时间：<font id = "preview_date_time"> </font>
+                        </small>
+                      </p> 
+                    </div>
+                  </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="send">发送</button>
+      </div>
     </div>
+  </div>
+</div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-var fake_users = [
-  {uid: 1, name: '郭元晨', sex_text: '男', wid: '2015011111', department_text: '单位1', sub_union_text: '分工会1', mobile: '18810022222', email: 'bennyguo@163.com'},
-  {uid: 2, name: '伦理学', sex_text: '女', wid: '2017777111', department_text: '单位2', sub_union_text: '分工会2', mobile: '18810987622', email: 'llx@163.com'},
-]
 
 new Vue({
   el: '#root',
@@ -189,7 +195,8 @@ new Vue({
     n_pages : 10,
     current_page : 1,
     number_per_page : 5,
-    request_url : '/admin/broadcast/new',
+    old_news_list: [],
+    request_url: '/admin/broadcast/get',
   },
   created: function() {
     window.departments_selected = [];
@@ -216,7 +223,36 @@ new Vue({
     })
   },
   methods: {
+    preview : function() {
+      $.get('/admin/get_date_time')
+      .done(function(data) {
+        $('#preview_date_time').html(data.data.date_time);
+      });
+      $('#preview_title').html(this.title);
+      $('#preview_content').html(this.content);
+      $('#preview_sender').html(this.sender);
+      $('#preview_notice').attr('checked', this.send_notice);
+      $('#preview_email').attr('checked', this.send_email);
+      $('#preview_sms').attr('checked', this.send_sms);
+    },
     getBroadcast: function() {
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: '/admin/broadcast/get',
+        data: JSON.stringify({
+            page: this.current_page,
+            number: this.number_per_page
+          }),
+        contentType: 'application/json'
+      })
+      .done(function(data) {
+        self.n_pages = data.data.page_total;
+        self.old_news_list = data.data.old_news_list;
+      })
+      .fail(function() {
+        console.log('fail');
+      })
     },
     prevPage: function() {
       this.toPage(this.current_page - 1);
@@ -251,14 +287,13 @@ new Vue({
         contentType: 'application/json'
       })
       .done(function(data) {
-        console.log(data.data.user_list)
-        self.n_pages = data.data.page_total;
-        self.user_list = data.data.user_list;
+        alert("发送成功！");
+         self.toPage(1);
       })
       .fail(function() {
         console.log('fail');
-      })      
-    } 
+      })   
+    }, 
   }
 })
 </script>
