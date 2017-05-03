@@ -7,6 +7,7 @@ from base.models import *
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
 import datetime
+import time
 import hashlib
 import os
 
@@ -221,12 +222,12 @@ def createBroadcast(dic):
     print tags
     print dic
     broadcast = Broadcast(
-        bid = bid_md,
+        bbid = bid_md,
         title = dic['title'],
         content = dic['content'],
         sender = user,
         sender_name = dic['sender'],
-        send_at = datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'),
+        send_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds(),
         send_notice = dic['send_notice'],
         send_email = dic['send_email'],
         send_sms = dic['send_sms'],
@@ -376,5 +377,6 @@ def getBroadcastByPage(page, number):
                 dict['tags'] = ['所有人']
             else:
                 dict['tags'] = dict['tags'].split(',')
+            dict['send_at'] = time.strftime('%Y/%m/%d  %H:%M:%S',time.localtime(dict['send_at']))
             old_news_list.append(dict)
     return (old_news_list, (count - 1) / number + 1)
