@@ -156,3 +156,21 @@ def signIn(request, aaid):
 		return JsonResponse({'status': 'error', 'msg': '您已报名。'})
 	else:
 		return JsonResponse({'status': 'success', 'msg': '报名成功！'})
+
+
+@require_http_methods(['GET'])
+@login_required
+def userActivities(request):
+	return render(request, 'participation/user_activities.html')
+
+
+@require_http_methods(['GET'])
+@login_required
+def userMessages(request):
+	return render(request, 'participation/user_messages.html')
+
+
+@require_http_methods(['GET'])
+@login_required
+def userSettings(request):
+	return render(request, 'participation/user_settings.html')

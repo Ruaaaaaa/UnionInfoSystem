@@ -249,6 +249,7 @@ def downloadUsers(request):
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
 
+
 @require_http_methods(['GET'])
 @login_required
 @admin_required
@@ -269,6 +270,7 @@ def getSubUnions(request):
 def getDepartments(request):
 	return JsonResponse({'status':'success', 'msg': '获取部门列表成功！', 'data': {'departments': getDepartmentListSimple()}})
 
+
 @require_http_methods(['POST'])
 @csrf_exempt
 @login_required
@@ -281,6 +283,7 @@ def newBroadcast(request):
 		JsonResponse({'status': 'error', 'msg': create_result['msg']})
 	else:
 		return JsonResponse({'status': 'success', 'msg': '消息发送成功！'})
+
 
 @require_http_methods(['POST'])
 @csrf_exempt
@@ -296,8 +299,10 @@ def getBroadcast(request):
 	old_news_list, page_total = getBroadcastByPage(page, number)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'old_news_list':old_news_list}})
 
+
 @require_http_methods(['GET'])
 @login_required
 @admin_required
 def getDateTime(request):
 	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})
+

@@ -24,11 +24,15 @@ import settings
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
     url(r'^administrator/', admin.site.urls),
+
 	# User part
     url(r'^login', participation.login),
     url(r'^logout', participation.logout),
     url(r'^register', participation.register),
     url(r'^verification', participation.verification),
+    url(r'^activities', participation.userActivities),
+    url(r'^messages', participation.userMessages),
+    url(r'^settings', participation.userSettings),
     url(r'^activity/([0-9, a-z]{10})/$', participation.activity),
     url(r'^activity/([0-9, a-z]{10})/checkin$', participation.checkIn),
     url(r'^activity/checkin/success$', participation.checkInSuccess),

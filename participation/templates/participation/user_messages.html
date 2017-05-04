@@ -1,0 +1,65 @@
+{% extends 'participation/base.html' %}
+
+{% block title %}
+用户中心 - 我的消息
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<style type="text/css">
+.new-msg-badge {
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="bottom-nav">
+    <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/activities">活动</a></div>
+    <div class="bottom-nav-tab active"><a class="bottom-nav-tab-text" href="/messages">消息<span class="weui-badge new-msg-badge">1</span></a></div>
+    <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/settings">设置</a></div>
+</div>
+
+<div class="navbar-header navbar-header-user">
+    <span class="navbar-header-text">
+        欢迎你，XXX老师！
+    </span>
+</div>
+
+<div class="user-content-wrapper">
+    <div class="weui-panel">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_text">
+                <h4 class="weui-media-box__title">请老师们领取优惠券<span class="weui-badge new-msg-badge">NEW</span></h4>
+                <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+                <ul class="weui-media-box__info">
+                    <li class="weui-media-box__info__meta">来自 校团委</li>
+                    <li class="weui-media-box__info__meta">2015年5月20日 13:14:00</li>
+                    <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel">
+        <div class="weui-panel__bd">
+            <div class="weui-media-box weui-media-box_text">
+                <h4 class="weui-media-box__title">请老师们领取优惠券</h4>
+                <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+                <ul class="weui-media-box__info">
+                    <li class="weui-media-box__info__meta">来自 校团委</li>
+                    <li class="weui-media-box__info__meta">2015年5月20日 13:14:00</li>
+                    <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript">
+
+</script>
+{% endblock %}

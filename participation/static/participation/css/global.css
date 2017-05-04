@@ -1,16 +1,64 @@
 .navbar-header {
-	height: 50px;
-	background: purple;
 	position: fixed;
 	top: 0;
 	width: 100%;
-	text-align: center;
+	z-index: 2000;
+}
+
+.navbar-header.navbar-header-default {
+	height: 50px;
 	line-height: 50px;
+	background: purple;
 	color: white;
 	font-size: 20px;
-	z-index: 2000;
+	text-align: center;
+}
+
+.navbar-header.navbar-header-user {
+	height: 40px;
+	background: purple;
+	line-height: 40px;
+	color: white;
+	font-size: 15px;
+	text-align: left;
+	padding-left: 10px;
 }
 
 body {
 	background: #EEEEEE;
+}
+
+.bottom-nav {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    background: white;
+    height: 50px;
+    z-index: 2000;
+}
+.bottom-nav-tab {
+    width: 33.33%;
+    text-align: center;
+    float: left;
+}
+.bottom-nav-tab-text {
+    line-height: 50px;
+    color: purple;
+}
+
+.bottom-nav-tab.active {
+	background: #EEEEEE;
+}
+
+.panel-margin-0 {
+	margin-top: 0;
+}
+
+.form-margin-0 {
+	margin-top: 0;
+}
+
+.user-content-wrapper {
+	margin-top: 40px;
+	margin-bottom: 60px;
 }
