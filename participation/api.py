@@ -7,7 +7,9 @@ from base.models import *
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
 import datetime
+import time
 import hashlib
+import os
 
 def getUidByUsername(username):
     try:
@@ -189,8 +191,51 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
+    print 'name?',act_attributes['filename']
+    (pre,suf) = os.path.splitext(act_attributes['filename'])
+    act.poster.save(aaid_md+'.'+suf,act_attributes['image'],0)
     act.save()
     return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
+
+def createBroadcast(dic):
+    try:
+        user = User.objects.get(uid = dic['uid'])
+    except ObjectDoesNotExist:
+        return {'status' : 'error', 'msg' : '用户不存在。'}
+    if not user.is_admin:
+        return {'status': 'error', 'msg': '该用户没有发布消息的权利。'}
+    m = hashlib.md5()
+    m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+    bid_md = m.hexdigest()
+    bid_md = bid_md[0:10]
+    deps = Department.objects.filter(did__in = dic['departments'])
+    subs = Subunion.objects.filter(suid__in = dic['sub_unions'])
+    tags_list = []
+    for dep in deps:
+        tags_list += [dep.name]
+    for sub in subs:
+        tags_list += [sub.name]
+    if dic['checked_in'] :
+        tags_list += ['已签到']
+    st = ","
+    tags = st.join(tags_list)
+    print tags
+    print dic
+    broadcast = Broadcast(
+        bbid = bid_md,
+        title = dic['title'],
+        content = dic['content'],
+        sender = user,
+        sender_name = dic['sender'],
+        send_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds(),
+        send_notice = dic['send_notice'],
+        send_email = dic['send_email'],
+        send_sms = dic['send_sms'],
+        tags = tags
+    )
+    broadcast.save()
+    print broadcast
+    return {'status' : 'success', 'msg' : '创建成功'}
 
 def activityAuthorityCheck(uid, aaid):
     try:
@@ -203,49 +248,37 @@ def activityAuthorityCheck(uid, aaid):
         return -1
     return act.creator.uid == uid
 
-def getUserPageCount(number):
-    count = User.objects.all().count()
-    print number, type(number)
-    return ((count-1) / number ) +1
 
-def filterUsers(departments, activities, checked_in):
+def getUserListByFilter(page, number, departments, sub_unions, activities, check_in):
     userlist=[]
+    users = User.objects.all().exclude(is_admin = 1)
+    if len(departments) > 0:
+        deps = Department.objects.filter(did__in = departments)
+        users = User.objects.filter(department__in = deps)
+    if len(sub_unions) > 0:
+        subs = Subunion.objects.filter(suid__in = sub_unions)
+        users = users.filter(subunion__in = subs)
+    if len(activities) > 0:
+        acts = Activity.objects.filter(aid__in = activities)
+        recs = Record.objects.filter(activity__in = acts)
+        if check_in :
+            recs = recs.fillter(checked_in = 1)
+        uids = []
+        for rec in recs:
+            uids.append(rec.user.uid)
+        users = users.filter(uid__in = uids)
+    count = 0
+    for user in users:
+        count = count + 1
+        if (count >= number*(page-1)+1 and count <= number*page):
+            dict = model_to_dict(user)
+            dict['sex_text'] = u'男' if user.sex else u'女'
+            dict['department_text'] = user.department.name
+            dict['sub_union_text'] = user.subunion.name
+            dict['photo'] = ''
+            userlist.append(dict)
+    return (userlist, (count-1)/number+1)
 
-    for i in range(1,100000000):
-        try:
-            user = User.objects.get(uid = i)
-        except ObjectDoesNotExist:
-            break
-
-        if len(departments) > 0:
-            flag = 0
-            for i in range(0, len(departments)):
-                if departments[i] == user['department']:
-                    flag = 1
-                    break
-            if not flag: continue 
-        if len(sub_unions) > 0:
-            flag = 0
-            for i in range(0, len(sub_unions)):
-                if sub_unions[i] == user['sub_union']:
-                    flag = 1
-                    break
-            if not flag: continue 
-        if len(activities) > 0:
-            flag = 0
-            for i in range(0, len(activities)):
-                try:
-                    record = user.records.get(aid = activities[i])
-                except ObjectDoesNotExist:
-                    continue 
-                if record['checked_in'] == False:
-                    continue
-                flag = 1
-                break
-            if not flag: continue   
-
-        userlist.append(model_to_dict(user))
-    return userlist
 
 def getBroadcastsSendedByUid(uid):
     try:
@@ -301,6 +334,7 @@ def doEditActivity(uid,act_attributes):
     act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
+    act.poster.save(act.aaid+'.jpg',act_attributes['image'],0)
     act.save()
     return 1
 
@@ -312,3 +346,37 @@ def updateUserLoginTime(uid):
         return 0
     user.last_login_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     user.save()
+
+def getUserInformationListByActivity(aaid):
+    list = []
+    try:
+        activity = Activity.objects.get(aaid = aaid)
+    except ObjectDoesNotExist:
+        print u"无此活动"
+        return []
+    records = activity.records.all()
+    for record in records :
+        user = record.user
+        dic = model_to_dict(user)
+        dic['rid'] = record.rid
+        dic['signin_at'] = record.signin_at
+        dic['checked_in'] = record.checked_in
+        dic['checkin_at'] = record.checkin_at
+        list.append(dic)
+    return list
+
+def getBroadcastByPage(page, number):
+    old_news_list=[]
+    broadcasts = Broadcast.objects.all().order_by("-send_at")
+    count = 0
+    for broadcast in broadcasts:
+        count = count + 1
+        if (count >= number * (page - 1) + 1 and count <= number * page):
+            dict = model_to_dict(broadcast)
+            if dict['tags'] == "" :
+                dict['tags'] = ['所有人']
+            else:
+                dict['tags'] = dict['tags'].split(',')
+            dict['send_at'] = time.strftime('%Y/%m/%d  %H:%M:%S',time.localtime(dict['send_at']))
+            old_news_list.append(dict)
+    return (old_news_list, (count - 1) / number + 1)

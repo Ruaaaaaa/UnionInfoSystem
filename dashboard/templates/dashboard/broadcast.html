@@ -10,17 +10,291 @@
 .content-wrapper {
   margin-top: 70px;
 }
+/*#filter_init {
+  text-align: center;
+  line-height: 40px;
+  font-size: 20px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  top: 0;
+  left: 0;
+}
+#filter_form {
+  visibility: hidden;
+}
+.panel-body {
+  position: relative;
+}*/
+#filter_init {
+  display: none;
+}
 </style>
 {% endblock %}
 
 {% block body %}
 {% include 'dashboard/header.html' %}
+<div id = "root">
 <div class="container-fluid content-wrapper">
-broadcast
+        <div class="col-xs-12 col-sm-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">历史消息</h3>
+                </div>
+                <div class="panel-body" >
+                  
+
+                  <div class="panel panel-default" v-for="old_news in old_news_list">
+                    <div class="panel-heading">[[ old_news.title ]]
+                      <span class="label label-default" v-for="tag in old_news.tags" style = "margin-right : 2px;"> [[ tag ]] </span> 
+                    </div>
+                    <div class="panel-body">
+                        [[ old_news.content ]]
+                        <hr>
+                      <p class="text-muted" style = "text-align : right">
+                        <small>
+                        <input type="checkbox" name="checked_in"   disabled v-bind:checked = "old_news.send_notice">发送站内信 
+                        <input type="checkbox" name="checked_in"  disabled v-bind:checked = "old_news.send_email">发送邮件 
+                        <input type="checkbox" name="checked_in"  disabled v-bind:checked = "old_news.send_sms">发送短信 
+                        <br>
+                        发件人：[[old_news.sender_name]] &nbsp &nbsp 发送时间：[[old_news.send_at]]
+                        </small>
+                      </p> 
+                    </div>
+                  </div>
+                    
+                    <nav>
+                      <ul class="pagination">
+                          <li v-if="current_page != 1" @click="prevPage">
+                            <a href="#" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;</span>
+                            </a>
+                          </li>
+                          <li v-for="n in n_pages" :class="{'active': current_page == n}" @click="toPage(n)"><a href="#">[[ n ]]</a></li>
+                          <li v-if="current_page != n_pages" @click="nextPage">
+                              <a href="#" aria-label="Next">
+                                  <span aria-hidden="true">&raquo;</span>
+                              </a>
+                          </li>
+                      </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="hidden-xs col-sm-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                  <h3 class="panel-title">新消息</h3>
+              </div>
+              <div class="panel-body">               
+                  <form id="filter_form">
+                    {% csrf_token %}
+                      <div class="form-group">
+                        <input type = "text" class=" form-control" v-model = "title" placeholder="请输入消息标题">
+                      </div>
+                      <hr>
+                      <h5>发送给 <small>留空表示无限制</small></h5>
+                      <div class="form-group">
+                          <select id="dpm_selector"  data-placeholder="请选择收信人所属单位"  class=" form-control" multiple="multiple" >
+                          </select>
+                      </div>
+
+                      <div class="form-group">
+                          <select id="su_selector" data-placeholder="请选择收信人所属分工会" class="form-control" multiple="multiple">
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <select id="act_selector" data-placeholder="请选择收信人已报名活动" class="form-control" multiple="multiple">
+                          </select>
+                      </div>
+                      <div class="checkbox">
+                          <label>
+                              <input type="checkbox" id="checked_in" v-model = "checked_in">已签到
+                          </label>
+                      </div>
+                      
+                      <hr>
+                      <textarea class = "form-control" style = "height : 190px" placeholder = "请输入消息内容" v-model = "content"> </textarea>
+                      
+                      <hr>
+                      <div class="form-group">
+                        <input type = "text" class=" form-control" v-model = "sender" placeholder="请输入发件人，如“校工会”。">
+                      </div>
+                      <div class = "form-group form-inline">                          
+                              <input type="checkbox" name="checked_in" v-model = "send_notice">发送站内信 
+                              <input type="checkbox" name="checked_in" v-model = "send_email">发送邮件 
+                              <input type="checkbox" name="checked_in" v-model = "send_sms">发送短信 
+                      </div>
+                      <div style = "text-align:center">
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#preview" v-on:click="preview"> 预览 </button>
+                        <button type="button" class="btn btn-default" v-on:click="send">发送</button>
+                      </div>
+                  </form>
+              </div>
+            </div>             
+        </div>
+</div>
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="preview" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">消息预览</h4>
+      </div>
+      <div class="modal-body">
+
+                  <div class="panel panel-default" >
+                    <div class="panel-heading"><font id = "preview_title"> </font>
+                    </div>
+                    <div class="panel-body">
+                        <font id = "preview_content"> </font>
+                        <hr>
+                      <p class="text-muted" style = "text-align : right">
+                        <small>
+                        <input type="checkbox" name="checked_in"   disabled id = "preview_notice">发送站内信 
+                        <input type="checkbox" name="checked_in"  disabled id = "preview_email">发送邮件 
+                        <input type="checkbox" name="checked_in"  disabled id = "preview_sms">发送短信 
+                        <br>
+                        发件人：<font id = "preview_sender"> </font> &nbsp; &nbsp; 发送时间：<font id = "preview_date_time"> </font>
+                        </small>
+                      </p> 
+                    </div>
+                  </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" v-on:click="send">发送</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript"></script>
+<script type="text/javascript">
+
+new Vue({
+  el: '#root',
+  delimiters: ["[[", "]]"],
+  data: {
+    title : "",
+    content : "",
+    checked_in : false,
+    sender : "",
+    send_notice : true,
+    send_email : false,
+    send_sms : false,
+    n_pages : 10,
+    current_page : 1,
+    number_per_page : 5,
+    old_news_list: [],
+    request_url: '/admin/broadcast/get',
+  },
+  created: function() {
+    window.departments_selected = [];
+    window.sub_unions_selected = [];
+    window.activities_selected = [];
+    this.getBroadcast();
+    $.get('/admin/departments/get')
+    .done(function(data) {
+      $('#dpm_selector').select2({
+        data: data.data.departments
+      });
+    });
+    $.get('/admin/subunions/get')
+    .done(function(data) {
+      $('#su_selector').select2({
+        data: data.data.subunions
+      });
+    });
+    $.get('/admin/activities/get')
+    .done(function(data) {
+      $('#act_selector').select2({
+        data: data.data.activities
+      });
+    })
+  },
+  methods: {
+    preview : function() {
+      $.get('/admin/get_date_time')
+      .done(function(data) {
+        $('#preview_date_time').html(data.data.date_time);
+      });
+      $('#preview_title').html(this.title);
+      $('#preview_content').html(this.content);
+      $('#preview_sender').html(this.sender);
+      $('#preview_notice').attr('checked', this.send_notice);
+      $('#preview_email').attr('checked', this.send_email);
+      $('#preview_sms').attr('checked', this.send_sms);
+    },
+    getBroadcast: function() {
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: '/admin/broadcast/get',
+        data: JSON.stringify({
+            page: this.current_page,
+            number: this.number_per_page
+          }),
+        contentType: 'application/json'
+      })
+      .done(function(data) {
+        self.n_pages = data.data.page_total;
+        self.old_news_list = data.data.old_news_list;
+      })
+      .fail(function() {
+        console.log('fail');
+      })
+    },
+    prevPage: function() {
+      this.toPage(this.current_page - 1);
+    },
+    nextPage: function() {
+      this.toPage(this.current_page + 1);
+    },
+    toPage: function(page) {
+      this.current_page = page;
+      this.getBroadcast();
+    },
+    send: function() {
+      window.departments_selected = $('#dpm_selector').val().map(Number);
+      window.sub_unions_selected = $('#su_selector').val().map(Number);
+      window.activities_selected = $('#act_selector').val().map(Number);
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: '/admin/broadcast/new',
+        data: JSON.stringify({
+            title : this.title,
+            departments: window.departments_selected,
+            sub_unions: window.sub_unions_selected,
+            activities: window.activities_selected,
+            checked_in: this.checked_in,
+            content : this.content,
+            sender : this.sender,
+            send_notice : this.send_notice,
+            send_email : this.send_email,
+            send_sms : this.send_sms
+          }),
+        contentType: 'application/json'
+      })
+      .done(function(data) {
+        alert("发送成功！");
+         self.toPage(1);
+      })
+      .fail(function() {
+        console.log('fail');
+      })   
+    }, 
+  }
+})
+</script>
 {% endblock %}

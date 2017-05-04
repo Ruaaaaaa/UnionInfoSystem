@@ -43,10 +43,10 @@ class Activity(models.Model):
     aid = models.IntegerField(primary_key = True)
     aaid = models.CharField(max_length = 10, null = True)
     creator = models.ForeignKey(User, null = True, related_name = 'activities_created')
-    title = models.CharField(max_length = 256, null = True)
+    title = models.CharField(max_length = 300, null = True)
+    poster = models.ImageField(upload_to = 'poster/', default = 'poster/None/no-img.jpg')
     description = models.CharField(max_length = 2048, null = True)
     content = models.CharField(max_length = 10000, null = True)
-    poster = models.CharField(max_length = 256, null = True)
     signin_begin_at = models.IntegerField(null = True)
     signin_end_at = models.IntegerField(null = True)
     begin_at = models.IntegerField(null = True)
@@ -60,13 +60,16 @@ class Activity(models.Model):
 
 class Broadcast(models.Model):
     bid = models.IntegerField(primary_key = True)
+    bbid = models.CharField(max_length = 10, null = True)
     title = models.CharField(max_length = 256, null = True)
     content =  models.CharField(max_length = 4096, null = True)
     sender =  models.ForeignKey(User, null = True , related_name = 'broadcasts')
+    sender_name = models.CharField(max_length = 256, null = True)
     send_at = models.IntegerField(null = True)
     send_notice = models.BooleanField(default = 0)
     send_email = models.BooleanField(default = 0)
     send_sms = models.BooleanField(default = 0)
+    tags =  models.CharField(max_length = 4096, null = True)
 
 
 

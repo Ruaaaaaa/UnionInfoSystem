@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.views import static
 from dashboard import views as dashboard
 from participation import views as participation
 from base import views as base
+import settings
 
 urlpatterns = [
+    url(r'^media/(?P<path>.*)$', static.serve, {'document_root': settings.MEDIA_ROOT}),
+    url(r'^administrator/', admin.site.urls),
 	# User part
     url(r'^login', participation.login),
     url(r'^logout', participation.logout),
@@ -45,4 +49,7 @@ urlpatterns = [
     url(r'^admin/subunions/get', dashboard.getSubUnions),
     url(r'^admin/users/download$', dashboard.downloadUsers),
     url(r'^admin/broadcast$', dashboard.broadcast),
+    url(r'^admin/broadcast/new', dashboard.newBroadcast),
+    url(r'^admin/broadcast/get', dashboard.getBroadcast),
+    url(r'^admin/get_date_time', dashboard.getDateTime)   
 ]
