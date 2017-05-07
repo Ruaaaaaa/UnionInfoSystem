@@ -96,6 +96,8 @@ def newActivity(request):
 	else:
 		act_attributes = json.loads(request.POST['data'])
 		imagefile = request.FILES['poster']
+		if imagefile == None:
+			return JsonResponse({'status': 'error', 'msg': '没有收到活动海报'})	
 		act_attributes['filename'] = imagefile.name
 		act_attributes['image'] = ContentFile(imagefile.read())
 		create_result = createNewActivity(uid, act_attributes)
@@ -128,6 +130,8 @@ def editActivity(request, aaid):
 			return JsonResponse({'status': 'error', 'msg': '您无权修改此活动！'})
 
 		imagefile = request.FILES['poster']
+		if imagefile == None:
+			return JsonResponse({'status': 'error', 'msg': '没有收到活动海报'})	
 		act_attributes['image'] = ContentFile(imagefile.read())
 		editresult = doEditActivity(uid, act_attributes)
 		if editresult == 0:
@@ -256,6 +260,14 @@ def broadcast(request):
 def getActivities(request):
 	return JsonResponse({'status':'success', 'msg': '获取活动列表成功！', 'data': {'activities': getActivityListSimple()}})
 
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getActivityContent(request, aaid):
+	activity = getActivityByAaid(aaid) 
+	if activity == -1:
+		JsonResponse({'status':'error', 'msg': '无此活动！'})
+	return JsonResponse({'status':'success', 'msg': '获取活动详情成功！', 'data': {'content': activity['content']}})
 
 @require_http_methods(['GET'])
 @login_required
