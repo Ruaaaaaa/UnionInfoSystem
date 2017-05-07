@@ -63,14 +63,14 @@ def verification(request):
 	if len(name) == 0 or len(idnumber) == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	veresult = verificationOfRealId(name, idnumber) ;
+	veresult, user = verificationOfRealId(name, idnumber) ;
 	print name, idnumber 
 	if veresult == 0:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！实名或身份证号有误。'})
 	if veresult == 2:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！此身份证已被使用。'})
 
-	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'id_number': idnumber}})
+	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data':user})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -97,9 +97,7 @@ def register(request):
 		if registeredUsername(username):
 			return JsonResponse({'status': 'error', 'msg': '此用户名已被注册，请重新填写'})
 		if len(pwd) < 6 or len(username) < 4:
-			user = getUserByUid(uid) 
-			user['work_id'] = user['wid']
-			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）', 'data':user})
+			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
 		registerAccount(idnumber, username, pwd, mobile, email)
 
 		uid = getUidByUsername(username)
@@ -117,7 +115,7 @@ def activity(request, aaid):
 	if activity == -1:
 		raise Http404 
 	else:
-		return render(request, 'participation/activity.html', {'activity': activity})
+		return render(request, 'participation/activity.html', {'activity': activity, 'has_signed_in': 1})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt

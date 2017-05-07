@@ -34,7 +34,42 @@ def file_iterator(file_name, chunk_size=8192):
 				yield c
 			else:
 				break
-
+def enterUserInfoIntoXlsx(dirpath, filename, userlist, activity):
+	if not os.path.exists(dirpath):
+		os.makedirs(dirpath)
+	xlpath = dirpath + filename
+	style0 = xlwt.easyxf('font: name Times New Roman, color-index red, bold on',
+	    num_format_str='#,##0.00')
+	style1 = xlwt.easyxf(num_format_str='D-MMM-YY')
+	wb = xlwt.Workbook()
+	ws = wb.add_sheet('UserList')
+	row = 0 
+	ws.write(0, 0, '编号')
+	ws.write(0, 1, '报名人')
+	ws.write(0, 2, '性别')
+	ws.write(0, 3, '工号')
+	ws.write(0, 4, '邮箱')
+	ws.write(0, 5, '手机')
+	ws.write(0, 6, '所属单位')
+	ws.write(0, 7, '所属子工会')
+	ws.write(0, 8, '所属编制')
+	if not activity == None:
+		ws.write(0, 9, '是否已签到')
+	for user in userlist:
+		row = row+1
+		ws.write(row, 0, row)
+		ws.write(row, 1, user['name'])
+		ws.write(row, 2, user['sex_text'])
+		ws.write(row, 3, user['wid'])
+		ws.write(row, 4, user['email'])
+		ws.write(row, 5, user['mobile'])
+		ws.write(row, 6, user['department_text'])
+		ws.write(row, 7, user['sub_union_text'])
+		ws.write(row, 8, user['formation_text'])
+		if not activity == None:
+			record = getRecordByUidAndAaid(user['uid'], activity['aaid'])
+			ws.write(0, 9, "是" if record['checked_in'] == True else "否")
+	wb.save(xlpath)
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -173,22 +208,7 @@ def downloadActivity(request, aaid):
 	#excel part
 	dirpath = r"dashboard/files/%s"%aaid
 	print dirpath
-	if not os.path.exists(dirpath):
-		os.makedirs(dirpath)
-	xlpath = dirpath+"/userinfo.xls"
-	style0 = xlwt.easyxf('font: name Times New Roman, color-index red, bold on',
-	    num_format_str='#,##0.00')
-	style1 = xlwt.easyxf(num_format_str='D-MMM-YY')
-
-	wb = xlwt.Workbook()
-	ws = wb.add_sheet('A Test Sheet')
-
-	ws.write(0, 0, 1234.56, style0)
-	ws.write(1, 0, datetime.datetime.now(), style1)
-	ws.write(2, 0, 1)
-	ws.write(2, 1, 1)
-	ws.write(2, 2, xlwt.Formula("A3+B3"))
-	wb.save(xlpath)
+	xlsname = "/userinfo.xls"
 
 	#txt part
 
