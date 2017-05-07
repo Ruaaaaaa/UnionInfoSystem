@@ -20,11 +20,12 @@
       "name": "教师0号",
       "sex": 0,
       "wid": "2015000000",
+      "wid_hash": "89c19747535530ef5ba20c939b59c583",
       "id_hash": "3ea032bf79e8c116b05f4698d5a8e044",
       "id_partial": "0000000",
       "registered": false,
       "department_id": 1,
-      "subunion_id": 1
+      "formation_id": 1
     }
   },
   {
@@ -35,11 +36,12 @@
       "name": "教师1号",
       "sex": 1,
       "wid": "2015000001",
+      "wid_hash": "b03dffbbbe22ee077a1e9f0ec5646a54",
       "id_hash": "58583d76cd7f591f66fb4d4d0f125790",
       "id_partial": "0000001",
       "registered": false,
       "department_id": 1,
-      "subunion_id": 2
+      "formation_id": 2
     }
   },
   {
@@ -50,11 +52,12 @@
       "name": "教师2号",
       "sex": 0,
       "wid": "2015000002",
+      "wid_hash": "5f832266202a9bca5287e376183e2faa",
       "id_hash": "b39b6bd96f57ed7a92421e1ecd39e91d",
       "id_partial": "0000002",
       "registered": false,
       "department_id": 2,
-      "subunion_id": 1
+      "formation_id": 1
     }
   },
   {
@@ -65,25 +68,28 @@
       "name": "教师3号",
       "sex": 1,
       "wid": "2015000003",
+      "wid_hash": "3121459d9872bac887eb8f9e09e03840",
       "id_hash": "5958df09966cb06b7411cb7cc96ab56a",
       "id_partial": "0000003",
       "registered": false,
       "department_id": 2,
-      "subunion_id": 2
+      "formation_id": 3
     }
   },
   {
     "model": "base.Department",
     "pk": 1,
     "fields": {
-      "name": "麻将部门"
+      "name": "麻将部门",
+      "subunion_id": 1
     }
   },
   {
     "model": "base.Department",
     "pk": 2,
     "fields": {
-      "name": "火锅部门"
+      "name": "火锅部门",
+      "subunion_id": 2
     }
   },
   {
@@ -99,5 +105,26 @@
     "fields": {
       "name": "足球分工会"
     }
-  }
+  },
+  {
+    "model": "base.Formation",
+    "pk": 1,
+    "fields": {
+      "name": "事业编制"
+    }
+  },
+  {
+    "model": "base.Formation",
+    "pk": 2,
+    "fields": {
+      "name": "派遣"
+    }
+  },
+  {
+    "model": "base.Formation",
+    "pk": 3,
+    "fields": {
+      "name": "另一种非事编"
+    }
+  },
 ]
