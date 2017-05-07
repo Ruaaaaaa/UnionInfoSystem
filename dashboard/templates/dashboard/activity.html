@@ -59,7 +59,7 @@
       {% for act in activities %}
       <div class="col-xs-12 col-sm-4 col-md-3">
         <div class="thumbnail">
-          <img src="{{ act.poster.url }}">
+          <img class="poster" src="{{ act.poster.url }}">
           <div class="caption">
             <p>#{{ act.aaid }}</p>
             <h4>{{ act.title }}</h4>
@@ -166,8 +166,21 @@ var app = new Vue({
       window.open('/admin/activity/' + aaid + '/edit');
     },
     remove: function(aaid) {
-      console.log('remove');
-    }
+      $.post('/admin/activity/' + aaid + '/delete')
+      .done(function(data) {
+        if(data.status == 'success') {
+          alert(data.msg);
+          window.location.reload();
+        }
+        else if(data.status == 'error')
+          alert(data.msg);
+        else
+          alert('未知错误！')
+      })
+      .fail(function() {
+        console.log('网络状况不佳，请稍后再试！');
+      })
+    },
   }
 })
 </script>

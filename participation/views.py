@@ -21,7 +21,7 @@ import md5
 @csrf_exempt
 def login(request):
 	if sessions.getUser(request)[0] != None:
-		return HttpResponseRedirect("/") ;
+		return HttpResponseRedirect("/activities") ;
 	if request.method == 'GET': #GET METHOD
 		print sessions.getUser(request)
 		return render(request, 'participation/login.html', {})

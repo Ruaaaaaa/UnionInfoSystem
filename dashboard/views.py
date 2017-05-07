@@ -137,7 +137,7 @@ def editActivity(request, aaid):
 
 
 
-@require_http_methods(['GET'])
+@require_http_methods(['POST'])
 @csrf_exempt
 @login_required
 @admin_required
