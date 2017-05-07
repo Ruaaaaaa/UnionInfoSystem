@@ -110,21 +110,24 @@
     "model": "base.Formation",
     "pk": 1,
     "fields": {
-      "name": "事业编制"
+      "name": "事业编制",
+      "is_career": true
     }
   },
   {
     "model": "base.Formation",
     "pk": 2,
     "fields": {
-      "name": "派遣"
+      "name": "派遣",
+      "is_career": false
     }
   },
   {
     "model": "base.Formation",
     "pk": 3,
     "fields": {
-      "name": "另一种非事编"
+      "name": "另一种非事编",
+      "is_career": false
     }
-  },
+  }
 ]
