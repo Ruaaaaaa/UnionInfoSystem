@@ -34,7 +34,7 @@ def file_iterator(file_name, chunk_size=8192):
 				yield c
 			else:
 				break
-def enterUserInfoIntoXlsx(dirpath, filename, userlist, activity):
+def saveUserInfoToXlsx(dirpath, filename, userlist, activity):
 	if not os.path.exists(dirpath):
 		os.makedirs(dirpath)
 	xlpath = dirpath + filename
@@ -209,8 +209,8 @@ def downloadActivity(request, aaid):
 	#excel part
 	dirpath = r"dashboard/files/%s"%aaid
 	print dirpath
-	xlsname = "/userinfo.xls"
-
+	filename = "userinfo.xls"
+	#saveUserInfoToXlsx(dirpath, filename, userlist, activity):
 	#txt part
 
 	#packagepart
