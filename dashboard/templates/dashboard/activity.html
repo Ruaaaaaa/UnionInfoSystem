@@ -148,11 +148,12 @@ var app = new Vue({
       var self = this;
       $.get('/admin/activity/' + aaid + '/content')
       .done(function(data) {
-        self.contentLoading = false;
-        self.content = data.data;
+        if(data.status == 'success') {
+          self.content = data.data.content;
+        }
       })
-      .fail(function() {
-
+      .always(function() {
+        self.contentLoading = false;
       })
       $('#content_modal').modal('show');
     },
