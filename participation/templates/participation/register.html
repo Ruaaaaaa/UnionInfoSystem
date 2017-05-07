@@ -50,6 +50,32 @@
         </button>
     </div>
     <div class="info-wrapper">
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">性别</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="sex" disabled>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">工号</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="wid" disabled>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">单位</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="department" disabled>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">分工会</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="sub_union" disabled>
+                </div>
+            </div>
+        </div>
         <div class="weui-cells__title">信息补全</div>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
@@ -153,6 +179,10 @@ $('#verify_btn').on('click', function() {
                 $('.verify-before').html('已验证');
                 $('.verify-loading').css('display', 'none');
                 $('.verify-before').css('display', 'block');
+                $('input[name="sex"]').val(data.data.sex_text);
+                $('input[name="wid"]').val(data.data.wid);
+                $('input[name="department"]').val(data.data.sex_text);
+                $('input[name="sub_union"]').val(data.data.subunion_text);
                 $('.info-wrapper').css('display', 'block');
                 return;
             }
