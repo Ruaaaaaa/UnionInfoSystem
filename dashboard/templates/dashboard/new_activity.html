@@ -152,6 +152,18 @@ function toggleButton(status) {
   }
 }
 
+function dataUrlToBlob(dataurl) {
+  var arr = dataurl.split(',');
+  var mime = arr[0].match(/:(.*?);/)[1];
+  var bstr = atob(arr[1]);
+  var n = bstr.length;
+  var u8arr = new Uint8Array(n);
+  while(n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], {type: mime});
+}
+
 function init() {
   var dtp_ss_init = '{{ activity.signin_begin_at }}',
       dtp_se_init = '{{ activity.signin_end_at }}',
@@ -196,6 +208,21 @@ function init() {
 
   setTime(dtp_ss_init, dtp_se_init, dtp_as_init, dtp_as_init);
 
+  window.reader = new FileReader();
+  window.posterImg = new Image();
+
+  $('#poster').on('change', function() {
+    $('#poster_canvas').css('display', 'block');
+    var file = this.files[0];
+    window.reader.readAsDataURL(file);
+  });
+  window.reader.onload = function() {
+    window.posterImg.src = window.reader.result;
+  };
+  window.posterImg.onload = function() {
+    $('#poster_canvas')[0].getContext('2d').drawImage(window.posterImg, 0, 0, 200, 200);
+  };
+
   $('#submit_btn').on('click', function() {
     toggleButton(1);
     var moment_tmp = null;
@@ -214,12 +241,13 @@ function init() {
     var signin_max = parseInt($('#signin_max').val(), 10);
     var need_checkin = $('#need_checkin').get(0).checked;
     var poster = $('#poster')[0].files[0];
+    var poster_blob = dataUrlToBlob($('#poster_canvas')[0].toDataURL('image/jpeg'));
     if(!validateForm(title, description, content, poster, dtp_ss, dtp_se, dtp_as, dtp_ae, signin_restrict, signin_max, need_checkin)) {
       toggleButton(0);
       return;
     }
     var formData = new FormData();
-    formData.append('poster', poster);
+    formData.append('poster', poster_blob);
     formData.append('data', JSON.stringify({
         title: title,
         description: description,
@@ -259,21 +287,6 @@ function init() {
       toggleButton(0);
     })
   });
-
-  window.reader = new FileReader();
-  window.posterImg = new Image();
-
-  $('#poster').on('change', function() {
-    $('#poster_canvas').css('display', 'block');
-    var file = this.files[0];
-    window.reader.readAsDataURL(file);
-  });
-  window.reader.onload = function() {
-    window.posterImg.src = window.reader.result;
-  };
-  window.posterImg.onload = function() {
-    $('#poster_canvas')[0].getContext('2d').drawImage(window.posterImg, 0, 0, 200, 200);
-  };
 }
 
 init();
