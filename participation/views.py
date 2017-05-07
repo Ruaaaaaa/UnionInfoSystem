@@ -63,14 +63,16 @@ def verification(request):
 	if len(name) == 0 or len(idnumber) == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	veresult = verificationOfRealId(name, idnumber) ;
+	veresult, user = verificationOfRealId(name, idnumber) ;
 	print name, idnumber 
 	if veresult == 0:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！实名或身份证号有误。'})
 	if veresult == 2:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！此身份证已被使用。'})
 
-	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data': {'id_number': idnumber}})
+	user['photo'] = None
+	print user
+	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data':user})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -115,7 +117,10 @@ def activity(request, aaid):
 	if activity == -1:
 		raise Http404 
 	else:
-		return render(request, 'participation/activity.html', {'activity': activity})
+		uid, identity = sessions.getUser(request)
+		record = getRecordByUidAndAaid(uid, aaid)
+		print record
+		return render(request, 'participation/activity.html', {'activity': activity, 'has_signed_in': record!=-1})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -124,7 +129,7 @@ def checkIn(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'participation/checkin.html', {'aaid': aaid})
 	else:
-		uid = request.sessions['uid']
+		uid, identity = sessions.getUser(request)
 		result = userCheckIn(uid, aaid) ;
 		if result == 0:
 			return JsonResponse({'status': 'error', 'msg': '签到失败！'})

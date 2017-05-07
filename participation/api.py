@@ -343,7 +343,7 @@ def doEditActivity(uid,act_attributes):
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
     (pre,suf) = os.path.splitext(act_attributes['filename'])
-    act.poster.save(aaid_md+'.'+suf,act_attributes['image'],0)
+    act.poster.save(act_attributes['aaid']+'.'+suf,act_attributes['image'],0)
     act.save()
     return 1
 

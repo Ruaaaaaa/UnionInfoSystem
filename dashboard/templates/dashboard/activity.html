@@ -113,7 +113,7 @@
                   <i class="fa fa-spinner fa-pulse fa-fw"></i> 内容获取中...
               </div>
               <div class="act-content" v-if="!contentLoading">
-                  Content
+              [[ content ]]
               </div>
           </div>
         </div>
@@ -139,12 +139,22 @@ var app = new Vue({
   delimiters: ["[[","]]"],
   data: {
     QRCode: null,
-    contentLoading: true
+    contentLoading: true,
+    content: ''
   },
   methods: {
     showContent: function(aaid) {
-      //fetch data from server
-      //fill in 
+      this.contentLoading = true;
+      var self = this;
+      $.get('/admin/activity/' + aaid + '/content')
+      .done(function(data) {
+        if(data.status == 'success') {
+          self.content = data.data.content;
+        }
+      })
+      .always(function() {
+        self.contentLoading = false;
+      })
       $('#content_modal').modal('show');
     },
     showQR: function(aaid) {

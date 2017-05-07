@@ -34,7 +34,7 @@
     <div class="weui-cells">
         <div class="weui-cell">
             <div class="weui-cell__bd">
-                <input class="weui-input" type="text" placeholder="请输入您的身份证号" required name="id_number">
+                <input class="weui-input" type="text" placeholder="请输入您的身份证号或工号" required name="id_number">
             </div>
         </div>
         <div class="weui-cell">
@@ -50,6 +50,32 @@
         </button>
     </div>
     <div class="info-wrapper">
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">性别</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="sex" disabled>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">工号</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="wid" disabled>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">单位</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="department" disabled>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">分工会</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="sub_union" disabled>
+                </div>
+            </div>
+        </div>
         <div class="weui-cells__title">信息补全</div>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
@@ -98,6 +124,7 @@
 <script type="text/javascript">
 var id_re_1 = /^[0-9]{18}$/;
 var id_re_2 = /^[0-9]{17}X$/;
+var id_re_3 = /^[0-9]{10}$/;
 var mobile_re = /^[0-9]{11}$/;
 var email_re = /^\S+@\S+$/;
 var id_number = null;
@@ -107,10 +134,10 @@ function validateId(id_number) {
         weui.topTips('真实姓名不能为空', 3000);
         return false;
     }
-    if(id_re_1.exec(id_number) || id_re_2.exec(id_number)) {
+    if(id_re_1.exec(id_number) || id_re_2.exec(id_number) || id_re_3.exec(id_number)) {
         return true;
     }
-    weui.topTips('请输入正确的身份证号', 3000);
+    weui.topTips('请输入正确的18位身份证号或10位工号', 3000);
     return false;
 }
 function validateForm(username, pwd, mobile, email) {
@@ -153,6 +180,10 @@ $('#verify_btn').on('click', function() {
                 $('.verify-before').html('已验证');
                 $('.verify-loading').css('display', 'none');
                 $('.verify-before').css('display', 'block');
+                $('input[name="sex"]').val(data.data.sex_text);
+                $('input[name="wid"]').val(data.data.wid);
+                $('input[name="department"]').val(data.data.department_text);
+                $('input[name="sub_union"]').val(data.data.sub_union_text);
                 $('.info-wrapper').css('display', 'block');
                 return;
             }
@@ -194,7 +225,7 @@ $('#register_btn').on('click', function() {
                 weui.toast(data.msg, {
                     duration: 1000,
                     callback: function() {
-                        window.location.href = '//www.baidu.com';
+                        window.location.href = '/activities';
                     }
                 });
             }
