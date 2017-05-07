@@ -141,8 +141,12 @@ var signin_begin_at = {{ activity.signin_begin_at }},
 	begin_at = {{ activity.begin_at }},
 	end_at = {{ activity.end_at }};
 var aaid = '{{ activity.aaid }}';
+{% if has_signed_in %}
+var has_signed_in = true;
+{% else %}
 var has_signed_in = false;
-var can_signed_in = false;
+{% endif %}
+var can_sign_in = false;
 function formatTimeParam(p) {
 	if(p < 10) return '0' + p;
 	else return p;
@@ -157,40 +161,47 @@ function updateTime(interval) {
 }
 function updateStatus() {
 	var current = moment().unix();
+	if (has_signed_in)
+		$('#op_btn').css('background', 'gray').html('已报名');
+	else
+		$('#op_btn').css('background', 'gray').html('未报名');
+
 	if (current < signin_begin_at) {
+		can_sign_in = false;
 		$('#op_btn').css('background', 'blue').html('报名未开始');
 		$('#status_label').html('报名开始');
 		var interval = signin_begin_at - current;
 		updateTime(interval);
 	}
-	else if (current > signin_begin_at && current < signin_end_at) {
-		can_signed_in = true;
+	if (current > signin_begin_at && current < signin_end_at) {
 		if(has_signed_in) {
-			$('#op_btn').css('background', 'gray').html('已报名');
+			can_sign_in = false;
 			$('#status_label').html('活动开始');
 			var interval = begin_at - current;
 			updateTime(interval);
 		}
 		else {
+			can_sign_in = true;
 			$('#op_btn').css('background', 'green').html('立即报名');
 			$('#status_label').html('报名结束');
 			var interval = signin_end_at - current;
 			updateTime(interval);
 		}
 	}
-	else if (current > begin_at && current < end_at) {
-		$('#op_btn').css('background', 'red').html('活动进行中');
-		$('#status_label').html('活动结束');
-		var interval = end_at - current;
-		updateTime(interval);
+	if (current > begin_at && current < end_at) {
+		if(!can_sign_in || has_signed_in) {
+			can_sign_in = false;
+			$('#status_label').html('活动结束');
+			var interval = end_at - current;
+			updateTime(interval);
+		}
 	}
-	else if (current < begin_at){
-		$('#op_btn').css('background', 'gray').html('活动未开始');
+	if (current < begin_at){
 		$('#status_label').html('活动开始');
 		var interval = begin_at - current;
 		updateTime(interval);
 	}
-	else {
+	if(current > end_at) {
 		$('#op_btn').css('background', 'gray').html('活动已结束');
 		$('.act-time').css('display', 'none');
 		$('.act-op').css('width', '100%');
@@ -200,11 +211,12 @@ updateStatus();
 $('.act-hint').css('display', 'block');
 $('#op_btn').on('click', function() {
 	var now = moment.unix();
-	if(!can_signed_in)
+	if(!can_sign_in)
 		return;
 	$.post('/activity/' + aaid + '/signin')
 	.done(function(data) {
 		if(data.status == 'success') {
+			has_signed_in = true;
 			weui.toast(data.msg, {
 				duration: 1000
 			});
