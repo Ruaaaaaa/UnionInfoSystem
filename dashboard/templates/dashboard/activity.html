@@ -144,6 +144,7 @@ var app = new Vue({
   },
   methods: {
     showContent: function(aaid) {
+      this.contentLoading = true;
       var self = this;
       $.get('/admin/activity/' + aaid + '/content')
       .done(function(data) {
