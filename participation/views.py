@@ -70,6 +70,8 @@ def verification(request):
 	if veresult == 2:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！此身份证已被使用。'})
 
+	user['photo'] = None
+	print user
 	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data':user})
 
 @require_http_methods(['GET', 'POST'])
@@ -115,7 +117,10 @@ def activity(request, aaid):
 	if activity == -1:
 		raise Http404 
 	else:
-		return render(request, 'participation/activity.html', {'activity': activity, 'has_signed_in': 1})
+		uid, identity = sessions.getUser(request)
+		record = getRecordByUidAndAaid(uid, aaid)
+		print record
+		return render(request, 'participation/activity.html', {'activity': activity, 'has_signed_in': record!=-1})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -124,7 +129,7 @@ def checkIn(request, aaid):
 	if request.method == 'GET':
 		return render(request, 'participation/checkin.html', {'aaid': aaid})
 	else:
-		uid = request.sessions['uid']
+		uid, identity = sessions.getUser(request)
 		result = userCheckIn(uid, aaid) ;
 		if result == 0:
 			return JsonResponse({'status': 'error', 'msg': '签到失败！'})

@@ -167,6 +167,7 @@ def editActivity(request, aaid):
 		imagefile = request.FILES['poster']
 		if imagefile == None:
 			return JsonResponse({'status': 'error', 'msg': '没有收到活动海报'})	
+		act_attributes['filename'] = imagefile.name
 		act_attributes['image'] = ContentFile(imagefile.read())
 		editresult = doEditActivity(uid, act_attributes)
 		if editresult == 0:
