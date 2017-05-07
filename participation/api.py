@@ -274,7 +274,7 @@ def getUserListByFilter(page, number, departments, sub_unions, activities, check
             dict = model_to_dict(user)
             dict['sex_text'] = u'男' if user.sex else u'女'
             dict['department_text'] = user.department.name
-            dict['sub_union_text'] = user.subunion.name
+            dict['sub_union_text'] = user.department.subunion.name
             dict['photo'] = ''
             userlist.append(dict)
     return (userlist, (count-1)/number+1)
@@ -334,7 +334,8 @@ def doEditActivity(uid,act_attributes):
     act.end_at = act_attributes['end_at']
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
-    act.poster.save(act.aaid+'.jpg',act_attributes['image'],0)
+    (pre,suf) = os.path.splitext(act_attributes['filename'])
+    act.poster.save(aaid_md+'.'+suf,act_attributes['image'],0)
     act.save()
     return 1
 
@@ -380,3 +381,15 @@ def getBroadcastByPage(page, number):
             dict['send_at'] = time.strftime('%Y/%m/%d  %H:%M:%S',time.localtime(dict['send_at']))
             old_news_list.append(dict)
     return (old_news_list, (count - 1) / number + 1)
+
+
+def getUserByUid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"无用户"
+    dict = model_to_dict(user)
+    dict['sex_text'] = u'男' if user.sex else u'女'
+    dict['department_text'] = user.department.name
+    dict['sub_union_text'] = user.department.subunion.name
+    return dict

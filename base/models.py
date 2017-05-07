@@ -6,15 +6,25 @@ from django.db import models
 # Create your models here.
 
 
-class Department(models.Model):
-    did = models.IntegerField(primary_key = True)
-    name = models.CharField(max_length = 256, null = True)
-
-
 
 class Subunion(models.Model):
     suid = models.IntegerField(primary_key = True)
     name = models.CharField(max_length = 256, null = True)
+
+
+
+class Department(models.Model):
+    did = models.IntegerField(primary_key = True)
+    subunion = models.ForeignKey(Subunion, null = True, related_name = 'departments')
+    name = models.CharField(max_length = 256, null = True)
+
+
+
+
+class Formation(models.Model):
+    fid = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=256, null=True)
+    is_career = models.BooleanField(default = 1)
 
 
 
@@ -25,6 +35,7 @@ class User(models.Model):
     sex = models.BooleanField(default = 0)
     wid = models.CharField(max_length = 32, null = True)
     photo = models.ImageField(upload_to = 'photos/', default = 'photos/None/no-img.jpg')
+    wid_hash = models.CharField(max_length = 256, null = True)
     id_hash = models.CharField(max_length = 256, null = True)
     id_partial = models.CharField(max_length = 32, null = True)
     mobile = models.CharField(max_length = 11, null = True)
@@ -35,7 +46,7 @@ class User(models.Model):
     register_at = models.IntegerField(null = True)
     last_login_at = models.IntegerField(null = True)
     department = models.ForeignKey(Department, null = True, related_name = 'users')
-    subunion = models.ForeignKey(Subunion, null = True, related_name = 'users')
+    formation = models.ForeignKey(Formation, null = True, related_name = 'users')
 
 
 
