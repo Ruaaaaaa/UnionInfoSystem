@@ -9,6 +9,7 @@
 <style type="text/css">
 .content-wrapper {
 	margin-top: 50px;
+	margin-bottom: 50px;
 }
 .act-title {
 	background: white;
@@ -107,22 +108,22 @@
 	        </div>
 	    </div>
 	</div>
-</div>
-<div class="weui-panel weui-panel_access">
-    <div class="weui-panel__hd">活动简介</div>
-    <div class="weui-panel__bd">
-        <div class="weui-media-box weui-media-box_text">
-            <p class="weui-media-box__desc">{{ activity.description }}</p>
-        </div>
-    </div>
-</div>
-<div class="weui-panel weui-panel_access">
-    <div class="weui-panel__hd">活动详情</div>
-    <div class="weui-panel__bd">
-        <div class="weui-media-box weui-media-box_text">
-            <p class="weui-media-box__desc">{{ activity.content }}</p>
-        </div>
-    </div>
+	<div class="weui-panel weui-panel_access">
+	    <div class="weui-panel__hd">活动简介</div>
+	    <div class="weui-panel__bd">
+	        <div class="weui-media-box weui-media-box_text">
+	            <p class="weui-media-box__desc">{{ activity.description }}</p>
+	        </div>
+	    </div>
+	</div>
+	<div class="weui-panel weui-panel_access">
+	    <div class="weui-panel__hd">活动详情</div>
+	    <div class="weui-panel__bd">
+	        <div class="weui-media-box weui-media-box_text">
+	            <p class="weui-media-box__desc">{{ activity.content }}</p>
+	        </div>
+	    </div>
+	</div>
 </div>
 <div class="act-hint">
 	<div class="act-time">
@@ -168,37 +169,39 @@ function updateStatus() {
 
 	if (current < signin_begin_at) {
 		can_sign_in = false;
-		$('#op_btn').css('background', 'blue').html('报名未开始');
+		$('#op_btn').css('background', 'gray').html('报名未开始');
+	}
+	else if(current > signin_begin_at && current < signin_end_at) {
+		if (has_signed_in)
+			can_sign_in = false;
+		else {
+			can_sign_in = true;
+			$('#op_btn').css('background', 'green').html('立即报名');
+		}
+	}
+	else {
+		can_sign_in = false;
+	}
+
+
+	if (current < begin_at){
+		$('#status_label').html('活动开始');
+		var interval = begin_at - current;
+		updateTime(interval);
+	}
+	if (current < signin_begin_at) {
 		$('#status_label').html('报名开始');
 		var interval = signin_begin_at - current;
 		updateTime(interval);
 	}
 	if (current > signin_begin_at && current < signin_end_at) {
-		if(has_signed_in) {
-			can_sign_in = false;
-			$('#status_label').html('活动开始');
-			var interval = begin_at - current;
-			updateTime(interval);
-		}
-		else {
-			can_sign_in = true;
-			$('#op_btn').css('background', 'green').html('立即报名');
-			$('#status_label').html('报名结束');
-			var interval = signin_end_at - current;
-			updateTime(interval);
-		}
+		$('#status_label').html('报名结束');
+		var interval = signin_end_at - current;
+		updateTime(interval);
 	}
 	if (current > begin_at && current < end_at) {
-		if(!can_sign_in || has_signed_in) {
-			can_sign_in = false;
-			$('#status_label').html('活动结束');
-			var interval = end_at - current;
-			updateTime(interval);
-		}
-	}
-	if (current < begin_at){
-		$('#status_label').html('活动开始');
-		var interval = begin_at - current;
+		$('#status_label').html('活动结束');
+		var interval = end_at - current;
 		updateTime(interval);
 	}
 	if(current > end_at) {

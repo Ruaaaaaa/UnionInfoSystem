@@ -10,6 +10,8 @@ import datetime
 import time
 import hashlib
 import os
+import xlrd
+
 
 def getUidByUsername(username):
     try:
@@ -434,3 +436,151 @@ def getFormationByFid(fid):
         print u"无制编"
         return -1
     return model_to_dict(formation)
+
+
+
+
+'''
+
+try:
+    shibian = Formation.objects.get(name = u'正式事业编制')
+except ObjectDoesNotExist:
+    shibian = Formation(
+        name = u'正式事业编制',
+        is_career = 1
+    )
+    shibian.save()
+shibian = Formation.objects.get(name=u'正式事业编制')
+data = xlrd.open_workbook('/home/lilingxin/UnionInfoSystem/A.xls')
+table = data.sheets()[0]
+ncols = table.ncols
+nrows = table.nrows
+for i in range(1,nrows):
+    ddid = table.cell(i, 0).value
+    dep_name = table.cell(i, 1).value
+    try:
+        department = Department.objects.get(name = dep_name)
+    except ObjectDoesNotExist:
+        try:
+            subunion = Subunion.objects.get(name = dep_name)
+        except ObjectDoesNotExist:
+            subunion = Subunion(
+                name = dep_name
+            )
+            subunion.save()
+        subunion = Subunion.objects.get(name=dep_name)
+        department = Department(
+            name = dep_name,
+            ddid = ddid,
+            subunion = subunion
+        )
+        department.save()
+    department = Department.objects.get(name=dep_name)
+    forma = table.cell(i, 5).value
+
+
+    wid = table.cell(i, 2).value
+    wid = wid.encode('utf-8')
+    id = table.cell(i, 3).value
+    id = id.encode('utf-8')
+    name = table.cell(i,4).value
+
+
+    m = hashlib.md5()
+    m.update(id)
+    idhash = m.hexdigest()
+    m.update(wid)
+    widhash = m.hexdigest()
+    try:
+        user = User.objects.get(id_hash = idhash)
+    except ObjectDoesNotExist:
+        user = User(
+            name = name,
+            id_hash = idhash,
+            id_partial = id[0:3]+id[14:18],
+            wid = wid,
+            wid_hash = widhash,
+            department = department,
+            formation = shibian
+        )
+        user.save()
+    #print str(i+1)+'/'+str(nrows)
+
+
+try:
+    hetong = Formation.objects.get(name = u'合同制')
+except ObjectDoesNotExist:
+    hetong = Formation(
+        name = u'合同制',
+        is_career = 0
+    )
+    hetong.save()
+try:
+    laowu = Formation.objects.get(name = u'劳务派遣')
+except ObjectDoesNotExist:
+    laowu = Formation(
+        name = u'劳务派遣',
+        is_career = 0
+    )
+    laowu.save()
+
+data = xlrd.open_workbook('/home/lilingxin/UnionInfoSystem/B.xlsx')
+table = data.sheets()[0]
+ncols = table.ncols
+nrows = table.nrows
+
+for i in range(1,nrows):
+    dep_name = table.cell(i, 3).value
+    subunion_name = table.cell(i, 4).value
+    try:
+        subunion = Subunion.objects.get(name=subunion_name)
+    except ObjectDoesNotExist:
+        subunion = Subunion(
+            name=subunion_name
+        )
+        subunion.save()
+    subunion = Subunion.objects.get(name=subunion_name)
+    try:
+        department = Department.objects.get(name = dep_name)
+    except ObjectDoesNotExist:
+        department = Department(
+            name = dep_name,
+            subunion = subunion
+        )
+        department.save()
+    department = Department.objects.get(name=dep_name)
+    forma = table.cell(i, 5).value
+    #print type(forma),forma
+    try:
+        formation = Formation.objects.get(name = forma)
+    except ObjectDoesNotExist:
+        formation = Formation(
+            name = forma,
+            is_career = 0
+        )
+        formation.save()
+    formation = Formation.objects.get(name=forma)
+    wid = table.cell(i, 2).value
+    #print type(wid),wid
+    wid = str(int(wid))
+    #wid = wid.encode('utf-8')
+    name = table.cell(i,0).value
+    sex = 1 if table.cell(i,1).value == u'男' else 0
+    m = hashlib.md5()
+    m.update(wid)
+    widhash = m.hexdigest()
+    #print type(name),name,type(sex),sex,type(wid),wid,type(widhash),widhash
+    try:
+        user = User.objects.get(wid_hash = widhash)
+    except ObjectDoesNotExist:
+        user = User(
+            name = name,
+            sex = sex,
+            wid = wid,
+            wid_hash = widhash,
+            department = department,
+            formation = formation
+        )
+        user.save()
+    #print str(i+1)+'/'+str(nrows)
+'''
