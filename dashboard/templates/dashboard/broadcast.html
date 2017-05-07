@@ -224,10 +224,7 @@ new Vue({
   },
   methods: {
     preview : function() {
-      $.get('/admin/get_date_time')
-      .done(function(data) {
-        $('#preview_date_time').html(moment().format('Y/MM/DD HH:mm:ss'));
-      });
+      $('#preview_date_time').html(moment().format('Y/MM/DD HH:mm:ss'));
       $('#preview_title').html(this.title);
       $('#preview_content').html(this.content);
       $('#preview_sender').html(this.sender);

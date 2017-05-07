@@ -372,10 +372,3 @@ def getBroadcast(request):
 	old_news_list, page_total = getBroadcastByPage(page, number)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'old_news_list':old_news_list}})
 
-
-@require_http_methods(['GET'])
-@login_required
-@admin_required
-def getDateTime(request):
-	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})
-

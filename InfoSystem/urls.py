@@ -55,6 +55,5 @@ urlpatterns = [
     url(r'^admin/users/download$', dashboard.downloadUsers),
     url(r'^admin/broadcast$', dashboard.broadcast),
     url(r'^admin/broadcast/new', dashboard.newBroadcast),
-    url(r'^admin/broadcast/get', dashboard.getBroadcast),
-    url(r'^admin/get_date_time', dashboard.getDateTime)   
+    url(r'^admin/broadcast/get', dashboard.getBroadcast), 
 ]
