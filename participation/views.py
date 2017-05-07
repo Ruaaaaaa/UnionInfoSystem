@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -111,7 +112,10 @@ def register(request):
 @login_required
 def activity(request, aaid):
 	activity = getActivityByAaid(aaid) 
-	return render(request, 'participation/activity.html', {'activity': activity})
+	if activity == -1:
+		raise Http404 
+	else:
+		return render(request, 'participation/activity.html', {'activity': activity})
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
