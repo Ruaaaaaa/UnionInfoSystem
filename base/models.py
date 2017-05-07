@@ -15,6 +15,7 @@ class Subunion(models.Model):
 
 class Department(models.Model):
     did = models.IntegerField(primary_key = True)
+    ddid = models.CharField(max_length = 4, null = True)
     subunion = models.ForeignKey(Subunion, null = True, related_name = 'departments')
     name = models.CharField(max_length = 256, null = True)
 
