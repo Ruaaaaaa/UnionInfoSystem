@@ -6,15 +6,25 @@ from django.db import models
 # Create your models here.
 
 
-class Department(models.Model):
-    did = models.IntegerField(primary_key = True)
-    name = models.CharField(max_length = 256, null = True)
-
-
 
 class Subunion(models.Model):
     suid = models.IntegerField(primary_key = True)
     name = models.CharField(max_length = 256, null = True)
+
+
+
+class Department(models.Model):
+    did = models.IntegerField(primary_key = True)
+    subunion = models.ForeignKey(Subunion, null = True, related_name = 'departments')
+    name = models.CharField(max_length = 256, null = True)
+
+
+
+
+class Formation(models.Model):
+    fid = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=256, null=True)
+    is_career = models.BooleanField(default = 1)
 
 
 
@@ -35,7 +45,7 @@ class User(models.Model):
     register_at = models.IntegerField(null = True)
     last_login_at = models.IntegerField(null = True)
     department = models.ForeignKey(Department, null = True, related_name = 'users')
-    subunion = models.ForeignKey(Subunion, null = True, related_name = 'users')
+    formation = models.ForeignKey(Formation, null = True, related_name = 'users')
 
 
 
