@@ -280,6 +280,7 @@ def getUserListByFilter(page, number, departments, sub_unions, activities, check
             dict['sex_text'] = u'男' if user.sex else u'女'
             dict['department_text'] = user.department.name
             dict['sub_union_text'] = user.department.subunion.name
+            dict['formation_text'] = user.formation.name
             dict['photo'] = ''
             userlist.append(dict)
     return (userlist, (count-1)/number+1)
@@ -398,6 +399,7 @@ def getUserByUid(uid):
     dict['sex_text'] = u'男' if user.sex else u'女'
     dict['department_text'] = user.department.name
     dict['sub_union_text'] = user.department.subunion.name
+    dict['formation_text'] = user.formation.name
     return dict
 
 
