@@ -173,7 +173,7 @@ var app = new Vue({
       $('#qr_modal').modal('show');
     },
     downloadInfo: function(aaid) {
-      console.log('download ' + aaid);
+      window.open('/admin/activity/' + aaid + '/download');
     },
     edit: function(aaid) {
       window.open('/admin/activity/' + aaid + '/edit');
