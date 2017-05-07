@@ -170,6 +170,7 @@ function init() {
       dtp_as_init = '{{ activity.begin_at }}',
       dtp_ae_init = '{{ activity.end_at }}';
   window.type = '{{ type }}';
+  var old_poster = '{{ activity.poster.url }}';
   var icons = {
                 time: 'fa fa-clock-o',
                 date: 'fa fa-calendar',
@@ -222,6 +223,11 @@ function init() {
   window.posterImg.onload = function() {
     $('#poster_canvas')[0].getContext('2d').drawImage(window.posterImg, 0, 0, 200, 200);
   };
+
+  if(old_poster) {
+    window.posterImg.src = old_poster;
+    $('#poster_canvas').css('display', 'block');
+  }
 
   $('#submit_btn').on('click', function() {
     toggleButton(1);
