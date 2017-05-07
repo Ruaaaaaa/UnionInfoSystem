@@ -47,14 +47,19 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        print u"没有这个身份证号"
-        return 0
+        print u"没有身份证号"
+        try:
+            user1 = User.objects.get(wid_hash = idnumber)
+        except ObjectDoesNotExist:
+            print u"没有这个工号"
+            return 0
+        user = user1
     if user.registered :
-        return 2
+        return (2,getUserByUid(user.uid))
     if realname == user.name :
-        return 1
+        return (1,getUserByUid(user.uid))
     else:
-        return 0
+        return (0,-1)
 
 def registerAccount(idnumber, username, pwd, mobile, email):
     try:
@@ -275,6 +280,7 @@ def getUserListByFilter(page, number, departments, sub_unions, activities, check
             dict['sex_text'] = u'男' if user.sex else u'女'
             dict['department_text'] = user.department.name
             dict['sub_union_text'] = user.department.subunion.name
+            dict['formation_text'] = user.formation.name
             dict['photo'] = ''
             userlist.append(dict)
     return (userlist, (count-1)/number+1)
@@ -388,8 +394,43 @@ def getUserByUid(uid):
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
         print u"无用户"
+        return -1
     dict = model_to_dict(user)
     dict['sex_text'] = u'男' if user.sex else u'女'
     dict['department_text'] = user.department.name
     dict['sub_union_text'] = user.department.subunion.name
+    dict['formation_text'] = user.formation.name
     return dict
+
+
+def getRecordByUidAndAaid(uid, aaid):
+    try:
+        record = Record.objects.get(uid = uid, aaid = aaid)
+    except ObjectDoesNotExist:
+        print u"未报名"
+        return -1
+    return model_to_dict(record)
+
+def getDepartmentByDid(did):
+    try:
+        department = Department.objects.get(did = did)
+    except ObjectDoesNotExist:
+        print u"无单位"
+        return -1
+    return model_to_dict(department)
+
+def getSubunionBySuid(suid):
+    try:
+        sub = Subunion.objects.get(suid = suid)
+    except ObjectDoesNotExist:
+        print u"无工会"
+        return -1
+    return model_to_dict(sub)
+
+def getFormationByFid(fid):
+    try:
+        formation = Formation.objects.get(fid = fid)
+    except ObjectDoesNotExist:
+        print u"无制编"
+        return -1
+    return model_to_dict(formation)
