@@ -18,6 +18,9 @@ import os
 import xlrd
 import xlwt
 import datetime
+import codecs
+import shutil
+import zipfile
 
 from InfoSystem.shared import dashboard_tabs
 from base import sessions
@@ -34,12 +37,12 @@ def file_iterator(file_name, chunk_size=8192):
 				yield c
 			else:
 				break
-def enterUserInfoIntoXlsx(dirpath, filename, userlist, activity):
+def saveUserInfoToXlsx(dirpath, filename, userlist, activity):
 	if not os.path.exists(dirpath):
 		os.makedirs(dirpath)
-	xlpath = dirpath + filename
+	xlpath = dirpath + '/' + filename
 	style0 = xlwt.easyxf('font: name Times New Roman, color-index red, bold on',
-	    num_format_str='#,##0.00')
+		num_format_str='#,##0.00')
 	style1 = xlwt.easyxf(num_format_str='D-MMM-YY')
 	wb = xlwt.Workbook()
 	ws = wb.add_sheet('UserList')
@@ -68,8 +71,9 @@ def enterUserInfoIntoXlsx(dirpath, filename, userlist, activity):
 		ws.write(row, 8, user['formation_text'])
 		if not activity == None:
 			record = getRecordByUidAndAaid(user['uid'], activity['aaid'])
-			ws.write(0, 9, "是" if record['checked_in'] == True else "否")
+			ws.write(row, 9, "是" if record['checked_in'] == True else "否")
 	wb.save(xlpath)
+	return xlpath
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -195,7 +199,6 @@ def deleteActivity(request, aaid):
 		return JsonResponse({'status': 'success', 'msg': '删除活动成功!'})	
 
 
-# 先不管这个了，弃疗
 @require_http_methods(['GET'])
 @login_required
 @admin_required
@@ -207,17 +210,57 @@ def downloadActivity(request, aaid):
 		return JsonResponse({'status': 'error', 'msg': '无权下载此活动信息！'})
 
 	#excel part
-	dirpath = r"dashboard/files/%s"%aaid
-	print dirpath
-	xlsname = "/userinfo.xls"
+	dirpath = r"media/files/%s"%aaid
+	filename = "已报名用户信息.xls"
+	activity = getActivityByAaid(aaid)
+	userlist, page_total = getUserListByFilter(1, 10000000, [], [], [activity['aid']], 0)	
+	if not os.path.exists(dirpath): #reset dir
+		os.makedirs(dirpath)
+	else:
+		shutil.rmtree(dirpath)
+	xlpath = saveUserInfoToXlsx(dirpath, filename, userlist, activity)
 
 	#txt part
+	txtfile = codecs.open(dirpath+'/活动信息.txt', 'w', 'utf-8') 
+	string = '活动名称：\n'+activity['title']+'\n' 
+	txtfile.write('活动名称：\r\n'+activity['title']+'\r\n')
+	txtfile.write('活动简介：\r\n'+activity['description']+'\r\n')
+	txtfile.write('活动内容：\r\n'+activity['content']+'\r\n') 
+	txtfile.write('活动报名人数：\r\n'+str(activity['signin_count'])+'\r\n') 
+	txtfile.write('活动签到人数：\r\n'+str(activity['checkin_count'])+'\r\n') 
+	txtfile.close()
 
-	#packagepart
+	#photopart
+	if not os.path.exists(dirpath+'/photos'):
+		os.makedirs(dirpath+'/photos')
+	for user in userlist:
+		record = getRecordByUidAndAaid(user['uid'], activity['aaid'])
+		if record['checked_in'] == False:
+			continue
+		photopath = str(user['photo'])
+		if len(photopath) == 0:
+			photopath = "photos/None/no-img.jpg"
+		#photopath = "../media/"+photopath
+		photopath = 'media/'+photopath
+		shutil.copyfile(photopath, dirpath+'/photos/'+user['name']+'.jpg')
 
+	#zippart
+	zipf = zipfile.ZipFile(dirpath+'/package.zip', 'w')
+	zipf.write(dirpath+'/已报名用户信息.xls', '已报名用户信息.xls')
+	zipf.write(dirpath+'/活动信息.txt', '活动信息.txt')
+	for subdirpath, subdirnames, filenames in os.walk(dirpath+'/photos'): 
+		for filename in filenames: 
+			zipf.write(os.path.join(subdirpath,filename), '用户照片/'+filename) 
+	zipf.close()
 
-	response = StreamingHttpResponse(file_iterator(xlpath))
-	response['Content-Disposition'] = 'attachment;filename="userinfo_%s.xls"'%aaid
+	response = StreamingHttpResponse(file_iterator(dirpath+'/package.zip'))
+	restr = u'attachment;filename="%s_%s.zip'%(aaid, '活动信息')
+	clientSystem = request.META['HTTP_USER_AGENT']
+	if clientSystem.find('Windows') > -1:
+		restr = restr.encode('cp936')
+	else:
+		restr = restr.encode('utf-8')
+	response['Content-Disposition'] = restr
 	return response
 
 @require_http_methods(['GET'])
@@ -227,9 +270,6 @@ def users(request):
 	uid = sessions.getUser(request)[0] 
 	username = getUsernameByUid(uid)
 	return render(request, 'dashboard/users.html', {'tab': dashboard_tabs['users'], 'username': username})
-
-
-
 
 @require_http_methods(['POST'])
 @csrf_exempt
@@ -331,11 +371,4 @@ def getBroadcast(request):
 		return JsonResponse({'status': 'error', 'msg': e})
 	old_news_list, page_total = getBroadcastByPage(page, number)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'old_news_list':old_news_list}})
-
-
-@require_http_methods(['GET'])
-@login_required
-@admin_required
-def getDateTime(request):
-	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})
 
