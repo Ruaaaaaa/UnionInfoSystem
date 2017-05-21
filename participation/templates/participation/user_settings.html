@@ -11,6 +11,10 @@
     margin-left: 5px;
     margin-bottom: 5px;
 }
+.weui-btn-area {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
 </style>
 {% endblock %}
 
@@ -48,6 +52,12 @@
             </div>
         </div>
         <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">工号</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="text" name="wid" disabled value="2015000000">
+            </div>
+        </div>
+        <div class="weui-cell">
             <div class="weui-cell__hd"><label class="weui-label">所属单位</label></div>
             <div class="weui-cell__bd">
                 <input class="weui-input" type="text" name="department" disabled value="麻将单位">
@@ -82,7 +92,7 @@
     <div class="weui-cells__tips">我们可能会向您的邮箱发送通知</div>
     <div class="weui-btn-area">
         <button class="weui-btn weui-btn_default" id="register_btn">
-            <span class="register-before">确认修改联系方式</span>
+            <span>确认修改联系方式</span>
         </button>
     </div>
 
@@ -107,7 +117,14 @@
     </div>
     <div class="weui-btn-area">
         <button class="weui-btn weui-btn_default" id="register_btn">
-            <span class="register-before">确认修改密码</span>
+            <span>确认修改密码</span>
+        </button>
+    </div>
+
+    <div class="weui-cells__title">退出登录</div>
+    <div class="weui-btn-area">
+        <button class="weui-btn weui-btn_warn" id="logout_btn" onclick="logout()">
+            <span>登出</span>
         </button>
     </div>
 </div>
@@ -116,6 +133,9 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+logout = function() {
 
+    window.location.href = '/logout';
+}
 </script>
 {% endblock %}

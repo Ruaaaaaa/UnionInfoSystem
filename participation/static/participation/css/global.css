@@ -4,7 +4,11 @@
 	width: 100%;
 	z-index: 2000;
 }
-
+.navbar-header-left {
+	position: absolute;
+	left: 10px;
+	color: white;
+}
 .navbar-header.navbar-header-default {
 	height: 50px;
 	line-height: 50px;
