@@ -18,6 +18,9 @@
   height: 200px;
   margin: 5px 0 5px 0;
 }
+.new-act-btn {
+  margin: 0 0 10px 0;
+}
 .btn-group {
   width: 100%;
 }
@@ -26,6 +29,9 @@
 }
 .btn-group .group-btn-3{
   width: 33.33%;
+}
+.btn-group .group-btn-5{
+  width: 20%;
 }
 .poster {
   width: 100%;
@@ -53,41 +59,43 @@
 {% block body %}
 {% include 'dashboard/header.html' %}
 <div class="container-fluid content-wrapper" id="root">
-  	<ul class="nav nav-tabs">
-  	  <li role="presentation" class="active"><a href="#">进行中活动</a></li>
-  	  <li role="presentation"><a href="#">已结束活动</a></li>
-  	</ul>
-    <a class="btn btn-default" target="_blank" href="/admin/activity/new">我是一个很丑的临时新建活动按钮</a>
-    <div class="row">
-      {% for act in activities %}
-      <div class="col-xs-12 col-sm-4 col-md-3">
-        <div class="thumbnail">
-          <img class="poster" src="{{ act.poster.url }}">
-          <div class="caption">
-            <p>#{{ act.aaid }}</p>
-            <h4>{{ act.title }}</h4>
-            <p>{% if act.signin_max %}报名人数上限: {{ act.signin_max }}{% else %}无报名人数限制{% endif %}</p>
-            <p>报名人数: {{ act.signin_count }}</p>
-            <p>{% if not act.need_checkin %}不{% endif %}需要现场签到</p>
-            <p>报名开始: <span class="act-time">{{ act.signin_begin_at }}</span></p>
-            <p>报名结束: <span class="act-time">{{ act.signin_end_at }}</span></p>
-            <p>活动开始: <span class="act-time">{{ act.begin_at }}</span></p>
-            <p>活动结束: <span class="act-time">{{ act.end_at }}</span></p>
-            <p>{{ act.description }}</p>
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-default group-btn-3" @click="showContent('{{ act.aaid }}')">活动内容</button>
-              <button type="button" class="btn btn-default group-btn-3" @click="showQR('{{ act.aaid }}')">二维码</button>
-              <button type="button" class="btn btn-default group-btn-3" @click="downloadInfo('{{ act.aaid }}')">导出数据</button>
-            </div>
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-default group-btn-2" @click="edit('{{ act.aaid }}')">修改</button>
-              <button type="button" class="btn btn-default group-btn-2" @click="remove('{{ act.aaid }}')">删除</button>
-            </div>
-          </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">所有活动</h3>
         </div>
-      </div>
-      {% endfor %}
+        <div class="panel-body">
+            <a class="btn btn-default new-act-btn" target="_blank" href="/admin/activity/new"><i class="fa fa-plus-square"></i>点我创建新活动</a>
+            <div class="row">
+                {% for act in activities %}
+                <div class="col-xs-12 col-sm-4 col-md-3">
+                  <div class="thumbnail">
+                    <img class="poster" src="{{ act.poster.url }}">
+                    <div class="caption">
+                      <p>#{{ act.aaid }}</p>
+                      <h4>{{ act.title }}</h4>
+                      <p>{% if act.signin_max %}报名人数上限: {{ act.signin_max }}{% else %}无报名人数限制{% endif %}</p>
+                      <p>报名人数: {{ act.signin_count }}</p>
+                      <p>{% if not act.need_checkin %}不{% endif %}需要现场签到</p>
+                      <p>报名开始: <span class="act-time">{{ act.signin_begin_at }}</span></p>
+                      <p>报名结束: <span class="act-time">{{ act.signin_end_at }}</span></p>
+                      <p>活动开始: <span class="act-time">{{ act.begin_at }}</span></p>
+                      <p>活动结束: <span class="act-time">{{ act.end_at }}</span></p>
+                      <p>{{ act.description }}</p>
+                      <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default group-btn-5" @click="showContent('{{ act.aaid }}')"><i class="fa fa-info"></i></button>
+                        <button type="button" class="btn btn-default group-btn-5" @click="showQR('{{ act.aaid }}')"><i class="fa fa-qrcode"></i></button>
+                        <button type="button" class="btn btn-default group-btn-5" @click="downloadInfo('{{ act.aaid }}')"><i class="fa fa-download"></i></button>
+                        <button type="button" class="btn btn-default group-btn-5" @click="edit('{{ act.aaid }}')"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-default group-btn-5" @click="remove('{{ act.aaid }}')"><i class="fa fa-trash"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
+
     <div class="modal fade" id="qr_modal" tabindex="-1" role="dialog">
       <div class="modal-dialog qr-modal-body" role="document">
         <div class="modal-content">
@@ -179,6 +187,9 @@ var app = new Vue({
       window.open('/admin/activity/' + aaid + '/edit');
     },
     remove: function(aaid) {
+      var doRemove = confirm('你确认要移除这个活动和其相关的所有信息吗？注意，这个操作是不可逆的！');
+      if(!doRemove)
+        return;
       $.post('/admin/activity/' + aaid + '/delete')
       .done(function(data) {
         if(data.status == 'success') {

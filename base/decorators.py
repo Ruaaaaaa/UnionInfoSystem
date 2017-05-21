@@ -22,7 +22,9 @@ def login_required(function):
 def admin_required(function):
 	def wrap(request, *args, **kwargs):
 		(uid, identity) = sessions.getUser(request)
-		if (uid is not None) and (identity == identities['admin']):
+		if (uid is None) and (identity is None):
+			return HttpResponseRedirect('/admin/login?from=' + request.get_full_path())
+		elif (uid is not None) and (identity == identities['admin']):
 			return function(request, *args, **kwargs)
 		else:
 			raise Http404

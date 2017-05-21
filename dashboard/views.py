@@ -113,7 +113,6 @@ def login(request):
 
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def activity(request):
 	uid = sessions.getUser(request)[0] 
@@ -125,7 +124,6 @@ def activity(request):
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
-@login_required
 @admin_required
 def newActivity(request):
 	uid = sessions.getUser(request)[0] 
@@ -149,7 +147,6 @@ def newActivity(request):
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
-@login_required
 @admin_required
 def editActivity(request, aaid):
 	uid = sessions.getUser(request)[0] 
@@ -183,7 +180,6 @@ def editActivity(request, aaid):
 
 @require_http_methods(['POST'])
 @csrf_exempt
-@login_required
 @admin_required
 def deleteActivity(request, aaid):
 	uid = sessions.getUser(request)[0] 
@@ -200,7 +196,6 @@ def deleteActivity(request, aaid):
 
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def downloadActivity(request, aaid): 
 
@@ -264,7 +259,6 @@ def downloadActivity(request, aaid):
 	return response
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def users(request):
 	uid = sessions.getUser(request)[0] 
@@ -273,7 +267,6 @@ def users(request):
 
 @require_http_methods(['POST'])
 @csrf_exempt
-@login_required
 @admin_required
 def getUsers(request):
 	dic = json.loads(request.body)
@@ -293,7 +286,6 @@ def getUsers(request):
 
 #先不管了，弃疗
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def downloadUsers(request):	
 	uid = sessions.getUser(request)[0] 
@@ -309,20 +301,17 @@ def downloadUsers(request):
 
 # 先不管这个了，弃疗
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
 
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def getActivities(request):
 	return JsonResponse({'status':'success', 'msg': '获取活动列表成功！', 'data': {'activities': getActivityListSimple()}})
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def getActivityContent(request, aaid):
 	activity = getActivityByAaid(aaid) 
@@ -331,14 +320,12 @@ def getActivityContent(request, aaid):
 	return JsonResponse({'status':'success', 'msg': '获取活动详情成功！', 'data': {'content': activity['content']}})
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def getSubUnions(request):
 	return JsonResponse({'status':'success', 'msg': '获取分工会列表成功！', 'data': {'subunions': getSubUnionListSimple()}})
 
 
 @require_http_methods(['GET'])
-@login_required
 @admin_required
 def getDepartments(request):
 	return JsonResponse({'status':'success', 'msg': '获取部门列表成功！', 'data': {'departments': getDepartmentListSimple()}})
@@ -346,7 +333,6 @@ def getDepartments(request):
 
 @require_http_methods(['POST'])
 @csrf_exempt
-@login_required
 @admin_required
 def newBroadcast(request):
 	dic = json.loads(request.body)
@@ -360,7 +346,6 @@ def newBroadcast(request):
 
 @require_http_methods(['POST'])
 @csrf_exempt
-@login_required
 @admin_required
 def getBroadcast(request):
 	dic = json.loads(request.body)
