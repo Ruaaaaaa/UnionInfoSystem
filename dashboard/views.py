@@ -21,6 +21,15 @@ import datetime
 import codecs
 import shutil
 import zipfile
+import reportlab.rl_config
+from reportlab.pdfgen import canvas 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+
+pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
+#pdfmetrics.registerFont(TTFont('song', 'SURSONG.TTF'))
+#pdfmetrics.registerFont(TTFont('hei', 'SIMHEI.TTF'))
 
 from InfoSystem.shared import dashboard_tabs
 from base import sessions
@@ -37,6 +46,12 @@ def file_iterator(file_name, chunk_size=8192):
 				yield c
 			else:
 				break
+
+def hello(c):
+	name = "郭元晨"
+	c.drawString(100,100,name)
+	# the two unicode characters below are "Tokyo"
+
 def saveUserInfoToXlsx(dirpath, filename, userlist, activity):
 	if not os.path.exists(dirpath):
 		os.makedirs(dirpath)
@@ -74,6 +89,43 @@ def saveUserInfoToXlsx(dirpath, filename, userlist, activity):
 			ws.write(row, 9, "是" if record['checked_in'] == True else "否")
 	wb.save(xlpath)
 	return xlpath
+
+#reportlab中的pagesize为(595.27,841.89)，单位为1/72inch
+#都是些什么乱七八糟的单位
+def saveUserInfoToPdf(dirpath, filename, userlist, activity):
+	if not os.path.exists(dirpath):
+		os.makedirs(dirpath)
+	pdfpath = dirpath + '/' + filename
+	print "pdf:", pdfpath 
+	canv = canvas.Canvas(pdfpath)
+	canv.setFont('STSong-Light', 11)
+	#hello(canv)	
+	h = 841.89; w = 595.27
+	pw = 70.87; ph = 99.21
+	mw = 81; mh = 122 
+	r = 1; c = 1 
+	for user in userlist:
+		record = getRecordByUidAndAaid(user['uid'], activity['aaid'])
+		#if record['checked_in'] == False:
+		#	continue
+		photopath = str(user['photo'])
+		if len(photopath) == 0:
+			photopath = "photos/None/no-img.jpg"
+		photopath = "../media/"+photopath
+		photopath = 'media/'+photopath	
+		y = h-59.945-mh*r; x = 19.135+mw*(c-1)
+		canv.drawImage(photopath, x, y+22, width=pw,height=ph)
+		canv.drawString(x, y+12, user['name'])
+		c = c+1 
+		if c == 8:
+			r = r+1; c = 1 
+			if r == 7:
+				canv.showPage()
+				canv.setFont('STSong-Light', 11)
+				r = 1
+	canv.showPage()
+	canv.save()
+	return pdfpath
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -113,6 +165,7 @@ def login(request):
 
 
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def activity(request):
 	uid = sessions.getUser(request)[0] 
@@ -124,6 +177,7 @@ def activity(request):
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
+@login_required
 @admin_required
 def newActivity(request):
 	uid = sessions.getUser(request)[0] 
@@ -147,6 +201,7 @@ def newActivity(request):
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
+@login_required
 @admin_required
 def editActivity(request, aaid):
 	uid = sessions.getUser(request)[0] 
@@ -180,6 +235,7 @@ def editActivity(request, aaid):
 
 @require_http_methods(['POST'])
 @csrf_exempt
+@login_required
 @admin_required
 def deleteActivity(request, aaid):
 	uid = sessions.getUser(request)[0] 
@@ -195,7 +251,9 @@ def deleteActivity(request, aaid):
 		return JsonResponse({'status': 'success', 'msg': '删除活动成功!'})	
 
 
+
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def downloadActivity(request, aaid): 
 
@@ -206,14 +264,16 @@ def downloadActivity(request, aaid):
 
 	#excel part
 	dirpath = r"media/files/%s"%aaid
-	filename = "已报名用户信息.xls"
+	xlname = "已报名用户信息.xls"
+	pdfname = "已报名用户.pdf"
 	activity = getActivityByAaid(aaid)
 	userlist, page_total = getUserListByFilter(1, 10000000, [], [], [activity['aid']], 0)	
 	if not os.path.exists(dirpath): #reset dir
 		os.makedirs(dirpath)
 	else:
 		shutil.rmtree(dirpath)
-	xlpath = saveUserInfoToXlsx(dirpath, filename, userlist, activity)
+	pdfpath = saveUserInfoToPdf(dirpath, pdfname, userlist, activity)
+	xlpath = saveUserInfoToXlsx(dirpath, xlname, userlist, activity)
 
 	#txt part
 	txtfile = codecs.open(dirpath+'/活动信息.txt', 'w', 'utf-8') 
@@ -259,6 +319,7 @@ def downloadActivity(request, aaid):
 	return response
 
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def users(request):
 	uid = sessions.getUser(request)[0] 
@@ -267,6 +328,7 @@ def users(request):
 
 @require_http_methods(['POST'])
 @csrf_exempt
+@login_required
 @admin_required
 def getUsers(request):
 	dic = json.loads(request.body)
@@ -286,6 +348,7 @@ def getUsers(request):
 
 #先不管了，弃疗
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def downloadUsers(request):	
 	uid = sessions.getUser(request)[0] 
@@ -301,17 +364,20 @@ def downloadUsers(request):
 
 # 先不管这个了，弃疗
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
 
 
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def getActivities(request):
 	return JsonResponse({'status':'success', 'msg': '获取活动列表成功！', 'data': {'activities': getActivityListSimple()}})
 
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def getActivityContent(request, aaid):
 	activity = getActivityByAaid(aaid) 
@@ -320,12 +386,14 @@ def getActivityContent(request, aaid):
 	return JsonResponse({'status':'success', 'msg': '获取活动详情成功！', 'data': {'content': activity['content']}})
 
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def getSubUnions(request):
 	return JsonResponse({'status':'success', 'msg': '获取分工会列表成功！', 'data': {'subunions': getSubUnionListSimple()}})
 
 
 @require_http_methods(['GET'])
+@login_required
 @admin_required
 def getDepartments(request):
 	return JsonResponse({'status':'success', 'msg': '获取部门列表成功！', 'data': {'departments': getDepartmentListSimple()}})
@@ -333,6 +401,7 @@ def getDepartments(request):
 
 @require_http_methods(['POST'])
 @csrf_exempt
+@login_required
 @admin_required
 def newBroadcast(request):
 	dic = json.loads(request.body)
@@ -346,6 +415,7 @@ def newBroadcast(request):
 
 @require_http_methods(['POST'])
 @csrf_exempt
+@login_required
 @admin_required
 def getBroadcast(request):
 	dic = json.loads(request.body)
@@ -356,4 +426,11 @@ def getBroadcast(request):
 		return JsonResponse({'status': 'error', 'msg': e})
 	old_news_list, page_total = getBroadcastByPage(page, number)
 	return JsonResponse({'status': 'success', 'msg': 'users', 'data':{'page_total':page_total, 'old_news_list':old_news_list}})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def getDateTime(request):
+	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})
 
