@@ -217,11 +217,14 @@ def createBroadcast(dic):
     bid_md = bid_md[0:10]
     deps = Department.objects.filter(did__in = dic['departments'])
     subs = Subunion.objects.filter(suid__in = dic['sub_unions'])
+    acts = Activity.objects.filter(aid__in = dic['activities'])
     tags_list = []
     for dep in deps:
         tags_list += [dep.name]
     for sub in subs:
         tags_list += [sub.name]
+    for act in acts:
+        tags_list += [act.name]
     if dic['checked_in'] :
         tags_list += ['已签到']
     st = ","
@@ -242,6 +245,35 @@ def createBroadcast(dic):
     )
     broadcast.save()
     print broadcast
+    receivers = User.objects.all().exclude(is_admin = 1)
+    if len(dic['departments']) > 0:
+        deps = Department.objects.filter(did__in = dic['departments'])
+        receivers = receivers.filter(department__in = deps)
+    if len(dic['sub_unions']) > 0:
+        subs = Subunion.objects.filter(suid__in = dic['sub_unions'])
+        receivers = receivers.filter(subunion__in = subs)
+    if len(dic['activities']) > 0:
+        acts = Activity.objects.filter(aid__in = dic['activities'])
+        recs = Record.objects.filter(activity__in = acts)
+        if dic['checked_in'] :
+            recs = recs.fillter(checked_in = 1)
+        uids = []
+        for rec in recs:
+            uids.append(rec.user.uid)
+        receivers = receivers.filter(uid__in = uids)
+    for receiver in receivers:
+        m = hashlib.md5()
+        m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+        mid_md = m.hexdigest()
+        mid_md = mid_md[0:10]
+        message = Message(
+            mid = mid_md,
+            broadcast = broadcast,
+            sender = user,
+            receiver = receiver,
+            send_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
+        )
+        message.save()
     return {'status' : 'success', 'msg' : '创建成功'}
 
 def activityAuthorityCheck(uid, aaid):
