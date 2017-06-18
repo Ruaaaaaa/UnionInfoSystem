@@ -104,7 +104,8 @@
             <h4 class="modal-title">活动二维码</h4>
           </div>
           <div class="modal-body">
-            <div id="qr_div"></div>
+            <div id="act_qr_div"></div>
+            <div id="checkin_qr_div"></div>
           </div>
         </div>
       </div>
@@ -147,7 +148,8 @@ var app = new Vue({
   el: '#root',
   delimiters: ["[[","]]"],
   data: {
-    QRCode: null,
+    ActQRCode: null,
+    CheckinQRCode: null,
     contentLoading: true,
     content: ''
   },
@@ -167,17 +169,30 @@ var app = new Vue({
       $('#content_modal').modal('show');
     },
     showQR: function(aaid) {
-      if(!this.QRCode) {
-        this.QRCode = new QRCode(document.getElementById('qr_div'), {
+      if(!this.ActQRCode) {
+        this.ActQRCode = new QRCode(document.getElementById('act_qr_div'), {
             text: DOMAIN + "/activity/" + aaid,
             width: 200,
             height: 200
         });
       }
       else {
-        this.QRCode.clear();
-        this.QRCode.makeCode(DOMAIN + "/activity/" + aaid);
+        this.ActQRCode.clear();
+        this.ActQRCode.makeCode(DOMAIN + "/activity/" + aaid);
       }
+
+      if(!this.CheckinQRCode) {
+        this.CheckinQRCode = new QRCode(document.getElementById('checkin_qr_div'), {
+            text: DOMAIN + "/activity/" + aaid + '/checkin',
+            width: 200,
+            height: 200
+        });
+      }
+      else {
+        this.CheckinQRCode.clear();
+        this.CheckinQRCode.makeCode(DOMAIN + "/activity/" + aaid + '/checkin');
+      }
+
       $('#qr_modal').modal('show');
     },
     downloadInfo: function(aaid) {
