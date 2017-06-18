@@ -63,7 +63,7 @@ def verification(request):
 	if len(name) == 0 or len(idnumber) == 0:
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-	veresult, user = verificationOfRealId(name, idnumber) ;
+	veresult, user = verificationOfRealId(name, idnumber) 
 	print name, idnumber 
 	if veresult == 0:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！实名或身份证号有误。'})
@@ -163,6 +163,8 @@ def signIn(request, aaid):
 		return JsonResponse({'status': 'error', 'msg': '报名失败！'})
 	elif result == 2:
 		return JsonResponse({'status': 'error', 'msg': '您已报名。'})
+	elif result == 3:
+		return JsonResponse({'status': 'error', 'msg': '已无报名名额。'})
 	else:
 		return JsonResponse({'status': 'success', 'msg': '报名成功！'})
 
@@ -170,13 +172,18 @@ def signIn(request, aaid):
 @require_http_methods(['GET'])
 @login_required
 def userActivities(request):
-	return render(request, 'participation/user_activities.html')
+	uid, identity = sessions.getUser(request)
+	act = getActivitiesInvolvedByUid(uid)
+	#print act
+	return render(request, 'participation/user_activities.html', {'activities':act})
 
 
 @require_http_methods(['GET'])
 @login_required
 def userMessages(request):
-	return render(request, 'participation/user_messages.html')
+	uid, identity = sessions.getUser(request)
+	message = 0#getBroadcastsReceivedByUid(uid)
+	return render(request, 'participation/user_messages.html', {'messages':message})
 
 
 @require_http_methods(['GET'])

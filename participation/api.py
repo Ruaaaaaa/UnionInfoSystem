@@ -54,7 +54,7 @@ def verificationOfRealId(realname, idnumber):
             user1 = User.objects.get(wid_hash = idnumber)
         except ObjectDoesNotExist:
             print u"没有这个工号"
-            return 0
+            return (0,0)
         user = user1
     if user.registered :
         return (2,getUserByUid(user.uid))
@@ -127,6 +127,9 @@ def userSignIn(uid, aaid):
     try:
         user.records.get(aaid=aaid)
     except ObjectDoesNotExist:
+        if act.signin_max != None and act.signin_count == act.signin_max:
+            print u"已无名额"
+            return 3
         rec = Record(
             aid = act.aid,
             aaid = act.aaid,
@@ -136,6 +139,8 @@ def userSignIn(uid, aaid):
             signin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
         )
         rec.save()
+        act.signin_count = act.signin_count+1 
+        act.save() 
         return 1
     print u"报名过了"
     return 2
