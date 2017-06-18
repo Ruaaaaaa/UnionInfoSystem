@@ -12,3 +12,5 @@ dashboard_tabs = {
 	'users': 1,
 	'broadcast': 2
 }
+
+DOMAIN = '127.0.0.1:8000'
