@@ -621,3 +621,24 @@ for i in range(1,nrows):
         user.save()
     #print str(i+1)+'/'+str(nrows)
 '''
+
+def setUserInfo(uid, userinfo):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"没有这个用户"
+        return 0
+    user.mobile = userinfo['mobile']
+    user.email = userinfo['email']
+    user.save()
+    return 1
+
+def setPassword(uid, newpassword):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"没有这个用户"
+        return 0
+    user.password = newpassword
+    user.save()
+    return 1

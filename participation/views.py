@@ -174,7 +174,7 @@ def signIn(request, aaid):
 def userActivities(request):
 	uid, identity = sessions.getUser(request)
 	act = getActivitiesInvolvedByUid(uid)
-	#print act
+	#	print act
 	return render(request, 'participation/user_activities.html', {'activities':act})
 
 
@@ -190,3 +190,31 @@ def userMessages(request):
 @login_required
 def userSettings(request):
 	return render(request, 'participation/user_settings.html')
+
+@require_http_methods(['POST'])
+@login_required
+def setUserInfo(request):
+	uid, identity = sessions.getUser(request)
+	user = getUserByUid(uid)
+	if request['email'] != None:
+		user['email'] = request['email']
+	if request['mobile'] != None:
+		user['mobile'] = request['mobile']
+	result = setUserInfo(uid, user)
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '修改失败！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '修改成功！'})
+
+@require_http_methods(['POST'])
+@login_required
+def resetPassword(request):
+	uid, identity = sessions.getUser(request)
+	user = getUserByUid(uid)
+	if request['password'] == None or len(request['password']) == 0:
+		return JsonResponse({'status': 'error', 'msg': '输入无效！'})
+	result = setPassword(uid, request['password'])
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '修改失败！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '修改成功！'})
