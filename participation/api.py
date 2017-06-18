@@ -229,7 +229,7 @@ def createBroadcast(dic):
     for sub in subs:
         tags_list += [sub.name]
     for act in acts:
-        tags_list += [act.name]
+        tags_list += [act.title]
     if dic['checked_in'] :
         tags_list += ['已签到']
     st = ","
