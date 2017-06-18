@@ -100,8 +100,11 @@ def register(request):
 			return JsonResponse({'status': 'error', 'msg': '此用户名已被注册，请重新填写'})
 		if len(pwd) < 6 or len(username) < 4:
 			return JsonResponse({'status': 'error', 'msg': '用户名或密码长度不够（用户名至少4位，密码至少6位）'})
-		registerAccount(idnumber, username, pwd, mobile, email)
+		result = registerAccount(idnumber, username, pwd, mobile, email)
 
+		if result == 0:
+			return JsonResponse({'status': 'error', 'msg': '注册失败'})
+			
 		uid = getUidByUsername(username)
 		identity = getIdentityByUid(uid)
 		sessions.login(request, uid, identity)

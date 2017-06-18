@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from base.models import *
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.forms import model_to_dict
+from django.db.models import Q
 import datetime
 import time
 import hashlib
@@ -64,11 +65,18 @@ def verificationOfRealId(realname, idnumber):
         return (0,-1)
 
 def registerAccount(idnumber, username, pwd, mobile, email):
+    flag = 1
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
         print u"没有这个身份证号"
-        return 0
+        flag = 0
+    if flag == 0:
+        try:
+            user = User.objects.get(wid_hash = idnumber)
+        except ObjectDoesNotExist:
+            print u"没有这个工号"
+            return 0
     user.registered = 1
     user.username = username
     user.password = pwd
@@ -249,14 +257,16 @@ def createBroadcast(dic):
         tags = tags
     )
     broadcast.save()
-    print broadcast
+    broadcast = Broadcast.objects.get(bbid = bid_md)
+
     receivers = User.objects.all().exclude(is_admin = 1)
-    if len(dic['departments']) > 0:
-        deps = Department.objects.filter(did__in = dic['departments'])
-        receivers = receivers.filter(department__in = deps)
+
+    subs = []
     if len(dic['sub_unions']) > 0:
         subs = Subunion.objects.filter(suid__in = dic['sub_unions'])
-        receivers = receivers.filter(subunion__in = subs)
+    deps_U = Department.objects.filter(Q(subunion__in = subs) | Q(did__in = dic['departments']))
+    receivers = receivers.filter(department__in = deps_U)
+
     if len(dic['activities']) > 0:
         acts = Activity.objects.filter(aid__in = dic['activities'])
         recs = Record.objects.filter(activity__in = acts)
@@ -267,17 +277,13 @@ def createBroadcast(dic):
             uids.append(rec.user.uid)
         receivers = receivers.filter(uid__in = uids)
     for receiver in receivers:
-        m = hashlib.md5()
-        m.update(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
-        mid_md = m.hexdigest()
-        mid_md = mid_md[0:10]
         message = Message(
-            mid = mid_md,
             broadcast = broadcast,
             sender = user,
             receiver = receiver,
             send_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
         )
+        print model_to_dict(message)
         message.save()
     return {'status' : 'success', 'msg' : '创建成功'}
 
@@ -296,12 +302,11 @@ def activityAuthorityCheck(uid, aaid):
 def getUserListByFilter(page, number, departments, sub_unions, activities, check_in):
     userlist=[]
     users = User.objects.all().exclude(is_admin = 1)
-    if len(departments) > 0:
-        deps = Department.objects.filter(did__in = departments)
-        users = User.objects.filter(department__in = deps)
+    subs = []
     if len(sub_unions) > 0:
         subs = Subunion.objects.filter(suid__in = sub_unions)
-        users = users.filter(subunion__in = subs)
+    dep_U = Department.objects.filter(Q(subunion__in = subs) | Q(did__in = departments))
+    users = users.filter(department__in = deps_U)
     if len(activities) > 0:
         acts = Activity.objects.filter(aid__in = activities)
         recs = Record.objects.filter(activity__in = acts)
@@ -526,6 +531,8 @@ for i in range(1,nrows):
     m = hashlib.md5()
     m.update(id)
     idhash = m.hexdigest()
+
+    m = hashlib.md5() 
     m.update(wid)
     widhash = m.hexdigest()
     try:
