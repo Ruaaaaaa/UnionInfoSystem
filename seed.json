@@ -9,7 +9,9 @@
       "wid": "2000100100",
       "registered": true,
       "username": "admin",
-      "password": "21232f297a57a5a743894a0e4a801fc3"
+      "password": "21232f297a57a5a743894a0e4a801fc3",
+      "department_id": 1,
+      "formation_id": 1
     }
   },
   {
