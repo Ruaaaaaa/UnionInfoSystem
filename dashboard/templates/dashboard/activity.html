@@ -133,6 +133,7 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+var DOMAIN = '{{ DOMAIN }}';
 function generateQRCode(aaid) {
     var url = '/activity/' + aaid + '/';
     console.log(url);
@@ -168,15 +169,14 @@ var app = new Vue({
     showQR: function(aaid) {
       if(!this.QRCode) {
         this.QRCode = new QRCode(document.getElementById('qr_div'), {
-            // 域名没有传！
-            text: "http://127.0.0.1:8000/activity/" + aaid,
+            text: DOMAIN + "/activity/" + aaid,
             width: 200,
             height: 200
         });
       }
       else {
         this.QRCode.clear();
-        this.QRCode.makeCode("http://127.0.0.1:8000/activity/" + aaid);
+        this.QRCode.makeCode(DOMAIN + "/activity/" + aaid);
       }
       $('#qr_modal').modal('show');
     },

@@ -195,14 +195,15 @@ def userSettings(request):
 	return render(request, 'participation/user_settings.html')
 
 @require_http_methods(['POST'])
+@csrf_exempt
 @login_required
-def setUserInfo(request):
+def setUserInformation(request):
 	uid, identity = sessions.getUser(request)
 	user = getUserByUid(uid)
-	if request['email'] != None:
-		user['email'] = request['email']
-	if request['mobile'] != None:
-		user['mobile'] = request['mobile']
+	if request.POST['email'] != None:
+		user['email'] = request.POST['email']
+	if request.POST['mobile'] != None:
+		user['mobile'] = request.POST['mobile']
 	result = setUserInfo(uid, user)
 	if result == 0:
 		return JsonResponse({'status': 'error', 'msg': '修改失败！'})
@@ -210,13 +211,14 @@ def setUserInfo(request):
 		return JsonResponse({'status': 'success', 'msg': '修改成功！'})
 
 @require_http_methods(['POST'])
+@csrf_exempt
 @login_required
 def resetPassword(request):
 	uid, identity = sessions.getUser(request)
 	user = getUserByUid(uid)
-	if request['password'] == None or len(request['password']) == 0:
+	if request.POST['password'] == None or len(request.POST['password']) == 0:
 		return JsonResponse({'status': 'error', 'msg': '输入无效！'})
-	result = setPassword(uid, request['password'])
+	result = setPassword(uid, request.POST['password'])
 	if result == 0:
 		return JsonResponse({'status': 'error', 'msg': '修改失败！'})
 	else:
