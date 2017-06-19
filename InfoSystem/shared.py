@@ -14,4 +14,4 @@ dashboard_tabs = {
 	'organization': 3
 }
 
-DOMAIN = '127.0.0.1:8000'
+DOMAIN = '118.89.176.226:8000'
