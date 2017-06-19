@@ -17,7 +17,7 @@
 {% block body %}
 <div class="bottom-nav">
     <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/activities">活动</a></div>
-    <div class="bottom-nav-tab active"><a class="bottom-nav-tab-text" href="/messages">消息<span class="weui-badge new-msg-badge">1</span></a></div>
+    <div class="bottom-nav-tab active"><a class="bottom-nav-tab-text" href="/messages">消息{% if unreceived > 0 %}<span class="weui-badge new-msg-badge">{{ unreceived }}</span>{% endif %}</a></div>
     <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/settings">设置</a></div>
 </div>
 
@@ -28,38 +28,29 @@
 </div>
 
 <div class="user-content-wrapper">
+{% for b in broadcasts %}
     <div class="weui-panel">
         <div class="weui-panel__bd">
             <div class="weui-media-box weui-media-box_text">
-                <h4 class="weui-media-box__title">请老师们领取优惠券<span class="weui-badge new-msg-badge">NEW</span></h4>
-                <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+                <h4 class="weui-media-box__title">{{ b.title }}{% if not b.received %}<span class="weui-badge new-msg-badge">NEW</span>{% endif %}</h4>
+                <p class="weui-media-box__desc">{{ b.content }}</p>
                 <ul class="weui-media-box__info">
-                    <li class="weui-media-box__info__meta">来自 校团委</li>
-                    <li class="weui-media-box__info__meta">2015年5月20日 13:14:00</li>
-                    <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
+                    <li class="weui-media-box__info__meta">来自 {{ b.sender_name }}</li>
+                    <li class="weui-media-box__info__meta send_time">{{ b.send_at }}</li>
+                    <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">一些其它信息</li>
                 </ul>
             </div>
         </div>
     </div>
-    <div class="weui-panel">
-        <div class="weui-panel__bd">
-            <div class="weui-media-box weui-media-box_text">
-                <h4 class="weui-media-box__title">请老师们领取优惠券</h4>
-                <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                <ul class="weui-media-box__info">
-                    <li class="weui-media-box__info__meta">来自 校团委</li>
-                    <li class="weui-media-box__info__meta">2015年5月20日 13:14:00</li>
-                    <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+{% endfor %}
 </div>
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-
+$('.send_time').html(function(idx, old) {
+    return moment.unix(old).format('YYYY年M月D日 HH:mm:ss');
+})
 </script>
 {% endblock %}

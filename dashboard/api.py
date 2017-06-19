@@ -52,17 +52,62 @@ def doDeleteActivity(uid, aaid):
 	try:
 		user = User.objects.get(uid = uid)
 	except ObjectDoesNotExist:
-		print '无此用户'
+		print 'No such user.'
 		return 0
    
 	if not activityAuthorityCheck(uid, aaid):
-		print '无权删除此活动'
+		print 'Insufficient permissions for deleting this activity.'
 		return 0
    
 	try:
 		act = Activity.objects.get(aaid = aaid)
 	except ObjectDoesNotExist:
-		print '无此活动'
+		print 'No such activity.'
 		return 0
 	act.delete() 	
 	return 1
+
+def doAddDepartment(name, suid):
+	name.strip()
+	try:
+		department = Department.objects.get(name = name)
+		print u'Department already exist.'
+		return 0 
+	except ObjectDoesNotExist:
+		subunion = Subunion.objects.get(suid = suid)
+		#print model_to_dict(subunion)
+		department = Department(
+			subunion = subunion,
+			name = name
+   		)
+   	 	department.save() 
+   	 	return 1 
+
+def doAddSubunion(name):
+	try:
+		subunion = Subunion.objects.get(name = name)
+		print u'Subunion already exist.'
+		return 0 
+	except ObjectDoesNotExist:
+		name.strip()
+		subunion = Subunion(
+			name = name
+   		)
+   	 	subunion.save() 
+   	 	return 1	
+
+def doSetDepartmenttoSubunion(did, suid):
+	try:
+		subunion = Subunion.objects.get(suid = suid)
+	except ObjectDoesNotExist:
+		print u"No such subunion."
+		return 0
+	try:
+		department = Department.objects.get(did = did)
+	except ObjectDoesNotExist:
+		print u"No such department."
+		return 0
+	department.subunion = subunion
+	department.save() 
+	return 1
+	

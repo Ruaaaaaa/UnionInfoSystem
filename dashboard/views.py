@@ -96,7 +96,7 @@ def saveUserInfoToPdf(dirpath, filename, userlist, activity):
 	if not os.path.exists(dirpath):
 		os.makedirs(dirpath)
 	pdfpath = dirpath + '/' + filename
-	print "pdf:", pdfpath 
+	#print "pdf:", pdfpath 
 	canv = canvas.Canvas(pdfpath)
 	canv.setFont('STSong-Light', 11)
 	#hello(canv)	
@@ -137,8 +137,8 @@ def login(request):
 
 	if request.method == 'GET':
 		user = sessions.getUser(request)
-		print user
-		print getIdentityByUid(user[0])
+		#print user
+		#print getIdentityByUid(user[0])
 		if user[0] == None or user[1] == None:
 			return render(request, 'dashboard/login.html', {})
 		else:
@@ -362,12 +362,18 @@ def downloadUsers(request):
 	#return JsonResponse({'status': 'success', 'msg': 'download'})
 
 
-# 先不管这个了，弃疗
 @require_http_methods(['GET'])
 @login_required
 @admin_required
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def organization(request):
+	return render(request, 'dashboard/organization.html', {'tab': dashboard_tabs['organization']})
 
 
 @require_http_methods(['GET'])
@@ -434,3 +440,47 @@ def getBroadcast(request):
 def getDateTime(request):
 	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})
 
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def addSubunion(request):
+	name = request.POST['name']
+	if name == None or len(name) == 0:
+		return JsonResponse({'status': 'error', 'msg': '输入信息不完整！'})
+	result = doAddSubunion(name)
+	if result == 0 :
+		return JsonResponse({'status': 'error', 'msg': '添加部门失败！已有此子工会！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '添加子工会成功！'})
+	
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def addDepartment(request):
+	name = request.POST['name']
+	suid = request.POST['suid']
+	if name == None or len(name) == 0 or suid == None:
+		return JsonResponse({'status': 'error', 'msg': '输入信息不完整！'})
+	result = doAddDepartment(name, suid)
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '添加部门失败！已有此部门！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '添加部门成功！'})
+	
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def setDepartmenttoSubunion(request):
+	did = request.POST['did']
+	suid = request.POST['suid']
+	if did == None or suid == None:
+		return JsonResponse({'status': 'error', 'msg': '输入信息不完整！'})
+	result = doSetDepartmenttoSubunion(did, suid)
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '修改部门所属子工会失败！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '修改部门所属子工会成功！'})
+	

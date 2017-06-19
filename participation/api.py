@@ -18,7 +18,7 @@ def getUidByUsername(username):
     try:
         user = User.objects.get(username = username)
     except ObjectDoesNotExist:
-        print u"没有这个用户名"
+        print u"No such user with this username."
         return -1
     return user.uid
 
@@ -26,7 +26,7 @@ def getUsernameByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"没有这个用户名"
+        print u"No such user."
         return -1
     return user.username
 
@@ -34,7 +34,7 @@ def verifyPassword(uid, pwd):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"没有这个用户"
+        print u"No such user."
         return -1
     return user.password == pwd
 
@@ -42,7 +42,7 @@ def getIdentityByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"没有这个用户"
+        print u"No such user."
         return -1
     return not user.is_admin
 
@@ -50,11 +50,11 @@ def verificationOfRealId(realname, idnumber):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        print u"没有身份证号"
+        print u"Id card number doesn't match."
         try:
             user1 = User.objects.get(wid_hash = idnumber)
         except ObjectDoesNotExist:
-            print u"没有这个工号"
+            print u"Employee ID number doesn't match."
             return (0,0)
         user = user1
     if user.registered :
@@ -69,13 +69,13 @@ def registerAccount(idnumber, username, pwd, mobile, email):
     try:
         user = User.objects.get(id_hash = idnumber)
     except ObjectDoesNotExist:
-        print u"没有这个身份证号"
+        print u"Id card number doesn't match."
         flag = 0
     if flag == 0:
         try:
             user = User.objects.get(wid_hash = idnumber)
         except ObjectDoesNotExist:
-            print u"没有这个工号"
+            print u"Employee ID number doesn't match."
             return 0
     user.registered = 1
     user.username = username
@@ -90,7 +90,7 @@ def getActivityByAaid(aaid):
     try:
         acti = Activity.objects.get(aaid = aaid)
     except ObjectDoesNotExist:
-        print u"无此活动"
+        print u"No such activity."
         return -1
     #user = User.objects.get(id_hash=idnumber)
     return model_to_dict(acti)
@@ -99,44 +99,44 @@ def userCheckIn(uid, aaid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无此用户"
+        print u"No such user."
         return 0
     try:
         act = Activity.objects.get(aaid = aaid)
     except ObjectDoesNotExist:
-        print u"无活动"
+        print u"No such activity."
         return 0
     try:
         rec = user.records.get(aaid = aaid)
     except ObjectDoesNotExist:
-        print u"未报名"
+        print u"Not signed in yet."
         return 0
-    if rec.check_in:
-        print u"签到过了"
+    if rec.checked_in:
+        print u"Already checked in."
         return 2
-    rec.check_in = 1
+    rec.checked_in = 1
     rec.checkin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     rec.save()
-    print "签到成功"
+    print "Check in success."
     return 1
 
 def userSignIn(uid, aaid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无此用户"
+        print u"No such user."
         return 0
     try:
         act = Activity.objects.get(aaid = aaid)
     except ObjectDoesNotExist:
-        print u"无活动"
+        print u"No such activity."
         return 0
     #print datetime.datetime.timetuple()
     try:
         user.records.get(aaid=aaid)
     except ObjectDoesNotExist:
         if act.signin_max != None and act.signin_count == act.signin_max:
-            print u"已无名额"
+            print u"No more quota remained for sign in."
             return 3
         rec = Record(
             aid = act.aid,
@@ -150,7 +150,7 @@ def userSignIn(uid, aaid):
         act.signin_count = act.signin_count+1 
         act.save() 
         return 1
-    print u"报名过了"
+    print u"Already signed in."
     return 2
 
 def registeredUsername(username):
@@ -164,7 +164,7 @@ def getActivitiesByUidSimple(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无用户"
+        print u"No such user."
         return 0
     actlist = []
     for act in user.activities_created.all():
@@ -175,12 +175,12 @@ def getActivitiesInvolvedByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无用户"
+        print u"No such user."
         return 0
     try:
         records = user.records.all()
     except ObjectDoesNotExist:
-        print u"没有活动"
+        print u"No such activity."
         return []
     actlist = []
     for rec in records:
@@ -211,7 +211,7 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
-    print 'name?',act_attributes['filename']
+    #print 'name?',act_attributes['filename']
     (pre,suf) = os.path.splitext(act_attributes['filename'])
     act.poster.save(aaid_md+'.'+suf,act_attributes['image'],0)
     act.save()
@@ -242,8 +242,8 @@ def createBroadcast(dic):
         tags_list += ['已签到']
     st = ","
     tags = st.join(tags_list)
-    print tags
-    print dic
+    #print tags
+    #print dic
     broadcast = Broadcast(
         bbid = bid_md,
         title = dic['title'],
@@ -283,7 +283,7 @@ def createBroadcast(dic):
             receiver = receiver,
             send_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
         )
-        print model_to_dict(message)
+        #print model_to_dict(message)
         message.save()
     return {'status' : 'success', 'msg' : '创建成功'}
 
@@ -305,7 +305,7 @@ def getUserListByFilter(page, number, departments, sub_unions, activities, check
     subs = []
     if len(sub_unions) > 0:
         subs = Subunion.objects.filter(suid__in = sub_unions)
-    dep_U = Department.objects.filter(Q(subunion__in = subs) | Q(did__in = departments))
+    deps_U = Department.objects.filter(Q(subunion__in = subs) | Q(did__in = departments))
     users = users.filter(department__in = deps_U)
     if len(activities) > 0:
         acts = Activity.objects.filter(aid__in = activities)
@@ -334,10 +334,10 @@ def getBroadcastsSendedByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无用户"
+        print u"No such user."
         return 0
     if not user.is_admin:
-        print u"不是管理员"
+        print u"Insufficient permissions."
         return 0
     broadcastlist = []
     for broadcast in user.broadcasts.all():
@@ -348,17 +348,29 @@ def getBroadcastsReceivedByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无用户"
-        return 0
+        print u"No such user."
+        return (None, None)
     try:
         messages = user.messages_received.all()
     except ObjectDoesNotExist:
-        print u"没有消息"
-        return []
+        print u"No such message."
+        return ([], [])
     broadcastlist = []
-    for message in massages:
+    messagelist = []
+    for message in messages:
         broadcastlist.append(model_to_dict(message.broadcast))
-    return broadcastlist
+        messagelist.append(model_to_dict(message)) 
+    return (broadcastlist, messagelist)
+
+def readMessage(mid):
+    try:
+        message = Message.objects.get(mid=mid)
+    except ObjectDoesNotExist:
+        print u"No such message."
+        return 
+    message.received = True 
+    message.received_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
+    message.save()
 
 def doEditActivity(uid,act_attributes):
     try:
@@ -367,7 +379,7 @@ def doEditActivity(uid,act_attributes):
         print 'no user'
         return 0
     try:
-        print act_attributes['aaid']
+        #print act_attributes['aaid']
         act = Activity.objects.get(aaid = act_attributes['aaid'])
     except ObjectDoesNotExist:
         print 'no activity'
@@ -393,7 +405,7 @@ def updateUserLoginTime(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无此用户"
+        print u"No such user."
         return 0
     user.last_login_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     user.save()
@@ -403,7 +415,7 @@ def getUserInformationListByActivity(aaid):
     try:
         activity = Activity.objects.get(aaid = aaid)
     except ObjectDoesNotExist:
-        print u"无此活动"
+        print u"No such activity."
         return []
     records = activity.records.all()
     for record in records :
@@ -437,7 +449,7 @@ def getUserByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"无用户"
+        print u"No such user."
         return -1
     dict = model_to_dict(user)
     dict['sex_text'] = u'男' if user.sex else u'女'
@@ -451,7 +463,7 @@ def getRecordByUidAndAaid(uid, aaid):
     try:
         record = Record.objects.get(uid = uid, aaid = aaid)
     except ObjectDoesNotExist:
-        print u"未报名"
+        print u"Not signed in yet."
         return -1
     return model_to_dict(record)
 
@@ -459,7 +471,7 @@ def getDepartmentByDid(did):
     try:
         department = Department.objects.get(did = did)
     except ObjectDoesNotExist:
-        print u"无单位"
+        print u"No such department."
         return -1
     return model_to_dict(department)
 
@@ -467,7 +479,7 @@ def getSubunionBySuid(suid):
     try:
         sub = Subunion.objects.get(suid = suid)
     except ObjectDoesNotExist:
-        print u"无工会"
+        print u"No such subunion."
         return -1
     return model_to_dict(sub)
 
@@ -475,7 +487,7 @@ def getFormationByFid(fid):
     try:
         formation = Formation.objects.get(fid = fid)
     except ObjectDoesNotExist:
-        print u"无制编"
+        print u"No such formation."
         return -1
     return model_to_dict(formation)
 
@@ -633,7 +645,7 @@ def setUserInfo(uid, userinfo):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"没有这个用户"
+        print u"No such user."
         return 0
     user.mobile = userinfo['mobile']
     user.email = userinfo['email']
@@ -644,7 +656,7 @@ def setPassword(uid, newpassword):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
-        print u"没有这个用户"
+        print u"No such user."
         return 0
     user.password = newpassword
     user.save()
@@ -774,3 +786,14 @@ def addUserList(file):
             error_log.append('回职成功！')
         # write error_log
         continue
+
+def setPhoto(uid, image):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"No such user."
+        return 0 
+    user.photo.save(uid+'.jpg',image,0)
+    act.save()
+    return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
+

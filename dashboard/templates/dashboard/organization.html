@@ -1,0 +1,49 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<style type="text/css">
+.content-wrapper {
+  margin-top: 70px;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'dashboard/header.html' %}
+<div id = "root">
+  <div class="container-fluid content-wrapper">
+      <div class="col-xs-12 col-sm-8">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <h3 class="panel-title">关系修改</h3>
+              </div>
+              <div class="panel-body" >
+
+              </div>
+          </div>
+      </div>
+      <div class="hidden-xs col-sm-4">    
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <h3 class="panel-title">新建组织</h3>
+              </div>
+              <div class="panel-body" >
+
+              </div>
+          </div>        
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript">
+  
+</script>
+{% endblock %}
