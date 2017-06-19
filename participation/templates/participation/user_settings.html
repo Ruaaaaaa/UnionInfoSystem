@@ -15,6 +15,24 @@
     margin-top: 5px;
     margin-bottom: 15px;
 }
+.photo_input_wrapper {
+    position: relative;
+}
+#photo_input {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+}
+#photo_canvas {
+    display: none;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
 </style>
 {% endblock %}
 
@@ -70,6 +88,21 @@
             </div>
         </div>        
     </div>
+
+    <div class="weui-cells__title">照片</div>
+    <div class="weui-btn-area">
+        <div class="photo_input_wrapper">
+            <button class="weui-btn weui-btn_default" id="upload_btn">
+                <span>点击上传照片</span>
+            </button>
+            <input type="file" id="photo_input">    
+        </div>
+    </div>
+    <div class="weui-cells__tips">我们会使用您的照片制作活动奖励</div>
+    <div class="canvas_wrapper">
+        <canvas id="photo_canvas" width="409" height="504"></canvas>
+    </div>
+
 
     <div class="weui-cells__title">联系方式</div>
     <div class="weui-cells weui-cells_form">
@@ -183,6 +216,72 @@ setPassword = function() {
     .fail(function() {
         weui.topTips('网络状况不佳，请稍后再试', 3000);
     })
+}
+
+function dataUrlToBlob(dataurl) {
+  var arr = dataurl.split(',');
+  var mime = arr[0].match(/:(.*?);/)[1];
+  var bstr = atob(arr[1]);
+  var n = bstr.length;
+  var u8arr = new Uint8Array(n);
+  while(n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], {type: mime});
+}
+
+var old_photo = ''
+window.reader = new FileReader();
+window.posterImg = new Image();
+
+$('#photo_input').on('change', function() {
+    $('#photo_canvas').css('display', 'block');
+    var file = this.files[0];
+    if(file) {
+        window.reader.readAsDataURL(file);
+    }
+});
+window.reader.onload = function() {
+    window.posterImg.src = window.reader.result;
+};
+window.posterImg.onload = function() {
+    $('#photo_canvas')[0].getContext('2d').drawImage(window.posterImg, 0, 0, 409, 504);
+    $('#photo_input').css('display', 'none');
+    $('#upload_btn').html('上传中 ...')
+    var photo_blob = dataUrlToBlob($('#photo_canvas')[0].toDataURL('image/jpeg'));
+    var data = new FormData();
+    data.append('photo', photo_blob);
+    $.ajax({
+        url: '/upload',
+        type: 'POST',
+        data: data,
+        cache: false,
+        processData: false,
+        contentType: false
+    })
+    .done(function(data, status) {
+        if(data.status == 'success') {
+            weui.toast(data.msg, {duration: 3000});
+        }
+        else if(data.status == 'error') {
+            weui.topTips(data.msg, 3000);
+        }
+        else {
+            weui.topTips('未知错误，请稍后再试', 3000);
+        }
+    })
+    .fail(function() {
+        weui.topTips('网络状况不佳，请稍后再试', 3000);
+    })
+    .always(function() {
+        $('#photo_input').css('display', 'block');
+        $('#upload_btn').html('点击上传照片');
+    });
+};
+
+if(old_photo) {
+window.posterImg.src = old_poster;
+$('#photo_canvas').css('display', 'block');
 }
 </script>
 {% endblock %}
