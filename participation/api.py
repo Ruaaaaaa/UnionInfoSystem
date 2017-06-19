@@ -111,10 +111,10 @@ def userCheckIn(uid, aaid):
     except ObjectDoesNotExist:
         print u"Not signed in yet."
         return 0
-    if rec.check_in:
+    if rec.checked_in:
         print u"Already checked in."
         return 2
-    rec.check_in = 1
+    rec.checked_in = 1
     rec.checkin_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
     rec.save()
     print "Check in success."

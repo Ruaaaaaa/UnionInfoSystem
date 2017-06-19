@@ -362,12 +362,18 @@ def downloadUsers(request):
 	#return JsonResponse({'status': 'success', 'msg': 'download'})
 
 
-# 先不管这个了，弃疗
 @require_http_methods(['GET'])
 @login_required
 @admin_required
 def broadcast(request):
 	return render(request, 'dashboard/broadcast.html', {'tab': dashboard_tabs['broadcast']})
+
+
+@require_http_methods(['GET'])
+@login_required
+@admin_required
+def organization(request):
+	return render(request, 'dashboard/organization.html', {'tab': dashboard_tabs['organization']})
 
 
 @require_http_methods(['GET'])
