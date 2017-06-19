@@ -8,6 +8,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 
+from django.core.files.base import ContentFile
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required

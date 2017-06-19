@@ -793,7 +793,7 @@ def setPhoto(uid, image):
     except ObjectDoesNotExist:
         print u"No such user."
         return 0 
-    user.photo.save(uid+'.jpg',image,0)
-    act.save()
-    return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
+    user.photo.save(str(user.wid)+'.jpg',image,0)
+    user.save()
+    return 1
 
