@@ -439,9 +439,6 @@ def getUserByUid(uid):
     except ObjectDoesNotExist:
         print u"无用户"
         return -1
-    if user == None :
-        print u"无用户"
-        return -1
     dict = model_to_dict(user)
     dict['sex_text'] = u'男' if user.sex else u'女'
     dict['department_text'] = user.department.name
