@@ -211,7 +211,7 @@ def createNewActivity(uid, act_attributes):
         signin_max = act_attributes['signin_max'],
         need_checkin = act_attributes['need_checkin']
     )
-    print 'name?',act_attributes['filename']
+    #print 'name?',act_attributes['filename']
     (pre,suf) = os.path.splitext(act_attributes['filename'])
     act.poster.save(aaid_md+'.'+suf,act_attributes['image'],0)
     act.save()
@@ -242,8 +242,8 @@ def createBroadcast(dic):
         tags_list += ['已签到']
     st = ","
     tags = st.join(tags_list)
-    print tags
-    print dic
+    #print tags
+    #print dic
     broadcast = Broadcast(
         bbid = bid_md,
         title = dic['title'],
@@ -283,7 +283,7 @@ def createBroadcast(dic):
             receiver = receiver,
             send_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
         )
-        print model_to_dict(message)
+        #print model_to_dict(message)
         message.save()
     return {'status' : 'success', 'msg' : '创建成功'}
 
@@ -379,7 +379,7 @@ def doEditActivity(uid,act_attributes):
         print 'no user'
         return 0
     try:
-        print act_attributes['aaid']
+        #print act_attributes['aaid']
         act = Activity.objects.get(aaid = act_attributes['aaid'])
     except ObjectDoesNotExist:
         print 'no activity'
