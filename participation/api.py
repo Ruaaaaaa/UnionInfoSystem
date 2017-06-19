@@ -349,16 +349,28 @@ def getBroadcastsReceivedByUid(uid):
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
         print u"无用户"
-        return 0
+        return (None, None)
     try:
         messages = user.messages_received.all()
     except ObjectDoesNotExist:
         print u"没有消息"
-        return []
+        return ([], [])
     broadcastlist = []
-    for message in massages:
+    messagelist = []
+    for message in messages:
         broadcastlist.append(model_to_dict(message.broadcast))
-    return broadcastlist
+        messagelist.append(model_to_dict(message)) 
+    return (broadcastlist, messagelist)
+
+def readMessage(mid):
+    try:
+        message = Message.objects.get(mid=mid)
+    except ObjectDoesNotExist:
+        print u"无消息"
+        return 
+    message.received = True 
+    message.received_at = (datetime.datetime.now()-datetime.datetime(1970,1,1)).total_seconds()
+    message.save()
 
 def doEditActivity(uid,act_attributes):
     try:
