@@ -96,7 +96,7 @@ def saveUserInfoToPdf(dirpath, filename, userlist, activity):
 	if not os.path.exists(dirpath):
 		os.makedirs(dirpath)
 	pdfpath = dirpath + '/' + filename
-	print "pdf:", pdfpath 
+	#print "pdf:", pdfpath 
 	canv = canvas.Canvas(pdfpath)
 	canv.setFont('STSong-Light', 11)
 	#hello(canv)	
@@ -137,8 +137,8 @@ def login(request):
 
 	if request.method == 'GET':
 		user = sessions.getUser(request)
-		print user
-		print getIdentityByUid(user[0])
+		#print user
+		#print getIdentityByUid(user[0])
 		if user[0] == None or user[1] == None:
 			return render(request, 'dashboard/login.html', {})
 		else:

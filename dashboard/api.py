@@ -75,7 +75,7 @@ def doAddDepartment(name, suid):
 		return 0 
 	except ObjectDoesNotExist:
 		subunion = Subunion.objects.get(suid = suid)
-		print model_to_dict(subunion)
+		#print model_to_dict(subunion)
 		department = Department(
 			subunion = subunion,
 			name = name

@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^settings$', participation.userSettings),
     url(r'^settings/set$', participation.setUserInformation),
     url(r'^settings/rstpwd$', participation.resetPassword),
+    url(r'^upload$', participation.uploadPhoto),
     url(r'^activity/([0-9, a-z]{10})/$', participation.activity),
     url(r'^activity/([0-9, a-z]{10})/checkin$', participation.checkIn),
     url(r'^activity/([0-9, a-z]{10})/checkin/success$', participation.checkInSuccess),

@@ -24,7 +24,7 @@ def login(request):
 	if sessions.getUser(request)[0] != None:
 		return HttpResponseRedirect("/activities") ;
 	if request.method == 'GET': #GET METHOD
-		print sessions.getUser(request)
+		#4print sessions.getUser(request)
 		return render(request, 'participation/login.html', {})
 	else: #POST METHOD
 		if not request.POST.has_key('username') or not request.POST.has_key('pwd'):
@@ -64,14 +64,14 @@ def verification(request):
 		return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
 	veresult, user = verificationOfRealId(name, idnumber) 
-	print name, idnumber 
+	#print name, idnumber 
 	if veresult == 0:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！实名或身份证号有误。'})
 	if veresult == 2:
 		return JsonResponse({'status': 'error', 'msg': '实名验证失败！此身份证已被使用。'})
 
 	user['photo'] = None
-	print user
+	#print user
 	return JsonResponse({'status': 'success', 'msg': '实名验证成功！', 'data':user})
 
 @require_http_methods(['GET', 'POST'])
@@ -88,11 +88,11 @@ def register(request):
 		mobile = request.POST['mobile']
 		email = request.POST['email']
 		idnumber = request.POST['id_number'] if request.POST.has_key('id_number') else 0
-		print "!!!",username
+		#print "!!!",username
 		if len(username) == 0 or len(pwd) == 0 or len(mobile) == 0 or len(email) == 0:
 			return JsonResponse({'status': 'error', 'msg': '请填写完您的信息。'})
 
-		print request.POST
+		#print request.POST
 		if False and verificationOfRealId(request.POST['name'], request.POST['id_number']) != 1:
 			return JsonResponse({'status': 'error', 'msg': '实名验证失败！您需要重新返回进行验证。'})
 
@@ -122,7 +122,7 @@ def activity(request, aaid):
 	else:
 		uid, identity = sessions.getUser(request)
 		record = getRecordByUidAndAaid(uid, aaid)
-		print record
+		#print record
 		return render(request, 'participation/activity.html', {'activity': activity, 'has_signed_in': record!=-1})
 
 @require_http_methods(['GET', 'POST'])
@@ -193,7 +193,7 @@ def userMessages(request):
 			broadcasts[i]['received'] = False
 			readMessage(message['mid'])
 			unreceived_message = unreceived_message + 1
-	print "Unreceived_message: ", unreceived_message
+	#print "Unreceived_message: ", unreceived_message
 	return render(request, 'participation/user_messages.html', {'broadcasts':broadcasts, 'unreceived':unreceived_message})
 
 
@@ -231,3 +231,17 @@ def resetPassword(request):
 		return JsonResponse({'status': 'error', 'msg': '修改失败！'})
 	else:
 		return JsonResponse({'status': 'success', 'msg': '修改成功！'})
+
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+def uploadPhoto(request):
+	uid, identity = sessions.getUser(request)
+	imagefile = request.FILES['photo']
+	if imagefile == None:
+		return JsonResponse({'status': 'error', 'msg': '没有收到头像照片'})	
+	result = setPhoto(uid, ContentFile(imagefile.read()))
+	if result == 0:
+		JsonResponse({'status': 'error', 'msg': "上传失败！"})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '上传成功!' })

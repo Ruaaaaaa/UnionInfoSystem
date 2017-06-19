@@ -661,3 +661,13 @@ def setPassword(uid, newpassword):
     user.password = newpassword
     user.save()
     return 1
+
+def setPhoto(uid, image):
+    try:
+        user = User.objects.get(uid = uid)
+    except ObjectDoesNotExist:
+        print u"No such user."
+        return 0 
+    user.photo.save(uid+'.jpg',image,0)
+    act.save()
+    return {'status' : 'success', 'msg' : '创建成功', 'aaid' : act.aaid}
