@@ -58,4 +58,5 @@ urlpatterns = [
     url(r'^admin/broadcast$', dashboard.broadcast),
     url(r'^admin/broadcast/new', dashboard.newBroadcast),
     url(r'^admin/broadcast/get', dashboard.getBroadcast), 
+    url(r'^admin/organization$', dashboard.organization),
 ]
