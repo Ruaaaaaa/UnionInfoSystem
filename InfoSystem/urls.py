@@ -37,7 +37,7 @@ urlpatterns = [
     url(r'^settings/rstpwd$', participation.resetPassword),
     url(r'^activity/([0-9, a-z]{10})/$', participation.activity),
     url(r'^activity/([0-9, a-z]{10})/checkin$', participation.checkIn),
-    url(r'^activity/checkin/success$', participation.checkInSuccess),
+    url(r'^activity/([0-9, a-z]{10})/checkin/success$', participation.checkInSuccess),
     url(r'^activity/checkin/fail$', participation.checkInFail),
     url(r'^activity/([0-9, a-z]{10})/signin$', participation.signIn),
     

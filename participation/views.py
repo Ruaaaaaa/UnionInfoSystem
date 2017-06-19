@@ -137,7 +137,7 @@ def checkIn(request, aaid):
 		if result == 0:
 			return JsonResponse({'status': 'error', 'msg': '签到失败！'})
 		elif result == 2:
-			return JsonResponse({'status': 'error', 'msg': '您已签到。'})
+			return JsonResponse({'status': 'error', 'msg': '您已签到！'})
 		else:
 			return JsonResponse({'status': 'success', 'msg': '签到成功！'})
 
@@ -145,8 +145,8 @@ def checkIn(request, aaid):
 @require_http_methods(['GET'])
 @csrf_exempt
 @login_required
-def checkInSuccess(request):
-	return render(request, 'participation/checkin_success.html', {})
+def checkInSuccess(request, aaid):
+	return render(request, 'participation/checkin_success.html', {'aaid': aaid})
 
 @require_http_methods(['GET'])
 @csrf_exempt
