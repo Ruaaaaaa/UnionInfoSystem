@@ -66,3 +66,48 @@ def doDeleteActivity(uid, aaid):
 		return 0
 	act.delete() 	
 	return 1
+
+def doAddDepartment(name, suid):
+	name.strip()
+	try:
+		department = Department.objects.get(name = name)
+		print u'已有此部门'
+		return 0 
+	except ObjectDoesNotExist:
+		subunion = Subunion.objects.get(suid = suid)
+		print model_to_dict(subunion)
+		department = Department(
+			subunion = subunion,
+			name = name
+   		)
+   	 	department.save() 
+   	 	return 1 
+
+def doAddSubunion(name):
+	try:
+		subunion = Subunion.objects.get(name = name)
+		print u'已有此子工会'
+		return 0 
+	except ObjectDoesNotExist:
+		name.strip()
+		subunion = Subunion(
+			name = name
+   		)
+   	 	subunion.save() 
+   	 	return 1	
+
+def doSetDepartmenttoSubunion(did, suid):
+	try:
+		subunion = Subunion.objects.get(suid = suid)
+	except ObjectDoesNotExist:
+		print u"没有这个子工会"
+		return 0
+	try:
+		department = Department.objects.get(did = did)
+	except ObjectDoesNotExist:
+		print u"没有这个部门"
+		return 0
+	department.subunion = subunion
+	department.save() 
+	return 1
+	

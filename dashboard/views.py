@@ -434,3 +434,47 @@ def getBroadcast(request):
 def getDateTime(request):
 	return JsonResponse({'status':'success', 'msg': '获取日期与时间成功！', 'data': {'date_time': datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}})
 
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def addSubunion(request):
+	name = request.POST['name']
+	if name == None or len(name) == 0:
+		return JsonResponse({'status': 'error', 'msg': '输入信息不完整！'})
+	result = doAddSubunion(name)
+	if result == 0 :
+		return JsonResponse({'status': 'error', 'msg': '添加部门失败！已有此子工会！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '添加子工会成功！'})
+	
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def addDepartment(request):
+	name = request.POST['name']
+	suid = request.POST['suid']
+	if name == None or len(name) == 0 or suid == None:
+		return JsonResponse({'status': 'error', 'msg': '输入信息不完整！'})
+	result = doAddDepartment(name, suid)
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '添加部门失败！已有此部门！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '添加部门成功！'})
+	
+@require_http_methods(['POST'])
+@csrf_exempt
+@login_required
+@admin_required
+def setDepartmenttoSubunion(request):
+	did = request.POST['did']
+	suid = request.POST['suid']
+	if did == None or suid == None:
+		return JsonResponse({'status': 'error', 'msg': '输入信息不完整！'})
+	result = doSetDepartmenttoSubunion(did, suid)
+	if result == 0:
+		return JsonResponse({'status': 'error', 'msg': '修改部门所属子工会失败！'})
+	else:
+		return JsonResponse({'status': 'success', 'msg': '修改部门所属子工会成功！'})
+	
