@@ -305,7 +305,7 @@ def getUserListByFilter(page, number, departments, sub_unions, activities, check
     subs = []
     if len(sub_unions) > 0:
         subs = Subunion.objects.filter(suid__in = sub_unions)
-    dep_U = Department.objects.filter(Q(subunion__in = subs) | Q(did__in = departments))
+    deps_U = Department.objects.filter(Q(subunion__in = subs) | Q(did__in = departments))
     users = users.filter(department__in = deps_U)
     if len(activities) > 0:
         acts = Activity.objects.filter(aid__in = activities)
@@ -437,6 +437,9 @@ def getUserByUid(uid):
     try:
         user = User.objects.get(uid = uid)
     except ObjectDoesNotExist:
+        print u"无用户"
+        return -1
+    if user == None :
         print u"无用户"
         return -1
     dict = model_to_dict(user)
