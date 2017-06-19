@@ -186,15 +186,15 @@ def userActivities(request):
 def userMessages(request):
 	uid, identity = sessions.getUser(request)
 	(broadcasts, messages) = getBroadcastsReceivedByUid(uid)
-	if(broadcasts == None):
-		raise Http404 
 	unreceived_message = 0
-	for message in messages:
+	for i, message in enumerate(messages):
+		broadcasts[i]['received'] = True
 		if message['received'] == False:
+			broadcasts[i]['received'] = False
 			readMessage(message['mid'])
-			unreceived_message = unreceived_message+1
+			unreceived_message = unreceived_message + 1
 	print "Unreceived_message: ", unreceived_message
-	return render(request, 'participation/user_messages.html', {'broadcasts':broadcasts, 'messages': messages, 'received':unreceived_message})
+	return render(request, 'participation/user_messages.html', {'broadcasts':broadcasts, 'unreceived':unreceived_message})
 
 
 @require_http_methods(['GET'])

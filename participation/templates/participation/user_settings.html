@@ -21,7 +21,7 @@
 {% block body %}
 <div class="bottom-nav">
     <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/activities">活动</a></div>
-    <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/messages">消息<span class="weui-badge new-msg-badge">1</span></a></div>
+    <div class="bottom-nav-tab"><a class="bottom-nav-tab-text" href="/messages">消息</a></div>
     <div class="bottom-nav-tab active"><a class="bottom-nav-tab-text" href="/settings">设置</a></div>
 </div>
 
@@ -91,7 +91,7 @@
     </div>
     <div class="weui-cells__tips">我们可能会向您的邮箱发送通知</div>
     <div class="weui-btn-area">
-        <button class="weui-btn weui-btn_default" id="register_btn" onclick="setInfo()">
+        <button class="weui-btn weui-btn_default" onclick="setInfo()">
             <span>确认修改联系方式</span>
         </button>
     </div>
@@ -111,7 +111,7 @@
         </div>        
     </div>
     <div class="weui-btn-area">
-        <button class="weui-btn weui-btn_default" id="register_btn">
+        <button class="weui-btn weui-btn_default" onclick="setPassword()">
             <span>确认修改密码</span>
         </button>
     </div>
@@ -154,6 +154,35 @@ setInfo = function() {
         weui.topTips('网络状况不佳，请稍后再试', 3000);
     })
 }
-
+setPassword = function() {
+    var pwd_1 = $('input[name="pwd_new"]').val();
+    var pwd_2 = $('input[name="pwd_new_2"]').val();
+    if(pwd_1 != pwd_2) {
+        weui.topTips('您两次输入的密码不一致，请重新输入！', 3000);
+        return;
+    }
+    if(pwd_1.length < 6) {
+        weui.topTips('密码不能少于6位！', 3000);
+        return;
+    }
+    var pwd_hash = md5(pwd_1);
+    $.post('/settings/rstpwd', {
+        password: pwd_hash
+    })
+    .done(function(data, status) {
+        if(data.status == 'success') {
+            weui.toast(data.msg, {duration: 3000});
+        }
+        else if(data.status == 'error') {
+            weui.topTips(data.msg, 3000);
+        }
+        else {
+            weui.topTips('未知错误，请稍后再试', 3000);
+        }
+    })
+    .fail(function() {
+        weui.topTips('网络状况不佳，请稍后再试', 3000);
+    })
+}
 </script>
 {% endblock %}
