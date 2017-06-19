@@ -48,6 +48,7 @@ class User(models.Model):
     last_login_at = models.IntegerField(null = True)
     department = models.ForeignKey(Department, null = True, related_name = 'users')
     formation = models.ForeignKey(Formation, null = True, related_name = 'users')
+    dismissed = models.BooleanField(default=0)
 
 
 

@@ -649,3 +649,128 @@ def setPassword(uid, newpassword):
     user.password = newpassword
     user.save()
     return 1
+
+def addUserList(file):
+    filename = '/home/lilingxin/UnionInfoSystem/C.xls'
+    data = xlrd.open_workbook(filename)
+    table = data.sheets()[0]
+    ncols = table.ncols
+    nrows = table.nrows
+    for i in range(0, nrows):
+        print  '[', i, '/', nrows, ']'
+        wid = table.cell(i, 0).value
+        id = table.cell(i, 1).value
+        name = table.cell(i, 2).value
+        dep_name = table.cell(i, 3).value
+        sub_name = table.cell(i, 4).value
+        for_name = table.cell(i, 5).value
+        sex_name = table.cell(i, 6).value
+
+        wid = wid.strip()
+        id = id.strip()
+        name = name.strip()
+        dep_name = dep_name.strip()
+        sub_name = sub_name.strip()
+        for_name = for_name.strip()
+        sex_name = sex_name.strip()
+
+        m = hashlib.md5()
+        m.update(id)
+        idhash = m.hexdigest()
+
+        error_log = []
+
+        if (len(sub_name) == 0):
+            sub_name = dep_name
+        temp = 1
+        try:
+            subunion = Subunion.objects.get(name=sub_name)
+        except ObjectDoesNotExist:
+            error_log.append('分工会'+sub_name+'不存在')
+            temp = 0
+        try:
+            department = Department.objects.get(name=dep_name)
+        except ObjectDoesNotExist:
+            error_log.append('单位' + dep_name + '不存在')
+            temp = 0
+        if(temp):
+            if (department.subunion != subunion):
+                error_log.append('单位' + dep_name + '分工会'+sub_name+'不匹配')
+
+        try:
+            formation = Formation.objects.get(name=for_name)
+        except ObjectDoesNotExist:
+            error_log.append('类型' + for_name + '不存在')
+
+        if(sex_name == '男' or sex_name == '' ):
+            sex = 1
+        elif (sex_name == '女'):
+            sex = 0
+        else:
+            error_log.append('性别'+sex_name+'不存在')
+        if (len(error_log) != 0):
+            # write error_log
+            #
+            continue
+        hefa0 = (len(error_log) == 0)
+        # 检查 dep sub for sex 合法性
+
+        got_bywid = 1
+        got_byidhash = 1
+        try:
+            user = User.objects.get(wid = wid)
+        except ObjectDoesNotExist:
+            #工号不冲突时
+
+            got_bywid = 0
+            if (id == ''):#无身份证
+                user = User(
+                    wid=wid,
+                    name=name,
+                    department=department,
+                    formation=formation,
+                    sex=sex
+                )
+                user.save()
+                error_log.append('无身份证添加成功! uid=' + str(user.uid))
+                # write error_log
+                #
+                continue
+            #有身份证 验证是否与其他人冲突
+            try:
+                user = User.objects.get(id_hash = idhash)
+            except ObjectDoesNotExist:
+                user = User(
+                    wid = wid,
+                    id_hash = idhash,
+                    name = name,
+                    department = department,
+                    formation = formation,
+                    sex = sex
+                )
+                user.save()
+                error_log.append('带身份证添加成功! uid=' + str(user.uid))
+                # write error_log
+                #
+                continue
+            error_log.append('身份证'+id+'冲突')
+            # write error_log
+            #
+            continue
+        #工号冲突时
+        if(user.dismissed == 0):
+            error_log.append('工号' + wid + '与在职员工冲突')
+            # write error_log
+            continue
+        if(user.formation != formation):
+            error_log.append('类别' + formation.name + '与离职前'+user.formation.name+'冲突')
+        if(user.department != department):
+            error_log.append('单位' + department.name + '与离职前'+user.department.name+'冲突')
+        if(user.name != name):
+            error_log.append('名字' + name + '与离职前'+user.name+'冲突')
+        if(user.id_hash != idhash):
+            error_log.append('身份证与离职前冲突')
+        if(len(error_log) == 0):
+            error_log.append('回职成功！')
+        # write error_log
+        continue
