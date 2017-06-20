@@ -397,6 +397,8 @@ def doEditActivity(uid,act_attributes):
     act.signin_max = act_attributes['signin_max']
     act.need_checkin = act_attributes['need_checkin']
     (pre,suf) = os.path.splitext(act_attributes['filename'])
+    if act.poster != None:
+        act.poster.delete(0)
     act.poster.save(act_attributes['aaid']+'.'+suf,act_attributes['image'],0)
     act.save()
     return 1
@@ -793,6 +795,8 @@ def setPhoto(uid, image):
     except ObjectDoesNotExist:
         print u"No such user."
         return 0 
+    if user.photo != None:
+        user.photo.delete(0)
     user.photo.save(str(user.wid)+'.jpg',image,0)
     user.save()
     return 1
