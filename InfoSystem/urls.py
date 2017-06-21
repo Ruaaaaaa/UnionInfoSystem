@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^administrator/', admin.site.urls),
 
 	# User part
+    url(r'^$', participation.index),
     url(r'^login', participation.login),
     url(r'^logout', participation.logout),
     url(r'^register', participation.register),

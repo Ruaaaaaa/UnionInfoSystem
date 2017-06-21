@@ -32,6 +32,16 @@
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10px;
+    max-width: 80%;
+}
+#old_photo {
+    display: none;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px; 
+    max-width: 80%;
 }
 </style>
 {% endblock %}
@@ -101,6 +111,7 @@
     <div class="weui-cells__tips">我们会使用您的照片制作活动奖励</div>
     <div class="canvas_wrapper">
         <canvas id="photo_canvas" width="409" height="504"></canvas>
+        <img id="old_photo">
     </div>
 
 
@@ -230,11 +241,17 @@ function dataUrlToBlob(dataurl) {
   return new Blob([u8arr], {type: mime});
 }
 
-var old_photo = ''
+var old_photo = '{{ userinfo.photo.url }}';
 window.reader = new FileReader();
 window.posterImg = new Image();
 
+if(old_photo) {
+    $('#old_photo')[0].src = old_photo;
+    $('#old_photo').css('display', 'block');
+}
+
 $('#photo_input').on('change', function() {
+    $('#old_photo').css('display', 'none');
     $('#photo_canvas').css('display', 'block');
     var file = this.files[0];
     if(file) {
@@ -278,10 +295,5 @@ window.posterImg.onload = function() {
         $('#upload_btn').html('点击上传照片');
     });
 };
-
-if(old_photo) {
-window.posterImg.src = old_poster;
-$('#photo_canvas').css('display', 'block');
-}
 </script>
 {% endblock %}

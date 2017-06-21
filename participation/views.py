@@ -14,10 +14,15 @@ from django.views.decorators.csrf import csrf_exempt
 from base.decorators import login_required, admin_required
 
 from base import sessions
+from InfoSystem.shared import identities
 from api import *
 import md5
 
 # Create your views here.
+
+@require_http_methods(['GET'])
+def index(request):
+	return HttpResponseRedirect('/activities')
 
 @require_http_methods(['GET', 'POST'])
 @csrf_exempt
@@ -47,9 +52,13 @@ def login(request):
 @require_http_methods(['GET'])
 @csrf_exempt
 def logout(request):
-	print "Logout!"
-	sessions.logout(request) 
-	return HttpResponseRedirect('/login')
+	(_, identity) = sessions.getUser(request);
+	if identity == identities['admin']:
+		sessions.logout(request)
+		return HttpResponseRedirect('/admin/login')
+	else:
+		sessions.logout(request) 
+		return HttpResponseRedirect('/login')	
 
 @require_http_methods(['POST'])
 @csrf_exempt
