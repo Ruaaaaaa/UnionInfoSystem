@@ -2,5 +2,8 @@
 *.py[cod]
 db.sqlite3
 *~
-media
 .idea/
+media/files
+media/poster
+media/photos/*
+!media/photos/None
